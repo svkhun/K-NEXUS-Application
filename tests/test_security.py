@@ -107,15 +107,17 @@ class SecurityTests(unittest.TestCase):
         self.assertEqual(self.client.post(f"{BASE}/flowsense/micro-sweep", content=raw, headers=headers).status_code, 422)
 
     def test_visitors_have_separate_balances(self):
+        self.post("/flowsense/scenario", {"account_id": SOURCE, "scenario": "healthy"})
         before = self.balance()
         with TestClient(app) as other:
-            other.get(f"{BASE}/session")
+            other_csrf = other.get(f"{BASE}/session").json()["csrf_token"]
+            self.post("/flowsense/scenario", {"account_id": SOURCE, "scenario": "healthy"}, client=other, csrf=other_csrf)
             self.assertEqual(self.post("/flowsense/micro-sweep", {"account_id": SOURCE, "custom_sweep_amount": 200}).status_code, 200)
             self.assertEqual(self.balance(), before - 200)
             self.assertEqual(self.balance(other), before)
         self.assertEqual(self.post("/flowsense/recall", {"account_id": SOURCE, "amount": 0}).status_code, 200)
         self.assertEqual(self.balance(), before)
-        self.assertEqual(len(self.client.get(f"{BASE}/flowsense/forecast-30d/{SOURCE}").json()["timeline"]), 30)
+        self.assertEqual(len(self.client.get(f"{BASE}/flowsense/forecast-30d/{SOURCE}").json()["timeline"]), 38)
 
     def test_idempotency_prevents_duplicate_debit_and_payload_reuse(self):
         before = self.balance()
@@ -128,6 +130,7 @@ class SecurityTests(unittest.TestCase):
         self.assertEqual(self.post("/trustgraph/evaluate-transfer", {**body, "amount": 500}, key).status_code, 409)
 
     def test_concurrent_duplicate_request_runs_once(self):
+        self.post("/flowsense/scenario", {"account_id": SOURCE, "scenario": "healthy"})
         before = self.balance()
         key = secrets.token_hex(16)
         body = {"account_id": SOURCE, "custom_sweep_amount": 200}

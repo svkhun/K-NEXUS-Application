@@ -1,3 +1,4 @@
+from src.flowsense_engine import demo_now, next_payday, horizon as calculate_horizon
 from fastapi import FastAPI, HTTPException, Query, Header, Path, Request
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from src.demo_security import (PRODUCTION, SECRET, ALLOWED_HOSTS, DEMO_ACCOUNTS, DEMO_RECIPIENTS, SEED_ACCOUNTS, SessionMapping, current_session, DemoSessionMiddleware, BodyLimitMiddleware, SecurityHeadersMiddleware)
@@ -5,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
+from functools import lru_cache
 from typing import Optional, List, Dict, Any, Literal
 import onnxruntime as rt
 import pandas as pd
@@ -55,6 +57,11 @@ def mask_account_id(acc_id: Optional[str]) -> str:
     return f"{acc_id[:4]}***{acc_id[-1]}"
 
 def audit_log(event_type: str, actor: str, details: Dict[str, Any]):
+    if actor in DEMO_ACCOUNTS:
+        state = LIVE_ACCOUNT_STATES[actor]
+        events = state.setdefault("events", [])
+        events.insert(0, {"id": secrets.token_hex(8), "event_type": event_type, "timestamp": datetime.now(ZoneInfo("Asia/Bangkok")).isoformat(), "details": details})
+        del events[50:]
     record = {
         "audit_timestamp": datetime.now(ZoneInfo("Asia/Bangkok")).isoformat(),
         "service": "k-flowsense-trustgraph",
@@ -342,9 +349,21 @@ class MicroSweepRequest(StrictRequest):
     account_id: str
     custom_sweep_amount: Optional[float] = Field(None, gt=0, le=100_000)
 
+class LiquidityScenarioRequest(StrictRequest):
+    account_id: str
+    scenario: Literal["healthy", "normal_dip", "commitment_risk", "high_value"]
+
+class AutoSavingRequest(StrictRequest):
+    account_id: str
+    enabled: bool
+
+class AutoCycleRequest(StrictRequest):
+    account_id: str
+
 class VaultWithdrawalRequest(StrictRequest):
     account_id: str
     amount: Optional[float] = Field(None, ge=0, le=100_000)
+    mode: Literal["swept", "all", "partial", "undo"] = "swept"
 
 # ==============================================================================
 # 3. TRUSTGRAPH CORE SERVICES (ZERO-DELAY BASELINE & TARGET-SPECIFIC FRAUD DEFENSE)
@@ -411,6 +430,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
     # HIGH-VALUE DEMO GATE (>= 50,000 THB)
     # --------------------------------------------------------------------------
     if payload.target_account_id == "ACC_0000":
+        audit_log("TRANSFER_BLOCKED", payload.source_account_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount, "latency_ms": round(latency_ms, 2)})
         return {
             "status": "BLOCKED_MULE_INTERDICTION",
             "risk_tier": "CONFIRMED_MULE_RING",
@@ -426,9 +446,9 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
             "reason_summary": "Relational GCN ตรวจพบลักษณะตรงกับเครือข่ายบัญชีม้าความเสี่ยงสูงมาก",
             "direct_risk_reasons_list": [
                 "Relational GCN ตรวจพบลักษณะตรงกับเครือข่ายบัญชีม้าความเสี่ยงสูงมาก",
-                "ระงับธุรกรรมเพื่อปกป้องความเสียหายตามกฎหมาย พ.ร.ก. 2566"
+                "บัญชีนี้มีป้ายกำกับระงับการโอนในชุดข้อมูลสมมติ"
             ],
-            "primary_reason_th": "พบบัญชีปลายทางตรงกับเครือข่ายบัญชีม้า ธนาคารระงับการทำรายการเพื่อปกป้องทรัพย์สินของคุณ",
+            "primary_reason_th": "บัญชีปลายทางมีป้ายระงับในข้อมูลจำลอง จึงหยุดรายการนี้",
             "actionable_warning": "⛔ ระงับการทำรายการ: พบบัญชีปลายทางเป็นบัญชีม้าในเครือข่ายอาชญากรรม",
             "target_meta": {
                 "account_id": payload.target_account_id,
@@ -440,6 +460,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
         }
 
     if payload.amount >= 50000.0:
+        audit_log("TRANSFER_CHECK_REQUIRED", payload.source_account_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount, "latency_ms": round(latency_ms, 2)})
         remember_step_up(payload.source_account_id, payload.target_account_id, payload.amount)
         return {
             "status": "MICRO_AUTH_REQUIRED",
@@ -454,8 +475,8 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
             "eliminates_arbitrary_waiting": True,
             "direct_risk_reasoning": "รายการโอนมูลค่าสูงในสถานการณ์จำลองนี้ต้องตรวจเพิ่มก่อนยืนยัน",
             "counterfactual_message": "รายการโอนมูลค่าสูงในสถานการณ์จำลองนี้ต้องตรวจเพิ่มก่อนยืนยัน",
-            "reason_summary": "ยอดโอนสูงกว่าเกณฑ์ตรวจเพิ่มของต้นแบบ",
-            "direct_risk_reasons_list": ["ยอดโอนสูงกว่าเกณฑ์ตรวจเพิ่มของต้นแบบ"],
+            "reason_summary": "ยอดโอนถึงเกณฑ์ตรวจเพิ่มของต้นแบบ",
+            "direct_risk_reasons_list": ["ยอดโอนถึงเกณฑ์ตรวจเพิ่มของต้นแบบ"],
             "primary_reason_th": "รายการมูลค่าสูงในต้นแบบนี้ต้องผ่านการยืนยันตัวตนจำลองก่อนโอน",
             "actionable_warning": "⚠️ รายการมูลค่าสูง: กรุณาตรวจและยืนยันตัวตนจำลองก่อนโอน",
             "user_confirmation_prompt": "กรุณายืนยันตัวตนจำลอง แล้วตัดสินใจว่าจะโอนต่อหรือยกเลิก",
@@ -491,6 +512,9 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
 
         return {
             "status": "APPROVED",
+            "receipt_id": "DEMO-" + secrets.token_hex(6).upper(),
+            "executed_at": datetime.now(ZoneInfo("Asia/Bangkok")).isoformat(),
+            "amount": payload.amount,
             "risk_tier": "LOW_RISK",
             "risk_score": round(current_risk, 4),
             "current_risk_score": round(current_risk, 4),
@@ -520,20 +544,21 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
     # --------------------------------------------------------------------------
     direct_reasons = []
     if account_age_days <= 45:
-        direct_reasons.append(f"Recipient account opened {account_age_days} days ago (บัญชีเปิดใหม่เพียง {account_age_days} วัน)")
+        direct_reasons.append(f"บัญชีปลายทางเปิดใหม่เพียง {account_age_days} วัน")
     if inflow_velocity < 180:
-        direct_reasons.append(f"Rapid pass-through fund patterns ({int(inflow_velocity)}s inflow-to-outflow layering velocity)")
+        direct_reasons.append(f"เงินเข้าแล้วโอนออกเร็วภายใน {int(inflow_velocity)} วินาที")
     if payload.session_duration_sec < 15:
-        direct_reasons.append(f"Rapid execution ({payload.session_duration_sec}s session) suggests urgency pressure from scammers")
+        direct_reasons.append(f"เริ่มทำรายการอย่างรวดเร็วภายใน {payload.session_duration_sec} วินาที")
     if payload.ratio_to_daily_avg > 5.0:
-        direct_reasons.append(f"Amount is {payload.ratio_to_daily_avg:.1f}x higher than your daily transfer average")
+        direct_reasons.append(f"ยอดโอนสูงกว่าค่าเฉลี่ยต่อวัน {payload.ratio_to_daily_avg:.1f} เท่า")
 
     if not direct_reasons:
-        direct_reasons.append("Relational GCN detected topology match with high-risk mule ring")
+        direct_reasons.append("รูปแบบความสัมพันธ์ของบัญชีคล้ายเครือข่ายเสี่ยงในข้อมูลจำลอง")
 
     primary_reason = direct_reasons[0]
     reason_summary = " | ".join(direct_reasons)
 
+    audit_log("TRANSFER_CHECK_REQUIRED", payload.source_account_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount, "latency_ms": round(latency_ms, 2)})
     remember_step_up(payload.source_account_id, payload.target_account_id, payload.amount)
 
     return {
@@ -550,7 +575,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
         "counterfactual_message": f"Recipient account opened {account_age_days} days ago with rapid pass-through fund patterns ({int(inflow_velocity)}s)",
         "reason_summary": reason_summary,
         "direct_risk_reasons_list": direct_reasons,
-        "primary_reason_th": f"บัญชีปลายทางเพิ่งเปิดใหม่ {account_age_days} วัน พร้อมพฤติกรรมเงินเข้าแล้วโอนออกทันทีภายใน {int(inflow_velocity)} วินาที",
+        "primary_reason_th": primary_reason,
         "actionable_warning": f"⚠️ ตรวจพบความผิดปกติวิกฤต: {reason_summary}",
         "user_confirmation_prompt": "ระบบเปิดการยืนยัน Micro-Auth ด้วยการสแกนใบหน้า 5 วินาที เพื่อดึงสติและตรวจสอบผู้ใช้งานจริง และให้คุณเป็นผู้ตัดสินใจโอนเงินขั้นสุดท้าย",
         "final_decision_left_to_user": True,
@@ -629,6 +654,8 @@ def confirm_transfer(payload: TransferConfirmRequest, x_idempotency_key: Optiona
 
     res = {
         "status": "TRANSFER_EXECUTED",
+        "receipt_id": "DEMO-" + secrets.token_hex(6).upper(),
+        "executed_at": datetime.now(ZoneInfo("Asia/Bangkok")).isoformat(),
         "decision": "PROCEED",
         "amount": payload.amount,
         "remaining_balance": remaining,
@@ -667,6 +694,9 @@ def get_flowsense_profile(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
         "vault_balance": round(state["vault_balance"], 2),
         "total_swept": round(state["total_swept"], 2),
         "daily_spent_today": round(state["daily_spent_today"], 2),
+        "auto_saving_enabled": state.get("auto_saving_enabled", False),
+        "undo_amount": round(state.get("last_sweep_amount", 0), 2),
+        "events": state.get("events", []),
         "persona": {
             "cluster_id": int(prof["cluster_id"]),
             "name": prof["persona_name"],
@@ -690,125 +720,10 @@ def get_flowsense_horizon_status(account_id: str = Path(..., pattern=r"^[A-Za-z0
     if account_id not in DEMO_ACCOUNTS:
         raise HTTPException(status_code=404, detail="Unknown demo account")
 
-    prof = BEHAVIORAL_PROFILES_CACHE[account_id]
-    state = LIVE_ACCOUNT_STATES.get(account_id, {
-        "main_balance": 24500.0,
-        "vault_balance": float(prof["initial_vault_savings"]),
-        "total_swept": 1250.0,
-        "daily_spent_today": 310.0
-    })
-
-    now = datetime.now(ZoneInfo("Asia/Bangkok"))
-    payday_day = 28
-    if now.day <= payday_day:
-        days_to_payday = payday_day - now.day
-    else:
-        days_to_payday = (30 - now.day) + payday_day
-    days_to_payday = max(1, days_to_payday)
-
-    salary = float(prof["monthly_salary"])
-    fixed_rent = float(prof.get("fixed_rent", round(salary * 0.25, 2)))
-    fixed_debt_emi = float(prof.get("fixed_debt", round(salary * 0.12, 2)))
-    fixed_utilities = float(prof.get("fixed_utilities", round(salary * 0.05, 2)))
-    emergency_buffer = float(prof.get("emergency_buffer", round(salary * 0.12, 2)))
-    total_fixed_obligations = round(fixed_rent + fixed_debt_emi + fixed_utilities, 2)
-    living_type = str(prof.get("living_type", "ค่าเช่าห้อง/คอนโด"))
-    debt_type = str(prof.get("debt_type", "บิลผ่อนชำระ / บัตรเครดิต"))
-
-    current_balance = state["main_balance"]
-    spent_today = state["daily_spent_today"]
-    avg_daily_spend = float(prof.get("avg_daily_spend", 600.0))
-
-    # Burn rate & projected balance at payday
-    projected_daily_burn = (spent_today * 0.5) + (avg_daily_spend * 0.5)
-    projected_end_balance = current_balance - (projected_daily_burn * days_to_payday) - total_fixed_obligations
-
-    # Commitment Warning Logic (Pitch: Suppresses alerts during normal dips; fires ONLY when upcoming debit is at risk)
-    is_normal_dip = (current_balance < salary * 0.5) and (projected_end_balance >= 1000.0)
-    is_commitment_at_risk = projected_end_balance < 0.0
-
-    if is_commitment_at_risk:
-        horizon_state = "COMMITMENT_AT_RISK"
-        horizon_badge_th = "ภาระผูกพันมีความเสี่ยง"
-        alert_suppressed = False
-        warning_nudge = (
-            f"⚠️ แจ้งเตือนภาระผูกพัน: จากอัตราการใช้จ่ายปัจจุบัน ค่าใช้จ่ายคงที่สิ้นเดือน ฿{total_fixed_obligations:,.2f} "
-            f"({living_type} ฿{fixed_rent:,.0f} • {debt_type} ฿{fixed_debt_emi:,.0f}) อาจไม่เพียงพอในอีก {days_to_payday} วันข้างหน้า แนะนำใช้ 1-Tap Recall ดึงเงินออมกลับมาล่วงหน้า"
-        )
-    elif is_normal_dip:
-        horizon_state = "NORMAL_DIP_SAFE"
-        horizon_badge_th = "เงินลดปกติ (ไม่ส่งเสียงเตือน)"
-        alert_suppressed = True  # Suppress alerts during normal dips!
-        warning_nudge = (
-            f"Status Horizon: ยอดเงินลดลงตามวงจรปกติ แต่ครอบคลุมภาระผูกพันสิ้นเดือน ฿{total_fixed_obligations:,.2f} เรียบร้อย "
-            f"(ระบบระงับการแจ้งเตือนเพื่อตัดความรำคาญ และช่วยบริหารสภาพคล่องรายวันอัตโนมัติ)"
-        )
-    else:
-        horizon_state = "HEALTHY_HORIZON"
-        horizon_badge_th = "สภาพคล่องแข็งแรง"
-        alert_suppressed = True
-        warning_nudge = (
-            f"Status Horizon: สภาพคล่องเพียงพอครอบคลุมภาระคงที่ ฿{total_fixed_obligations:,.2f} 100% คาดการณ์เหลือเงิน ฿{max(0.0, projected_end_balance):,.2f} ณ วันเงินเดือนออก"
-        )
-
-    # Status Horizon Bar Percentage (0-100% indicating month-end liquidity runway health)
-    horizon_health_pct = min(100.0, max(15.0, round(((current_balance - total_fixed_obligations) / (current_balance + 1e-5)) * 100, 1)))
-    burn_rate_pct = min(100.0, max(10.0, round(100.0 - horizon_health_pct, 1)))
-    daily_safe_limit = max(200.0, round((current_balance - total_fixed_obligations) / days_to_payday, 2))
-
-    return {
-        "account_id": account_id,
-        "masked_account_id": mask_account_id(account_id),
-        "days_to_payday": days_to_payday,
-        "payday_date": f"{now.year}-{now.month:02d}-28",
-        "current_balance": round(current_balance, 2),
-        "horizon_health_pct": horizon_health_pct,
-        "burn_rate_pct": burn_rate_pct,
-        "horizon_state": horizon_state,
-        "horizon_badge_th": horizon_badge_th,
-        "alert_suppressed": alert_suppressed,
-        "commitment_at_risk": is_commitment_at_risk,
-        "total_recurring_commitments": total_fixed_obligations,
-        "breakdown": {
-            "rent": fixed_rent,
-            "rent_pct": round((fixed_rent / salary) * 100, 1),
-            "debt_emi": fixed_debt_emi,
-            "debt_pct": round((fixed_debt_emi / salary) * 100, 1),
-            "utilities": fixed_utilities,
-            "util_pct": round((fixed_utilities / salary) * 100, 1),
-            "emergency_buffer": emergency_buffer,
-            "living_type": living_type,
-            "debt_type": debt_type,
-            "total_fixed_obligations": total_fixed_obligations
-        },
-        "recurring_commitments": [
-            {
-                "name": living_type,
-                "amount": fixed_rent,
-                "due_days": max(1, days_to_payday - 2),
-                "is_at_risk": is_commitment_at_risk and (current_balance < fixed_rent)
-            },
-            {
-                "name": debt_type,
-                "amount": fixed_debt_emi,
-                "due_days": max(1, days_to_payday - 6),
-                "is_at_risk": False
-            },
-            {
-                "name": "ค่าน้ำ-ไฟ-อินเทอร์เน็ต",
-                "amount": fixed_utilities,
-                "due_days": max(1, days_to_payday - 1),
-                "is_at_risk": False
-            }
-        ],
-        "projected_month_end_liquidity": round(max(0.0, projected_end_balance), 2),
-        "raw_projected_end_balance": round(projected_end_balance, 2),
-        "deficit_amount": round(abs(projected_end_balance), 2) if projected_end_balance < 0 else 0.0,
-        "daily_safe_limit": daily_safe_limit,
-        "spent_today": round(spent_today, 2),
-        "remaining_today": max(0.0, round(daily_safe_limit - spent_today, 2)),
-        "nudge_message": warning_nudge
-    }
+    points = forecast_cashflow_30d(account_id)["timeline"]
+    projection = {point["date"]: point["projected_balance"] for point in points if not point["is_past"]}
+    result = calculate_horizon(BEHAVIORAL_PROFILES_CACHE[account_id], LIVE_ACCOUNT_STATES[account_id], projection)
+    return {"account_id": account_id, "masked_account_id": mask_account_id(account_id), **result}
 
 @app.get("/api/v2/flowsense/forecast-30d/{account_id}")
 def forecast_cashflow_30d(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,30}$", description="Sanitized Banking Account ID")):
@@ -828,7 +743,7 @@ def forecast_cashflow_30d(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
         "daily_spent_today": 310.0
     })
 
-    now = datetime.now(ZoneInfo("Asia/Bangkok"))
+    now = demo_now(state)
     cur_balance = float(state["main_balance"])
     salary = float(prof["monthly_salary"])
     avg_spend = float(prof["avg_daily_spend"])
@@ -855,7 +770,7 @@ def forecast_cashflow_30d(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
             "date": p_date.strftime("%Y-%m-%d"),
             "day_name": p_date.strftime("%a"),
             "is_weekend": bool(is_wk),
-            "days_to_payday": (28 - p_date.day) if p_date.day <= 28 else (30 - p_date.day + 28),
+            "days_to_payday": (next_payday(p_date).date() - p_date.date()).days,
             "predicted_spend": day_spend,
             "actual_spend": day_spend,
             "salary_inflow": 0.0,
@@ -868,7 +783,7 @@ def forecast_cashflow_30d(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
 
     # Today's point
     is_today_weekend = 1.0 if now.weekday() >= 5 else 0.0
-    dtp_today = (28 - now.day) if now.day <= 28 else (30 - now.day + 28)
+    dtp_today = (next_payday(now).date() - now.date()).days
     today_point = {
         "date": now.strftime("%Y-%m-%d"),
         "day_name": now.strftime("%a"),
@@ -885,7 +800,7 @@ def forecast_cashflow_30d(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
         "current_time": now.strftime("%H:%M")
     }
 
-    # Future 22 days (LightGBM rolling-window lag features & transaction seasonality)
+    # Future 30 days (LightGBM rolling-window lag features & transaction seasonality)
     future_points = []
     lag_1 = spent_today
     lag_3 = float(avg_spend * 0.95)
@@ -896,14 +811,11 @@ def forecast_cashflow_30d(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
     fixed_debt_emi = float(prof.get("fixed_debt", round(salary * 0.12, 2)))
     fixed_utilities = float(prof.get("fixed_utilities", round(salary * 0.05, 2)))
 
-    for f_step in range(1, 23):
+    for f_step in range(1, 31):
         target_date = now + timedelta(days=f_step)
         is_weekend = 1.0 if target_date.weekday() >= 5 else 0.0
 
-        if target_date.day <= 28:
-            dtp = float(28 - target_date.day)
-        else:
-            dtp = float((30 - target_date.day) + 28)
+        dtp = float((next_payday(target_date).date() - target_date.date()).days)
 
         fixed_due_7d = 1.0 if (target_date.day >= 25 or target_date.day <= 2) else 0.0
 
@@ -931,6 +843,7 @@ def forecast_cashflow_30d(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
             "predicted_spend": round(pred_spend, 2),
             "actual_spend": 0.0,
             "salary_inflow": inflow,
+            "commitment_payment": round(fixed_due_deduction, 2),
             "projected_balance": round(cum_bal, 2),
             "status": "FUTURE",
             "is_past": False,
@@ -943,13 +856,15 @@ def forecast_cashflow_30d(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
         lag_1 = pred_spend
 
     full_timeline = past_points + [today_point] + future_points
-    min_proj_balance = min(p["projected_balance"] for p in full_timeline)
+    min_proj_balance = min(p["projected_balance"] for p in [today_point] + future_points)
     is_safe = min_proj_balance >= 500.0
     payday_target = now + timedelta(days=int(dtp_today))
 
     return {
         "account_id": account_id,
         "forecast_days": 30,
+        "history_days": 7,
+        "data_mode": "synthetic_demo",
         "model_architecture": "LightGBM with rolling-window lag features & transaction seasonality",
         "operational_objective": "Forecasts safe liquidity margins 30 days ahead; suppresses alerts during normal dips.",
         "today_index": len(past_points),
@@ -963,7 +878,7 @@ def forecast_cashflow_30d(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
         "projection_summary": (
             "สุขภาพสภาพคล่องแข็งแรง มีเส้นทางกระแสเงินสดรองรับภาระผูกพันถึงวันเงินเดือนออก"
             if is_safe
-            else "ตรวจพบความเสี่ยงสภาพคล่องตึงตัวช่วง 3 วันก่อนเงินเดือนออก ระบบแจ้งเตือนเฉพาะจุดที่ภาระผูกพันเริ่มมีความเสี่ยง"
+            else "ยอดคาดการณ์บางวันต่ำกว่าเกณฑ์สภาพคล่อง ฿500 ควรวางแผนเงินที่ต้องใช้"
         ),
         "timeline": full_timeline
     }
@@ -983,15 +898,13 @@ def trigger_micro_sweep(payload: MicroSweepRequest, x_idempotency_key: Optional[
         state = LIVE_ACCOUNT_STATES[acc_id]
         prof = BEHAVIORAL_PROFILES_CACHE.get(acc_id, {"recommended_sweep_pct": 0.08})
 
+        liquidity = get_flowsense_horizon_status(acc_id)
         sweep_amount = payload.custom_sweep_amount
-        if sweep_amount is None or sweep_amount <= 0:
-            sweep_rate = float(prof.get("recommended_sweep_pct", 0.08))
-            sweep_amount = round(state["main_balance"] * sweep_rate * 0.15, 2)
-            sweep_amount = min(sweep_amount, 500.0)
-
-        if state["main_balance"] - sweep_amount < 500.0:
-            raise HTTPException(status_code=400, detail="ไม่สามารถกวาดเงินออมได้: ยอดคงเหลือในบัญชีหลักต้องไม่ต่ำกว่าเกณฑ์สภาพคล่องปลอดภัย ฿ 500.00")
-
+        if sweep_amount is None:
+            sweep_amount = liquidity["recommended_sweep_amount"]
+        if sweep_amount <= 0 or sweep_amount > liquidity["savings_capacity"]:
+            raise HTTPException(status_code=400, detail=f"พักการออมไว้ก่อน: เงินส่วนที่ออมได้หลังกันภาระ ค่าใช้จ่าย และเงินสำรอง ฿{liquidity['savings_capacity']:,.2f}")
+        state["last_sweep_amount"] = sweep_amount
         state["main_balance"] = round(state["main_balance"] - sweep_amount, 2)
         state["vault_balance"] = round(state["vault_balance"] + sweep_amount, 2)
         state["total_swept"] = round(state["total_swept"] + sweep_amount, 2)
@@ -1010,7 +923,7 @@ def trigger_micro_sweep(payload: MicroSweepRequest, x_idempotency_key: Optional[
         "new_vault_balance": res_vault,
         "total_accumulated_swept": res_total,
         "one_tap_undo_available": True,
-        "message": f"กวาดเงินส่วนเกิน ฿ {sweep_amount:,.2f} เข้าบัญชีย่อยดอกเบี้ยสูง 1.50% เรียบร้อยแล้ว (สามารถกด 1-Tap Undo เรียกคืนได้ทันที 100% ไร้ค่าปรับ)"
+        "message": f"กวาดเงินส่วนเกิน ฿ {sweep_amount:,.2f} เข้ากระเป๋าเงินออมจำลองเรียบร้อยแล้ว (สามารถกด 1-Tap Undo เรียกคืนได้ทันที 100% ไร้ค่าปรับ)"
     }
     audit_log("MICRO_SWEEP_EXECUTED", acc_id, {"swept": sweep_amount, "new_main": res_main, "new_vault": res_vault})
 
@@ -1031,20 +944,22 @@ def recall_micro_sweep_funds(payload: VaultWithdrawalRequest, x_idempotency_key:
     with get_account_lock(acc_id):
         state = LIVE_ACCOUNT_STATES[acc_id]
         recall_amount = payload.amount
-        if recall_amount is None or recall_amount <= 0:
-            # 1-Tap Undo (100% full recall of swept funds or sub-account balance)
-            if state.get("total_swept", 0.0) > 0:
-                recall_amount = state["total_swept"]
-            else:
-                recall_amount = state.get("vault_balance", 0.0)
-            recall_amount = min(recall_amount, state.get("vault_balance", 0.0))
-
+        if payload.mode == "undo":
+            recall_amount = min(state.get("last_sweep_amount", 0), state["vault_balance"])
+        elif payload.mode == "all":
+            recall_amount = state["vault_balance"]
+        elif payload.mode == "partial":
+            if recall_amount is None or recall_amount <= 0:
+                raise HTTPException(status_code=400, detail="กรุณาระบุจำนวนเงินที่ต้องการดึงคืน")
+        elif recall_amount is None or recall_amount <= 0:
+            recall_amount = min(state.get("total_swept", 0) or state["vault_balance"], state["vault_balance"])
         if recall_amount <= 0:
             raise HTTPException(status_code=400, detail="ไม่มีเงินในบัญชีย่อยที่สามารถดึงคืนได้ในขณะนี้")
 
         if recall_amount > state["vault_balance"]:
             raise HTTPException(status_code=400, detail=f"ยอดเงินในบัญชีย่อยไม่เพียงพอ (มี ฿ {state['vault_balance']:,.2f})")
 
+        state["last_sweep_amount"] = 0
         # Instant 1-tap return without penalty or waiting period!
         state["vault_balance"] = round(state["vault_balance"] - recall_amount, 2)
         state["main_balance"] = round(state["main_balance"] + recall_amount, 2)
@@ -1105,3 +1020,59 @@ def reset_account_state(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,30
 @app.get("/api/v2/health")
 def health_check():
     return {"status": "HEALTHY", "mode": "synthetic_demo", "version": "4.0.0"}
+
+
+@app.post("/api/v2/flowsense/scenario")
+def set_liquidity_scenario(payload: LiquidityScenarioRequest):
+    reset_account_state(payload.account_id)
+    state = LIVE_ACCOUNT_STATES[payload.account_id]
+    prof = BEHAVIORAL_PROFILES_CACHE[payload.account_id]
+    salary = float(prof["monthly_salary"])
+    state["scenario"] = payload.scenario
+    state["daily_spent_today"] = float(prof["avg_daily_spend"]) * .45
+    draft = calculate_horizon(prof, state)
+    obligations = draft["total_recurring_commitments"]
+    burn = draft["projected_daily_burn"] * draft["days_to_payday"]
+    if payload.scenario == "high_value":
+        state["main_balance"] = 60000.0
+    elif payload.scenario == "healthy":
+        state["main_balance"] = round(max(salary * .9, obligations + burn + draft["emergency_buffer"] + 2000), 2)
+    elif payload.scenario == "normal_dip":
+        # Presets adjust demo spending, not the visitor's genuine financial data.
+        state["main_balance"] = round(salary * .49, 2)
+        state["daily_spent_today"] = 0
+        if calculate_horizon(prof, state)["commitment_at_risk"]:
+            # Profiles with large obligations need extra headroom to remain safe.
+            state["main_balance"] = round(obligations + burn + 1000, 2)
+    else:
+        state["main_balance"] = round(max(500, obligations * .45), 2)
+    audit_log("SCENARIO_CHANGED", payload.account_id, {"scenario": payload.scenario})
+    return get_flowsense_horizon_status(payload.account_id)
+
+
+@app.post("/api/v2/flowsense/auto-saving")
+def set_auto_saving(payload: AutoSavingRequest):
+    LIVE_ACCOUNT_STATES[payload.account_id]["auto_saving_enabled"] = payload.enabled
+    return {"enabled": payload.enabled, "mode": "SIMULATED_EVENT_TRIGGER"}
+
+
+@app.post("/api/v2/flowsense/auto-cycle")
+def run_auto_saving_cycle(payload: AutoCycleRequest):
+    state = LIVE_ACCOUNT_STATES[payload.account_id]
+    if not state.get("auto_saving_enabled"):
+        raise HTTPException(status_code=400, detail="เปิดตัวช่วยออมก่อนทดลองรอบออม")
+    if get_flowsense_horizon_status(payload.account_id)["recommended_sweep_amount"] <= 0:
+        audit_log("AUTO_SAVING_SKIPPED", payload.account_id, {"reason": "LIQUIDITY_RESERVED"})
+        return {"status": "SKIPPED", "swept_amount": 0, "message": "พักการออมรอบนี้เพื่อกันเงินสำหรับภาระ ค่าใช้จ่าย และเงินสำรอง"}
+    return trigger_micro_sweep(MicroSweepRequest(account_id=payload.account_id))
+
+
+@app.get("/api/v2/demo/insights")
+@lru_cache(maxsize=1)
+def demo_insights():
+    # Bounded graph sample from the original synthetic transactions. No live bank connection.
+    frame = pd.read_csv(os.path.join(BASE_DIR, "data", "04_trustgraph_fraud_transactions.csv"))
+    sample = frame[frame["is_scam"] == 1].head(18)
+    ids = list(dict.fromkeys(sample["source_id"].tolist() + sample["target_id"].tolist()))
+    aliases = {acc: f"N{index+1}" for index, acc in enumerate(ids)}
+    return {"data_mode": "synthetic_sample", "nodes": [{"id": aliases[acc], "label": f"บัญชี {index+1:02d}", "is_mule": bool(USERS_METADATA_CACHE.get(acc, {}).get("is_mule", 0)), "age_days": int(USERS_METADATA_CACHE.get(acc, {}).get("account_age_days", 90))} for index, acc in enumerate(ids)], "edges": [{"source": aliases[row.source_id], "target": aliases[row.target_id], "amount": float(row.amount)} for row in sample.itertuples()], "sample_transactions": len(sample)}

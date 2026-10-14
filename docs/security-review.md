@@ -43,3 +43,10 @@ The Docker image contains only built frontend assets, runtime source, pinned Pyt
 - All 13 real HTTP security tests pass in the project's own environment, covering visitor isolation, request forgery, direct API bypass, concurrent replay, blocked high-value transfers, validation, cookie/header policy and fail-closed production configuration. `pip check` reports no broken requirements.
 - Browser verification confirms the built UI boots its session and completes saving/recall through the guarded API without console errors.
 - The local Docker daemon is unavailable, so the actual container build and production health check are implemented as a required CI step. Render deployment itself has not been created by this task.
+
+
+## Feature expansion review
+
+The added scenario, auto-saving and recall-mode mutations use the same session, exact-origin, CSRF, JSON/body/rate-limit and idempotency middleware. No public global account state or legacy SecOps endpoint was reintroduced. The new insights endpoint serves a cached, bounded, masked sample from the synthetic CSV; it does not accept an account lookup or query limit. Event history is limited to 50 records per persona within the existing session TTL, and profile responses only include that visitor's data. Downloaded receipts are explicitly labeled as demo records. Five-second verification is a client-side simulation and is not a biometric security boundary.
+
+The backend now prevents manual/automatic sweeps from consuming projected funds reserved for upcoming debits and the emergency buffer. Undo and partial/all recalls conserve the combined main/vault balance. The expanded suite contains 19 passing tests (six product-invariant tests plus the existing 13 security tests).

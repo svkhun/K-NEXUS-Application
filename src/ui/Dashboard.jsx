@@ -1,4 +1,6 @@
 import React from 'react';
+import InsightsLab from './InsightsLab';
+import { ScenarioPicker } from './SavingsPage';
 import {
   Activity, ArrowDownLeft, ArrowRight, BadgeCheck,
   Bell, ChevronRight, Clock3, CreditCard, Eye, EyeOff,
@@ -17,7 +19,7 @@ function PhonePreview({ dailyLimit }) {
       <span className="scene-leaf leaf-one" /><span className="scene-leaf leaf-two" /><span className="scene-leaf leaf-three" />
       <div className="concept-phone">
         <div className="phone-speaker" />
-        <div className="phone-brand">K<span>+</span><small>FlowSense</small></div>
+        <div className="phone-brand">K<small>FlowSense</small></div>
         <div className="phone-greeting">เงินที่ใช้ได้วันนี้</div>
         <strong className="phone-amount">฿{money(dailyLimit)}</strong>
         <div className="phone-status"><span /> พร้อมสำหรับทุกวัน</div>
@@ -54,12 +56,12 @@ export function AccountTiles({ profile, openTab, hidden = false }) {
 export function Commitments({ horizon }) {
   return (
     <section className="surface commitments">
-      <div className="surface-heading"><div><h2>ภาระที่ต้องจ่าย</h2><p className="heading-description">เตรียมเงินให้พร้อมก่อนถึงกำหนด</p></div><span className="subtle-total">รวม ฿{money(horizon.total_recurring_commitments)}</span></div>
+      <div className="surface-heading"><div><h2>ภาระที่ต้องจ่าย</h2><p className="heading-description">เตรียมเงินให้พร้อมก่อนถึงกำหนด</p></div><span className="subtle-total">ก่อนเงินเดือน ฿{money(horizon.total_recurring_commitments)}</span></div>
       <div className="commitment-list">
         {horizon.recurring_commitments?.filter((item) => item.amount > 0).map((item, index) => (
-          <div key={`${item.name}-${index}`} className="commitment-row">
+          <div key={`${item.name}-${index}`} className={`commitment-row ${item.is_at_risk ? 'at-risk' : ''}`}>
             <span className={`commitment-icon icon-${index}`}>{index === 0 ? <Home size={18} /> : index === 1 ? <CreditCard size={18} /> : <Bell size={18} />}</span>
-            <div><strong>{item.name}</strong><small>อีกประมาณ {item.due_days} วัน</small></div><b>฿{money(item.amount)}</b>
+            <div><strong>{item.name}</strong><small>อีก {item.due_days} วัน · {item.is_at_risk ? 'เงินอาจไม่พอ' : 'ตามกำหนด'}</small></div><b>฿{money(item.amount)}</b>
           </div>
         ))}
       </div>
@@ -81,7 +83,7 @@ function ActivityList({ activities }) {
 export function ForecastPanel({ horizon, chart }) {
   return (
     <section className="surface forecast-card">
-      <div className="surface-heading"><div><h2>มองเห็นเงินในวันข้างหน้า</h2><p className="heading-description">แนวโน้มยอดคงเหลืออีก 22 วันจาก FlowSense</p></div><span className="soft-chip"><TrendingUp size={14} /> คาดการณ์</span></div>
+      <div className="surface-heading"><div><h2>มองเห็นเงินในวันข้างหน้า</h2><p className="heading-description">แนวโน้ม 30 วัน · เลื่อนเลือกวันเพื่อดูรายละเอียด</p></div><span className="soft-chip"><TrendingUp size={14} /> คาดการณ์</span></div>
       <div className="forecast-stats"><div><span>ใช้ได้ต่อวันโดยประมาณ</span><strong>฿{money(horizon.daily_safe_limit)}</strong></div><div><span>ถึงรอบเงินเดือน</span><strong>{horizon.days_to_payday} วัน</strong></div><div><span>คงเหลือก่อนรอบเงินเดือน</span><strong className={horizon.commitment_at_risk ? 'amount-warning' : ''}>฿{money(horizon.raw_projected_end_balance)}</strong></div></div>
       {chart}
       <p className="chart-note">คาดการณ์จากข้อมูลจำลอง ผลลัพธ์อาจเปลี่ยนตามการใช้จ่าย</p>
@@ -99,7 +101,7 @@ export default function Dashboard({ profile, horizon, activities, chart, hidden,
           <div className="bank-quick-actions">
             <button onClick={() => openTab('transfer')}><span className="bank-action-icon action-primary"><Send size={21} /></span><strong>โอนเงิน</strong></button>
             <button onClick={() => openTab('savings')}><span className="bank-action-icon"><ArrowDownLeft size={21} /></span><strong>ออมเงิน</strong></button>
-            <button onClick={doRecall} disabled={busy || profile.vault_balance <= 0}><span className="bank-action-icon"><RotateCcw size={21} /></span><strong>ดึงเงินคืน</strong></button>
+            <button onClick={() => doRecall('all')} disabled={busy || profile.vault_balance <= 0}><span className="bank-action-icon"><RotateCcw size={21} /></span><strong>ดึงเงินคืน</strong></button>
             <button onClick={() => openTab('accounts')}><span className="bank-action-icon"><TrendingUp size={21} /></span><strong>ดูเงินข้างหน้า</strong></button>
           </div>
         </section>
@@ -115,10 +117,10 @@ export default function Dashboard({ profile, horizon, activities, chart, hidden,
       <div className="section-title-row assistant-title"><div><h2>ผู้ช่วยการเงินสำหรับคุณ</h2><p>สองฟังก์ชันใหม่ที่อยากให้คุณลอง</p></div><span className="new-feature-tag">NEW EXPERIENCE</span></div>
       <div className="assistant-grid">
         <section className="surface flowsense-assistant">
-          <div className="assistant-heading"><span className="assistant-icon"><Activity size={22} /></span><div><span>FlowSense</span><h3>ใช้จ่ายได้แค่ไหน สบายใจได้เท่าไร</h3></div><span className={`status-pill ${horizon.commitment_at_risk ? 'risk' : 'safe'}`}><span />{horizon.commitment_at_risk ? 'ควรวางแผน' : 'สภาพคล่องดี'}</span></div>
+          <div className="assistant-heading"><span className="assistant-icon"><Activity size={22} /></span><div><span>FlowSense</span><h3>ใช้จ่ายได้แค่ไหน สบายใจได้เท่าไร</h3></div><span className={`status-pill ${horizon.commitment_at_risk ? 'risk' : 'safe'}`}><span />{horizon.horizon_badge_th}</span></div>
           <div className="flowsense-amount-row"><div><span>ใช้ได้ต่อวันโดยประมาณ</span><strong>฿ {money(horizon.daily_safe_limit)}</strong></div><div className="payday-note"><Clock3 size={14} /><span>อีก {horizon.days_to_payday} วัน<br />ถึงรอบเงินเดือน</span></div></div>
           <div className="health-meter"><div><span>ระดับสภาพคล่อง</span><strong>{money(horizon.horizon_health_pct)}%</strong></div><div className="meter-track"><i style={{ width: `${horizon.horizon_health_pct}%` }} /></div></div>
-          <p className="assistant-description">{horizon.commitment_at_risk ? `เงินอาจขาดประมาณ ฿${money(horizon.deficit_amount)} ก่อนเงินเดือนเข้า ลองดึงเงินออมคืนเพื่อดูผลลัพธ์` : 'คาดว่ายังมีเงินรองรับภาระที่ต้องจ่าย ลองย้ายเงินส่วนที่พร้อมออมได้เลย'}</p>
+          <p className="assistant-description">{horizon.nudge_message}</p>
           <div className="assistant-actions"><button className="primary-button" onClick={() => openTab('savings')}><Wallet size={16} /> ทดลองออมและดึงคืน</button><button className="text-link" onClick={() => openTab('accounts')}>ดูแนวโน้ม <ArrowRight size={14} /></button></div>
         </section>
         <section className="surface trustgraph-assistant">
@@ -133,13 +135,13 @@ export default function Dashboard({ profile, horizon, activities, chart, hidden,
   );
 }
 
-export function AccountsPage({ profile, horizon, chart, openTab, hidden, doReset, busy }) {
+export function AccountsPage({ profile, horizon, chart, openTab, hidden, doReset, busy, onScenario, refresh }) {
   return (
-    <div className="accounts-page">
+    <div className="accounts-page"><ScenarioPicker {...{ horizon, busy, onScenario }} />
       <AccountTiles profile={profile} openTab={openTab} hidden={hidden} />
       <div className="account-detail-grid"><ForecastPanel horizon={horizon} chart={chart} /><Commitments horizon={horizon} /></div>
       {horizon.commitment_at_risk && <div className="liquidity-warning"><ShieldAlert size={21} /><div><strong>เตรียมสภาพคล่องก่อนถึงรอบเงินเดือน</strong><p>คาดว่าเงินอาจขาดประมาณ ฿{money(horizon.deficit_amount)} ลองดึงเงินออมคืนแล้วดูการคาดการณ์ที่เปลี่ยนไป</p></div><button onClick={() => openTab('savings')}>จัดการเงินออม <ArrowRight size={15} /></button></div>}
-      <div className="account-tools"><span><ShieldCheck size={15} /> ข้อมูลของโปรไฟล์ทดลองนี้</span><button className="reset-button" onClick={doReset} disabled={busy}><RotateCcw size={15} /> รีเซ็ตบัญชีทดลอง</button></div>
+      <InsightsLab {...{ profile, busy, refresh }} /><div className="account-tools"><span><ShieldCheck size={15} /> ข้อมูลของโปรไฟล์ทดลองนี้</span><button className="reset-button" onClick={doReset} disabled={busy}><RotateCcw size={15} /> รีเซ็ตบัญชีทดลอง</button></div>
     </div>
   );
 }
