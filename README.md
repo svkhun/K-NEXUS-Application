@@ -15,7 +15,7 @@ Engineered with a responsive, bank-grade mobile/desktop web interface, strict se
 
 ---
 
-## 🌐 Live Demo & Endpoints
+##  Live Demo & Endpoints
 
 - **Live Web Application:** [https://k-web-application.onrender.com](https://k-web-application.onrender.com)
 - **API Health Check:** [https://k-web-application.onrender.com/api/v2/health](https://k-web-application.onrender.com/api/v2/health)
@@ -25,7 +25,7 @@ Engineered with a responsive, bank-grade mobile/desktop web interface, strict se
 
 ---
 
-## ✨ Key Capabilities
+##  Key Capabilities
 
 ### 1. FlowSense — Liquidity Forecasting & Smart Micro-Sweep
 - **30-Day Liquidity Forecast:** High-resolution balance and cash flow projection across 30 future days, today, and 7 synthetic historical days powered by ONNX inference (`flowsense.onnx`).
@@ -78,7 +78,7 @@ k-web-application/
 
 ---
 
-## 🔒 Security by Design
+##  Security by Design
 
 - **Strict Session Isolation:** Visitor balances, pending step-up tokens, and transaction history are completely isolated in separate in-memory session contexts (`DemoSession`).
 - **Tamper-Proof Micro-Auth Tokens:** Clearance tokens are signed using HMAC-SHA256 with an ephemeral 120-second expiration, strictly bound to the visitor session and transaction parameters.
@@ -89,7 +89,7 @@ k-web-application/
 
 ---
 
-## 🚀 Local Development
+##  Local Development
 
 ### Prerequisites
 - **Node.js:** v22.12 or newer
@@ -150,7 +150,7 @@ To prevent the Render free-tier instance from sleeping after 15 minutes of inact
 
 ---
 
-## 🧪 Testing & Security Verification
+##  Testing & Security Verification
 
 ```powershell
 # Install test dependencies
@@ -169,7 +169,7 @@ npm run build
 
 ---
 
-## ⚠️ Disclaimer & Prototype Boundaries
+##  Disclaimer & Prototype Boundaries
 
 1. **Independent UX Prototype:** This project is an independent conceptual research prototype created for UX exploration. It is not affiliated with, endorsed by, or connected to KASIKORNBANK (KBank), KBTG, K PLUS, or MAKE by KBank.
 2. **100% Synthetic Data:** All accounts, balances, transaction histories, risk labels, and biometric verification checks are completely synthetic and simulated.
