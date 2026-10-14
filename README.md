@@ -50,7 +50,7 @@ Engineered with a responsive, bank-grade mobile/desktop web interface, strict se
 
 ---
 
-## 🛠 System Architecture & Tech Stack
+##  System Architecture & Tech Stack
 
 ```
 k-web-application/
@@ -123,7 +123,7 @@ Navigate to <http://127.0.0.1:5173/>. Vite will automatically proxy all `/api` c
 
 ---
 
-## ☁️ Deployment Guide (Render)
+##  Deployment Guide (Render)
 
 This repository includes a production-ready [Dockerfile](Dockerfile) and [render.yaml](render.yaml) Blueprint:
 
