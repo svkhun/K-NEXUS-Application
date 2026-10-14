@@ -15,5 +15,7 @@ services:
         value: production
       - key: HOST
         value: 0.0.0.0
+      - key: FORWARDED_ALLOW_IPS
+        value: '*'
       - key: DEMO_SESSION_SECRET
         generateValue: true
