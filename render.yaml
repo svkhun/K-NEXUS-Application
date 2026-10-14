@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: k-web-application
+    runtime: docker
+    repo: https://github.com/svkhun/k-web-application
+    branch: main
+    region: singapore
+    plan: starter
+    numInstances: 1
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/v2/health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: DEMO_SESSION_SECRET
+        generateValue: true

@@ -1,0 +1,18 @@
+import React from 'react';
+import { ArrowRight, Check, Send, ShieldCheck, Wallet } from 'lucide-react';
+
+const money = (value, digits = 0) => new Intl.NumberFormat('th-TH', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(Number(value ?? 0));
+
+export default function TransferForm({ profile, persona, recipients, recipient, amount, setAmount, changeRecipient, clearResult, busy, evaluate }) {
+  const changeAmount = (value) => { setAmount(value); clearResult(); };
+  return (
+    <section className="surface transfer-form-card">
+      <div className="transfer-tabbar"><span className="active"><Send size={15} /> โอนเงิน</span><span className="transfer-protection-label"><ShieldCheck size={15} /> ดูแลก่อนโอนด้วย TrustGraph</span></div>
+      <div className="transfer-columns">
+        <div className="transfer-source-column"><h2>บัญชีผู้โอน</h2><div className="source-account-card"><div><Wallet size={18} /><span>บัญชีออมทรัพย์<small>บัญชีของ{persona.name}</small></span></div><small>{profile.masked_account_id}</small><strong>฿ {money(profile.main_balance, 2)}</strong></div><p>ยอดเงินในบัญชีหลักที่พร้อมใช้สำหรับรายการนี้</p><div className="source-protection"><ShieldCheck size={18} /><span>ทุกรายการถูกตรวจสอบ<br />ก่อนเงินออกจากบัญชี</span></div></div>
+        <div className="transfer-recipient-column"><h2>โอนไปยัง</h2><p className="transfer-field-help">เลือกสถานการณ์ที่อยากลอง</p><div className="recipient-list">{recipients.map((item) => { const Icon = item.icon; return <button key={item.id} className={`recipient ${recipient.id === item.id ? 'selected' : ''}`} disabled={busy} onClick={() => changeRecipient(item)}><span className={`recipient-icon ${item.tone}`}><Icon size={18} /></span><span className="recipient-copy"><strong>{item.name}</strong><small>{item.meta}</small></span><span className="recipient-radio">{recipient.id === item.id && <Check size={11} />}</span></button>; })}</div></div>
+        <div className="transfer-amount-column"><h2>จำนวนเงิน</h2><div className="amount-input"><span>฿</span><input aria-label="จำนวนเงินที่จะโอน" type="number" min="1" step="1" disabled={busy} value={amount} onChange={(event) => changeAmount(event.target.value)} /><span>THB</span></div><p className="transfer-field-help">ยอดที่โอนได้ ฿ {money(profile.main_balance)}</p><div className="amount-presets">{[350, 1200, 3000].map((value) => <button key={value} disabled={busy} className={Number(amount) === value ? 'selected' : ''} onClick={() => changeAmount(String(value))}>฿{money(value)}</button>)}</div><div className="transfer-review"><span>ไปยัง</span><strong>{recipient.name}</strong><small>{recipient.id} · บัญชีสมมติ</small></div><button className="primary-button" disabled={busy} onClick={evaluate}>{busy ? 'กำลังตรวจสอบ...' : 'ตรวจสอบและทดลองโอน'}<ArrowRight size={16} /></button><p className="transfer-demo-note">การทดลองนี้ไม่มีการโอนเงินจริง</p></div>
+      </div>
+    </section>
+  );
+}
