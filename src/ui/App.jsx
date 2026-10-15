@@ -3,7 +3,7 @@ import {
   Activity, ArrowDownLeft, ArrowRight, ArrowUpRight, BadgeCheck,
   Bell, Check, ChevronDown, CircleAlert, CreditCard, Fingerprint,
   Home, LockKeyhole, RotateCcw, Send, ShieldAlert, ShieldCheck,
-  Sparkles, Wallet, X, Search, ChevronRight,
+  Sparkles, Wallet, X, Search, ChevronRight, Target, Eye, EyeOff,
 } from 'lucide-react';
 import { api } from './api';
 import Dashboard, { AccountsPage } from './Dashboard';
@@ -13,6 +13,7 @@ import SavingsPage from './SavingsPage';
 import TransferResult from './TransferResult';
 import { describeEvent } from './InsightsLab';
 import { bangkokDate } from './forecastModel.mjs';
+import DailyPlan from './DailyPlan';
 
 const personas = [
   { id: 'ACC_0100', name: 'เมย์', role: 'วัยเริ่มทำงาน', initials: 'ม', color: 'mint' },
@@ -27,6 +28,7 @@ const recipientTemplates = [
 const money = (value, digits = 0) => new Intl.NumberFormat('th-TH', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(Number(value ?? 0));
 const navItems = [
   { id: 'home', label: 'หน้าหลัก', icon: Home },
+  { id: 'plan', label: 'แผนใช้เงิน', icon: Target },
   { id: 'accounts', label: 'บัญชี', icon: CreditCard },
   { id: 'transfer', label: 'โอน / จ่าย', icon: Send },
   { id: 'savings', label: 'ออมเงิน', icon: Wallet },
@@ -55,10 +57,12 @@ function App() {
   const [transferResult, setTransferResult] = useState(null);
   const [clearanceToken, setClearanceToken] = useState(null);
   const inFlight = useRef(false);
+  const activeAccount = useRef(accountId);
   const persona = useMemo(() => personas.find((item) => item.id === accountId) ?? personas[0], [accountId]);
 
   const refresh = useCallback(async (id = accountId) => {
     const [nextProfile, nextHorizon, nextForecast] = await Promise.all([api.profile(id), api.horizon(id), api.forecast(id)]);
+    if (activeAccount.current !== id) return;
     setProfile(nextProfile);
     setHorizon(nextHorizon);
     setForecast(nextForecast);
@@ -103,6 +107,7 @@ function App() {
     finally { inFlight.current = false; setBusy(false); }
   };
   const changePersona = (id) => {
+    activeAccount.current = id;
     setAccountId(id); setTransferResult(null); setClearanceToken(null);
     setRecipient({ ...recipientTemplates[0], id: id === 'ACC_0101' ? 'ACC_0100' : 'ACC_0101' });
     setAmount('350'); setTelemetry({ device: false, first: false, duration: 90, ratio: 1.1, auth: 'pin' });
@@ -177,11 +182,11 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
   const searchItems = navItems.filter((item) => {
-    const terms = { home: 'หน้าหลัก ภาพรวม ยอดเงิน', accounts: 'บัญชี สภาพคล่อง คาดการณ์ กราฟ ภาระ', transfer: 'โอน จ่าย trustgraph ความเสี่ยง', savings: 'flowsense การออมเงิน ออมเงิน เงินออม ดึงคืน' };
+    const terms = { home: 'หน้าหลัก ภาพรวม ยอดเงิน', plan: 'แผนใช้เงิน งบ วันนี้ รายวัน วันละ ใช้ได้ ควรใช้ คาดการณ์รายจ่าย flowsense สภาพคล่อง', accounts: 'บัญชี สภาพคล่อง คาดการณ์ กราฟ ภาระ', transfer: 'โอน จ่าย trustgraph ความเสี่ยง', savings: 'flowsense การออมเงิน ออมเงิน เงินออม ดึงคืน' };
     return search.trim() && terms[item.id].includes(search.trim().toLowerCase());
   });
   const tryScenario = (index) => { changeRecipient(recipients[index]); openTab('transfer'); };
-  const title = { home: `สวัสดี, คุณ${persona.name}`, accounts: 'บัญชีของฉัน', savings: 'ออมเงิน', transfer: 'โอนเงิน' }[tab];
+  const title = { home: `สวัสดี, คุณ${persona.name}`, plan: 'แผนใช้เงิน', accounts: 'บัญชีของฉัน', savings: 'ออมเงิน', transfer: 'โอนเงิน' }[tab];
 
   useEffect(() => {
     if (transferResult && window.innerWidth <= 640) {
@@ -210,24 +215,25 @@ function App() {
             <button className="icon-button mobile-search-toggle" aria-label="เปิดช่องค้นหา" aria-expanded={searchOpen} onClick={() => setSearchOpen(!searchOpen)}><Search size={18} /></button><div className={`service-search ${searchOpen ? 'search-open' : ''}`}><Search size={16} /><input aria-label="ค้นหาบริการหรือเมนู" placeholder="ค้นหาบริการหรือเมนู" value={search} onChange={(event) => setSearch(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && searchItems.length) openTab(searchItems[0].id); if (event.key === 'Escape') setSearch(''); }} />
               {search.trim() && <div className="search-results">{searchItems.length ? searchItems.map(({ id, label, icon: Icon }) => <button key={id} onClick={() => openTab(id)}><Icon size={16} />{label}<ChevronRight size={14} /></button>) : <p>ไม่พบบริการ ลองค้นหา “ออม” หรือ “โอน”</p>}</div>}
             </div>
-            <div className="notification-wrap"><button className={`icon-button ${showAlerts ? 'selected' : ''}`} aria-label="ดูการแจ้งเตือน" aria-expanded={showAlerts} onClick={() => setShowAlerts(!showAlerts)}><Bell size={18} />{horizon?.commitment_at_risk && <span className="notification-dot" />}</button>{showAlerts && <div className="notification-panel"><strong>ผู้ช่วยแจ้งเตือนของคุณ</strong><p>{horizon?.nudge_message || 'กำลังเตรียมสถานะสภาพคล่อง'}</p><button className="text-link" onClick={() => openTab(horizon?.commitment_at_risk ? 'savings' : 'accounts')}>ดูรายละเอียด <ArrowRight size={14} /></button></div>}</div>
+            <button className="icon-button" aria-label={hidden ? "แสดงข้อมูลการเงิน" : "ซ่อนข้อมูลการเงิน"} aria-pressed={hidden} onClick={() => { setHidden(!hidden); setShowAlerts(false); }}>{hidden ? <EyeOff size={18} /> : <Eye size={18} />}</button><div className="notification-wrap"><button className={`icon-button ${showAlerts ? 'selected' : ''}`} aria-label="ดูการแจ้งเตือน" aria-expanded={showAlerts} onClick={() => setShowAlerts(!showAlerts)}><Bell size={18} />{horizon?.commitment_at_risk && <span className="notification-dot" />}</button>{showAlerts && !hidden && <div className="notification-panel"><strong>ผู้ช่วยแจ้งเตือนของคุณ</strong><p>{horizon?.nudge_message || 'กำลังเตรียมสถานะสภาพคล่อง'}</p><button className="text-link" onClick={() => openTab(horizon?.commitment_at_risk ? 'savings' : 'accounts')}>ดูรายละเอียด <ArrowRight size={14} /></button></div>}</div>
             <button className="icon-button" aria-label="รีเซ็ตบัญชีทดลอง" title="รีเซ็ตบัญชีทดลอง" disabled={busy || !profile} onClick={doReset}><RotateCcw size={17} /></button>
           </div>
         </header>
         <main className="main-content">
-          <div className="page-intro"><div><h1>{title}</h1><p>{tab === 'home' ? 'ดูแลเงินของคุณให้พร้อมสำหรับทุกวัน' : tab === 'accounts' ? 'เห็นยอดเงิน ภาระที่ต้องจ่าย และแนวโน้มวันข้างหน้า' : tab === 'savings' ? 'ออมเมื่อพร้อม และดึงกลับได้ทันทีเมื่อจำเป็น' : 'TrustGraph ช่วยดูความเสี่ยงก่อนคุณตัดสินใจ'}</p></div><div className="profile-picker"><label htmlFor="persona">ลองเปลี่ยนโปรไฟล์</label><div className="select-wrap"><select id="persona" value={accountId} disabled={busy} onChange={(event) => changePersona(event.target.value)}>{personas.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.role}</option>)}</select><ChevronDown size={15} /></div></div></div>
+          <div className="page-intro"><div><h1>{title}</h1><p>{tab === 'home' ? 'รู้วันนี้ว่าใช้ได้เท่าไร เพื่อให้เงินพอถึงวันข้างหน้า' : tab === 'plan' ? 'เห็นงบที่ควรใช้ เทียบกับรายจ่ายคาดการณ์ แล้วลองปรับแผน' : tab === 'accounts' ? 'เห็นยอดเงิน ภาระที่ต้องจ่าย และแนวโน้มวันข้างหน้า' : tab === 'savings' ? 'ออมเมื่อพร้อม และดึงกลับได้ทันทีเมื่อจำเป็น' : 'TrustGraph ช่วยดูความเสี่ยงก่อนคุณตัดสินใจ'}</p></div><div className="profile-picker"><label htmlFor="persona">ลองเปลี่ยนโปรไฟล์</label><div className="select-wrap"><select id="persona" value={accountId} disabled={busy} onChange={(event) => changePersona(event.target.value)}>{personas.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.role}</option>)}</select><ChevronDown size={15} /></div></div></div>
 
           <div className="demo-disclaimer"><ShieldCheck size={14} /><span>K · แอปต้นแบบอิสระ ใช้ข้อมูลสมมติ ไม่มีการโอนเงินจริง ไม่ใช่แอปทางการของ KBank</span></div>
-          {error && <div className="message error" role="alert"><CircleAlert size={18} /><span>{error}</span><button aria-label="ปิดข้อความ" onClick={() => setError('')}><X size={16} /></button></div>}
-          {notice && <div className="message success" role="status"><Check size={18} /><span>{notice}</span><button aria-label="ปิดข้อความ" onClick={() => setNotice('')}><X size={16} /></button></div>}
+          {error && !hidden && <div className="message error" role="alert"><CircleAlert size={18} /><span>{error}</span><button aria-label="ปิดข้อความ" onClick={() => setError('')}><X size={16} /></button></div>}
+          {notice && !hidden && <div className="message success" role="status"><Check size={18} /><span>{notice}</span><button aria-label="ปิดข้อความ" onClick={() => setNotice('')}><X size={16} /></button></div>}
 
-          {loading ? <div className="loading-card"><div className="spinner" /> กำลังโหลดข้อมูลจำลอง...</div> : profile && horizon ? <>
-            {tab === 'home' && <Dashboard profile={profile} horizon={horizon} activities={(profile.events || []).slice(0, 5).map(describeEvent)} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} hidden={hidden} setHidden={setHidden} busy={busy} doRecall={doRecall} openTab={openTab} tryScenario={tryScenario} />}
+          {hidden ? <section className="surface privacy-cover"><EyeOff size={32} /><h2>ซ่อนข้อมูลการเงินแล้ว</h2><p>ยอดเงิน กราฟ และรายการต่าง ๆ จะกลับมาเมื่อคุณเลือกแสดงข้อมูล</p><button className="primary-button" onClick={() => setHidden(false)}>แสดงข้อมูลการเงิน <Eye size={17} /></button></section> : loading ? <div className="loading-card"><div className="spinner" /> กำลังโหลดข้อมูลจำลอง...</div> : profile && horizon ? <>
+            {tab === 'home' && <Dashboard profile={profile} horizon={horizon} forecast={forecast} activities={(profile.events || []).slice(0, 5).map(describeEvent)} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} hidden={hidden} setHidden={setHidden} busy={busy} doRecall={doRecall} openTab={openTab} tryScenario={tryScenario} />}
+            {tab === 'plan' && <DailyPlan key={`${accountId}-${horizon.scenario}`} {...{ horizon, forecast, busy, onScenario, openTab }} />}
             {tab === 'accounts' && <AccountsPage profile={profile} horizon={horizon} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} openTab={openTab} hidden={hidden} doReset={doReset} busy={busy} onScenario={onScenario} refresh={() => run(() => refresh())} />}
 
-            {tab === 'savings' && <SavingsPage {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doAutoSweep, doRecall, doReset, doUndo, onAutoToggle, onAutoCycle, onScenario }} />}
+            {tab === 'savings' && <SavingsPage {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doAutoSweep, doRecall, doReset, doUndo, onAutoToggle, onAutoCycle, onScenario, openTab }} />}
 
-            {tab === 'transfer' && <div className="feature-layout transfer-layout"><TransferForm profile={profile} persona={persona} recipients={recipients} recipient={recipient} amount={amount} setAmount={setAmount} changeRecipient={changeRecipient} clearResult={() => { setTransferResult(null); setClearanceToken(null); }} busy={busy} evaluate={evaluate} prepareHighValue={prepareHighValue} telemetry={telemetry} setTelemetry={(value) => { setTelemetry(value); setTransferResult(null); setClearanceToken(null); }} /><aside className="feature-aside"><TransferResult result={transferResult} {...{ amount, recipient, busy, clearanceToken, verify, decide, scanning }} clear={() => setTransferResult(null)} /><div className="surface aside-card trust-note"><span className="icon-box mint"><LockKeyhole size={21} /></span><h3>ปลอดภัยตั้งแต่ก่อนโอน</h3><p>รายการปกติผ่านได้ทันที ส่วนรายการที่น่าสงสัยแสดงเหตุผลให้เห็นก่อนตัดสินใจ</p></div></aside></div>}
+            {tab === 'transfer' && <div className="feature-layout transfer-layout"><TransferForm profile={profile} persona={persona} recipients={recipients} recipient={recipient} amount={amount} setAmount={setAmount} changeRecipient={changeRecipient} clearResult={() => { setTransferResult(null); setClearanceToken(null); }} busy={busy} evaluate={evaluate} prepareHighValue={prepareHighValue} telemetry={telemetry} setTelemetry={(value) => { setTelemetry(value); setTransferResult(null); setClearanceToken(null); }} /><aside className="feature-aside"><TransferResult result={transferResult} {...{ amount, recipient, busy, clearanceToken, verify, decide, scanning }} clear={() => setTransferResult(null)} /><div className="surface aside-card trust-note"><span className="icon-box mint"><LockKeyhole size={21} /></span><h3>ดูเหตุผลก่อนตัดสินใจโอน</h3><p>รายการปกติผ่านได้ทันที ส่วนรายการที่น่าสงสัยแสดงเหตุผลให้เห็นก่อนตัดสินใจ</p></div></aside></div>}
           </> : null}
           <footer className="page-footer"><span>FlowSense × TrustGraph · Prototype experience</span><span>Inspired by everyday banking · ไม่ใช่ผลิตภัณฑ์ทางการของ KBank</span></footer>
         </main>

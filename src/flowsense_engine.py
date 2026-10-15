@@ -1,11 +1,17 @@
 """Calendar-aware demo liquidity rules shared by the horizon and sweep guard."""
 from datetime import datetime, timedelta
+from decimal import Decimal, ROUND_DOWN
 from zoneinfo import ZoneInfo
 
 
 def demo_now(state):
     # Financial presets must never move the calendar away from the real Thai date.
-    return datetime.now(ZoneInfo("Asia/Bangkok"))
+    now = datetime.now(ZoneInfo("Asia/Bangkok"))
+    today = now.strftime("%Y-%m-%d")
+    if state.get("spending_date", today) != today:
+        state["daily_spent_today"] = 0.0
+    state["spending_date"] = today
+    return now
 
 
 def next_payday(now):
@@ -62,7 +68,18 @@ def horizon(prof, state, projection=None):
     state_name = "COMMITMENT_AT_RISK" if risk else "NORMAL_DIP_SAFE" if normal else "HEALTHY_HORIZON"
     nudge = "มีภาระใกล้ถึงกำหนดที่เงินอาจไม่พอ ลองดึงเงินออมคืนหรือปรับแผนใช้จ่าย" if risk else "ยอดเงินลดตามรอบการใช้จ่าย ภาระก่อนเงินเดือนยังมีเงินรองรับ จึงไม่แจ้งเตือน" if normal else "มีเงินรองรับภาระก่อนเงินเดือน ออมได้เฉพาะส่วนที่เหลือหลังกันเงินใช้จ่ายและเงินสำรอง"
     health = round(max(0, min(100, (balance-fixed) / max(1, balance) * 100)), 1)
-    daily_limit = round(max(0, (balance-fixed-buffer) / days), 2)
+    # Current balance already includes today's debits. Add them back only when
+    # establishing today's total allowance, then deduct them once for what's left.
+    def money(value):
+        return Decimal(str(round(value, 2)))
+
+    def cents(value):
+        return float(max(Decimal(0), value).quantize(Decimal('0.01'), rounding=ROUND_DOWN))
+
+    available = money(balance) - money(fixed) - money(buffer)
+    daily_limit = cents((available + money(spent)) / days)
+    spendable = cents(available)
+    remaining_today = cents(min(available, money(daily_limit) - money(spent)))
     badges = {
         "COMMITMENT_AT_RISK": "ภาระใกล้ถึงกำหนดอาจไม่พอ",
         "NORMAL_DIP_SAFE": "เงินลดปกติ · ไม่แจ้งเตือน",
@@ -87,7 +104,10 @@ def horizon(prof, state, projection=None):
         "deficit_amount": round(max([0] + [-row["projected_after_payment"] for row in upcoming if row["is_at_risk"]]), 2),
         "daily_safe_limit": daily_limit,
         "spent_today": round(spent, 2),
-        "remaining_today": round(max(0, daily_limit-spent), 2),
+        "remaining_today": remaining_today,
+        "spendable_balance": spendable,
+        "budget_reserve_shortfall": round(max(0, fixed + buffer - balance), 2),
+        "daily_budget_method": "BALANCE_PLUS_TODAY_SPEND_MINUS_BILLS_AND_BUFFER_DIVIDED_BY_DAYS",
         "savings_capacity": surplus,
         "recommended_sweep_amount": suggested,
         "emergency_buffer": buffer,

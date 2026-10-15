@@ -503,6 +503,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
         with get_account_lock(src_id):
             if src_id in LIVE_ACCOUNT_STATES:
                 src_state = LIVE_ACCOUNT_STATES[src_id]
+                demo_now(src_state)
                 if src_state["main_balance"] < payload.amount:
                     raise HTTPException(status_code=400, detail=f"ยอดเงินในบัญชีหลักไม่เพียงพอ (มี ฿ {src_state['main_balance']:,.2f})")
                 src_state["main_balance"] = round(src_state["main_balance"] - payload.amount, 2)
@@ -645,6 +646,7 @@ def confirm_transfer(payload: TransferConfirmRequest, x_idempotency_key: Optiona
     # Concurrency Lock Guard to prevent double spending
     with get_account_lock(src_id):
         state = LIVE_ACCOUNT_STATES.get(src_id, {"main_balance": 24500.0, "vault_balance": 15000.0})
+        demo_now(state)
         if state["main_balance"] < payload.amount:
             raise HTTPException(status_code=400, detail=f"ยอดเงินในบัญชีหลักไม่เพียงพอ (มี ฿ {state['main_balance']:,.2f})")
 
@@ -685,6 +687,7 @@ def get_flowsense_profile(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
         "daily_spent_today": 280.0
     })
 
+    demo_now(state)
     return {
         "account_id": account_id,
         "masked_account_id": mask_account_id(account_id),

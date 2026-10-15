@@ -5,5 +5,6 @@ import './ui/styles.css';
 import './ui/reference.css';
 import './ui/enhancements.css';
 import './ui/pastel.css';
+import './ui/daily-plan.css';
 
 createRoot(document.getElementById('root')).render(<App />);

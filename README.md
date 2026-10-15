@@ -6,12 +6,12 @@
 [![ONNX Runtime](https://img.shields.io/badge/ONNX_Runtime-1.30-005CED?style=for-the-badge&logo=onnx&logoColor=white)](https://onnxruntime.ai)
 [![License](https://img.shields.io/badge/Status-Independent_Prototype-green?style=for-the-badge)](#disclaimer--prototype-boundaries)
 
-An independent, production-grade UX concept prototype demonstrating two next-generation financial AI capabilities designed for modern mobile banking experiences (inspired by K+ / MAKE by KBank):
+An independent interactive UX prototype demonstrating two next-generation financial AI capabilities designed for modern mobile banking experiences (inspired by K+ / MAKE by KBank):
 
-1. **FlowSense**: 30-day proactive liquidity runway forecasting and autonomous, surplus-only flexible micro-savings (Micro-Sweep).
+1. **FlowSense**: daily spending guidance, a budget simulator, 30-day cashflow forecasting, and surplus-only simulated micro-savings (Micro-Sweep).
 2. **TrustGraph**: Pre-transfer mule account interdiction and transaction fraud intelligence with an explainable AI (XAI) risk panel and simulated step-up micro-authentication.
 
-Engineered with a responsive, bank-grade mobile/desktop web interface, strict session isolation, and sub-second machine learning inference.
+Built with a responsive mobile/desktop interface and isolated visitor sessions. Financial data and transfers are synthetic; this is not a production banking service.
 
 ---
 
@@ -21,7 +21,7 @@ Engineered with a responsive, bank-grade mobile/desktop web interface, strict se
 - **API Health Check:** [https://k-web-application.onrender.com/api/v2/health](https://k-web-application.onrender.com/api/v2/health)
 
 > [!TIP]
-> **Zero Cold-Start:** Configured with an automated keep-awake ping every 10 minutes via Cron-job. The application stays active 24/7 on Render and loads instantly (1–2 seconds) without spin-down latency.
+> Availability and startup time depend on the hosting plan and service state. The health endpoint reports current readiness; this project does not guarantee continuous uptime or a fixed load time.
 
 ---
 
@@ -29,23 +29,25 @@ Engineered with a responsive, bank-grade mobile/desktop web interface, strict se
 
 ### 1. FlowSense — Liquidity Forecasting & Smart Micro-Sweep
 - **30-Day Liquidity Forecast:** High-resolution balance and cash flow projection across 30 future days, today, and 7 synthetic historical days powered by ONNX inference (`flowsense.onnx`).
-- **Status Horizon & Runway Health:** Real-time liquidity runway bar and calculated daily safe-spending limit based on fixed debits, upcoming payday, and emergency buffers.
+- **Daily Spending Plan:** The home screen highlights how much more can be spent today, the total daily allowance, and spending already posted. The allowance reserves known bills and an emergency buffer until payday. It is a transparent calculation, separate from model-predicted spending.
+- **Budget Simulator:** Try a daily budget and see the projected balance before payday, reserve shortfall, and bill risk without changing account balances.
+- **Status Horizon:** Calendar-aware bill-risk checks and a model-based 30-day balance projection. These are prototype estimates, not verified financial recommendations.
 - **Normal-Dip Suppression:** Intelligent alert gating that suppresses noise during routine balance drops, alerting only when upcoming fixed obligations (rent, bills, debt) are projected to be at risk.
-- **Surplus-Only Micro-Sweep:** Autonomous micro-savings engine that recommends moving only genuine surplus into an interest-bearing vault without impacting daily liquidity.
+- **Surplus-Only Micro-Sweep:** Simulated savings recommendations reserve projected expenses, bills, and a buffer before moving money to a demo vault. Automatic-saving cycles are manually triggered; no interest accrual or scheduled background saving is implemented.
 - **1-Tap Undo & Immediate Recall:** Instant one-tap reversal of the latest sweep, with partial or full emergency vault recall at zero penalty.
 
 ### 2. TrustGraph — Pre-Transfer Fraud & Mule Interdiction
-- **Real-Time Graph Embedding & Risk Scoring:** Millisecond-level inference with ONNX graph node embeddings (`trustgraph.onnx`) evaluating beneficiary account age, velocity anomalies, and relational mule patterns.
+- **Risk Scoring with Precomputed Graph Features:** ONNX inference uses saved graph embeddings and synthetic account/behavioral features. It does not build a live banking graph.
 - **Explainable AI (XAI) Risk Factors:** Human-readable risk explanations (e.g., dormant account reactivated, sudden deviation from historical averages, recipient velocity surge).
 - **Simulated Micro-Auth (5s Step-Up):** A simulated 5-second facial liveness verification gate that generates a cryptographically signed clearance token (HMAC-SHA256, 120s TTL) binding source, recipient, amount, and visitor session.
 - **Blocked Mule Interdiction:** Immediate transfer prevention for known or flagged mule accounts before debit execution.
-- **Downloadable E-Slip:** Generates formatted, verifiable text receipts with unique demo transaction references.
+- **Downloadable E-Slip:** Generates plain-text demo receipts with unique demo transaction references.
 
 ### 3. Behavioral Personas & Interactive Data Lab
 - **3 Synthetic Personas:** Switch between realistic financial profiles with distinct income rhythms:
   - **May (Early Career):** Stable entry-level salary, predictable living expenses.
-  - **Golf (Freelancer / Business Owner):** Irregular lump-sum inflows, volatile spending cycles.
-  - **Ann (Corporate Professional):** High income, multiple concurrent debt and family obligations.
+  - **Non (Multiple Commitments):** A demo profile with several expense obligations.
+  - **Praew (Reserve Builder):** A demo profile focused on financial reserves.
 - **SecOps & Data Lab:** Explore an interactive sample graph of 18 synthetic transactions, inspect node embeddings, and simulate deposit growth scenarios with an interactive CASA slider.
 
 ---
@@ -85,7 +87,7 @@ k-web-application/
 - **CSRF & Idempotency Enforcement:** All state-mutating requests require valid `X-CSRF-Token` headers and unique `X-Idempotency-Key` headers (UUID) to prevent double debits.
 - **Model Checksum Integrity:** Validates SHA-256 hashes of all `.onnx` model files at runtime startup to guard against tampering.
 - **Hardened Cookies & Headers:** Production cookies utilize the `__Host-` prefix, `Secure`, `HttpOnly`, and `SameSite=Strict`. Response headers enforce Strict Content-Security-Policy (CSP), HSTS, `X-Content-Type-Options: nosniff`, and `X-Frame-Options: DENY`.
-- **DoS Mitigation:** Enforces strict request body limits (max 8 KiB) and IP-based rate limiting on session creation and API operations.
+- **DoS Mitigation:** Enforces strict request body limits (max 8 KiB) and IP-based limits on session creation and per-session limits on API requests.
 
 ---
 
@@ -139,14 +141,8 @@ This repository includes a production-ready [Dockerfile](Dockerfile) and [render
 ### 2. Health Check Configuration
 - **Health Check Path:** `/api/v2/health`
 
-### 3. Keep-Awake / Zero Cold-Start Setup (100% Free)
-To prevent the Render free-tier instance from sleeping after 15 minutes of inactivity:
-1. Register a free account at **[cron-job.org](https://cron-job.org)**.
-2. Create a new Cronjob:
-   - **URL:** `https://<your-service-name>.onrender.com/api/v2/health`
-   - **Schedule:** `Every 10 minutes`
-   - **Request Method:** `GET`
-3. The lightweight health endpoint (~60 bytes) will be pinged periodically, keeping your service active 24/7 without incurring cold starts.
+### 3. Optional Availability Monitoring
+Monitor `/api/v2/health` with your chosen monitoring service. A periodic health request is not an uptime guarantee; verify hosting limits and deployment readiness for a live demonstration.
 
 ---
 
@@ -156,8 +152,9 @@ To prevent the Render free-tier instance from sleeping after 15 minutes of inact
 # Install test dependencies
 pip install -r requirements-dev.txt
 
-# Run the complete test suite (19 test cases)
+# Run the backend and frontend checks
 python -m unittest discover -s tests -p 'test_*.py' -v
+npm run test:ui
 
 # Perform automated security audits on dependencies
 pip-audit -r requirements.lock --disable-pip --no-deps
@@ -174,4 +171,8 @@ npm run build
 1. **Independent UX Prototype:** This project is an independent conceptual research prototype created for UX exploration. It is not affiliated with, endorsed by, or connected to KASIKORNBANK (KBank), KBTG, K PLUS, or MAKE by KBank.
 2. **100% Synthetic Data:** All accounts, balances, transaction histories, risk labels, and biometric verification checks are completely synthetic and simulated.
 3. **No Real Banking Connectivity:** There is no integration with live banking cores, payment networks, or facial recognition hardware.
-4. **Volatile In-Memory Storage:** Session balances and history expire after 1 hour of inactivity or upon container restart/redeployment.
+4. **Volatile In-Memory Storage:** Session balances and history expire 1 hour after session creation or upon container restart/redeployment.
+
+## Product review and daily-plan validation
+
+See [the UX, product, and security review](docs/PRODUCT_REVIEW_2026-10-15.md) for the findings, changes, verification, and remaining prototype boundaries.
