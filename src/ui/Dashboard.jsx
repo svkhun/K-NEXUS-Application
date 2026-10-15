@@ -4,36 +4,15 @@ import { AccountGarden, SavingsBloom } from './FinanceDecor';
 import { ScenarioPicker } from './SavingsPage';
 import { DailySummary } from './DailyPlan';
 import {
-  Activity, ArrowDownLeft, ArrowRight, BadgeCheck,
+  ArrowDownLeft, ArrowRight,
   Bell, ChevronRight, Clock3, CreditCard, Eye, EyeOff,
-  Home, LockKeyhole, RotateCcw, Send, ShieldAlert, ShieldCheck,
-  Sparkles, Target, TrendingUp, Wallet,
+  Home, RotateCcw, Send, ShieldAlert, ShieldCheck,
+  Sparkles, Target, Wallet,
 } from 'lucide-react';
 
 const money = (value, digits = 0) => new Intl.NumberFormat('th-TH', {
   minimumFractionDigits: digits, maximumFractionDigits: digits,
 }).format(Number(value ?? 0));
-
-function PhonePreview({ dailyLimit }) {
-  return (
-    <div className="phone-scene" aria-hidden="true">
-      <div className="scene-orbit orbit-one" /><div className="scene-orbit orbit-two" />
-      <span className="scene-leaf leaf-one" /><span className="scene-leaf leaf-two" /><span className="scene-leaf leaf-three" />
-      <div className="concept-phone">
-        <div className="phone-speaker" />
-        <div className="phone-brand">K<small>เงินออม</small></div>
-        <div className="phone-greeting">วันนี้ใช้เพิ่มได้อีก</div>
-        <strong className="phone-amount">฿{money(dailyLimit)}</strong>
-        <div className="phone-status"><span /> แผนรายวันของคุณ</div>
-        <div className="phone-chart"><svg viewBox="0 0 140 50"><path d="M0 43 L17 38 L35 40 L53 27 L70 31 L87 17 L106 20 L125 8 L140 12" fill="none" stroke="#099c72" strokeWidth="3" strokeLinecap="round" /></svg></div>
-        <div className="phone-vault"><Wallet size={14} /><span>กระเป๋าเงินออม</span><ArrowRight size={12} /></div>
-        <div className="phone-bottom"><Home size={13} /><Send size={13} /><Wallet size={13} /></div>
-      </div>
-      <div className="floating-insight"><span><ShieldCheck size={17} /></span><div><strong>TrustGraph</strong><small>ตรวจความเสี่ยงก่อนโอน</small></div></div>
-      <span className="scene-spark">✦</span>
-    </div>
-  );
-}
 
 export function AccountTiles({ profile, openTab, hidden = false }) {
   const value = (amount) => hidden ? '••••••' : `฿ ${money(amount, 2)}`;
@@ -49,7 +28,7 @@ export function AccountTiles({ profile, openTab, hidden = false }) {
       </button>
       <div className="account-tile protection-account">
         <div className="account-tile-top"><span className="account-emblem"><ShieldCheck size={16} /></span><div><strong>ตรวจความเสี่ยงก่อนโอน</strong><small>TrustGraph · สถานการณ์จำลอง</small></div><span className="protection-dot" /></div>
-        <AccountGarden /><b>รู้เหตุผลก่อนตัดสินใจ</b><button className="protection-link" onClick={() => openTab('transfer')}>ทดลองใช้งาน <ArrowRight size={14} /></button>
+        <AccountGarden /><b>ดูความเสี่ยงของผู้รับ</b><button className="protection-link" onClick={() => openTab('transfer')}>ตรวจสอบก่อนโอน <ArrowRight size={14} /></button>
       </div>
     </div>
   );
@@ -74,10 +53,10 @@ export function Commitments({ horizon }) {
 function ActivityList({ activities, openTab }) {
   return (
     <section className="surface activity-card">
-      <div className="surface-heading"><div><h2>รายการทดลองล่าสุด</h2><p className="heading-description">ติดตามสิ่งที่คุณเพิ่งลองใช้งาน</p></div><Clock3 size={18} color="#90a19d" /></div>
+      <div className="surface-heading"><div><h2>รายการล่าสุด</h2><p className="heading-description">รายการออมและโอนในบัญชีทดลองนี้</p></div><Clock3 size={18} /></div>
       {activities.length ? <div className="activity-list">{activities.map(({ title, description, icon: Icon, time }, index) => (
         <div key={index} className="activity-row"><span className="activity-icon"><Icon size={17} /></span><div><strong>{title}</strong><small>{description}</small></div><time>{time}</time></div>
-      ))}</div> : <div className="activity-starter"><p>เริ่มทดลอง แล้วรายการของคุณจะแสดงที่นี่</p><button onClick={() => openTab('savings')}><span className="starter-icon mint"><Wallet size={18} /></span><span><strong>เริ่มออมตามจังหวะของคุณ</strong><small>ลองออม ดึงคืน และดูสภาพคล่อง</small></span><ArrowRight size={16} /></button><button onClick={() => openTab('transfer')}><span className="starter-icon lilac"><ShieldCheck size={18} /></span><span><strong>ลองโอนอย่างเข้าใจความเสี่ยง</strong><small>เห็นเหตุผลก่อนตัดสินใจ</small></span><ArrowRight size={16} /></button></div>}
+      ))}</div> : <div className="activity-starter"><p>ยังไม่มีรายการ เมื่อทดลองออมหรือโอนเงิน รายการจะแสดงที่นี่</p><button onClick={() => openTab('savings')}><span className="starter-icon mint"><Wallet size={18} /></span><span><strong>ลองออมเงิน</strong><small>เลือกจำนวนเงิน และดึงคืนได้เมื่อจำเป็น</small></span><ArrowRight size={16} /></button><button onClick={() => openTab('transfer')}><span className="starter-icon lilac"><ShieldCheck size={18} /></span><span><strong>ลองโอนเงิน</strong><small>เลือกผู้รับเพื่อดูผลตรวจความเสี่ยง</small></span><ArrowRight size={16} /></button></div>}
     </section>
   );
 }
@@ -85,7 +64,7 @@ function ActivityList({ activities, openTab }) {
 export function ForecastPanel({ horizon, chart }) {
   return (
     <section className="surface forecast-card">
-      <div className="surface-heading timeline-heading"><div className="timeline-heading-copy"><span className="timeline-title-icon"><TrendingUp size={23} /></span><div><span className="section-kicker">YOUR MONEY TIMELINE</span><h2>เห็นเส้นทางเงิน ก่อนถึงวันข้างหน้า</h2><p className="heading-description">ย้อนหลัง 7 วัน เชื่อมวันนี้ สู่แผนการเงินอีก 30 วัน</p></div></div><span className={`runway-badge ${horizon.commitment_at_risk ? 'is-risk' : ''}`}><ShieldCheck size={15} />{horizon.commitment_at_risk ? 'ควรเตรียมสภาพคล่อง' : 'ภาระก่อนเงินเดือนมีเงินรองรับ'}</span></div>
+      <div className="surface-heading timeline-heading"><div className="timeline-heading-copy"><div><h2>แนวโน้มเงินเข้า–ออก</h2><p className="heading-description">ย้อนหลังจำลอง 7 วัน และคาดการณ์ล่วงหน้าสูงสุด 30 วัน</p></div></div><span className={`runway-badge ${horizon.commitment_at_risk ? 'is-risk' : ''}`}><ShieldCheck size={15} />{horizon.commitment_at_risk ? 'ควรเตรียมสภาพคล่อง' : 'ภาระก่อนเงินเดือนมีเงินรองรับ'}</span></div>
       {chart}
     </section>
   );
@@ -97,9 +76,9 @@ export default function Dashboard({ profile, horizon, forecast, activities, char
     <div className="bank-dashboard">
       <DailySummary {...{horizon, forecast, openTab}} />
       <div className="feature-entry-grid" aria-label="เริ่มทดลองฟังก์ชันหลัก">
-        <button className="feature-entry" onClick={() => openTab('plan')}><span className="plan-icon mint"><Target size={22} /></span><span><strong>1. วางแผนใช้เงิน</strong><small>ลองตั้งงบ แล้วดูว่าจะพอถึงเงินเดือนหรือไม่</small></span><ChevronRight size={17} /></button>
-        <button className="feature-entry" onClick={() => openTab('savings')}><span className="plan-icon peach"><Wallet size={22} /></span><span><strong>2. ออมส่วนที่พร้อม</strong><small>ดูยอดแนะนำ ออมและดึงคืนได้</small></span><ChevronRight size={17} /></button>
-        <button className="feature-entry" onClick={() => tryScenario(1)}><span className="plan-icon lilac"><ShieldCheck size={22} /></span><span><strong>3. ตรวจความเสี่ยงก่อนโอน</strong><small>ลองคำเตือนและเหตุผลก่อนตัดสินใจ</small></span><ChevronRight size={17} /></button>
+        <button className="feature-entry" onClick={() => openTab('plan')}><span className="plan-icon mint"><Target size={22} /></span><span><strong>วางแผนใช้เงิน</strong><small>ตั้งงบให้พอถึงเงินเดือน</small></span><ChevronRight size={17} /></button>
+        <button className="feature-entry" onClick={() => openTab('savings')}><span className="plan-icon peach"><Wallet size={22} /></span><span><strong>ออมเงิน</strong><small>ดูยอดแนะนำและจัดการเงินออม</small></span><ChevronRight size={17} /></button>
+        <button className="feature-entry" onClick={() => tryScenario(1)}><span className="plan-icon lilac"><ShieldCheck size={22} /></span><span><strong>ตรวจความเสี่ยงก่อนโอน</strong><small>ดูคำเตือนและเหตุผลของรายการ</small></span><ChevronRight size={17} /></button>
       </div>
       <div className="welcome-grid">
         <section className="surface total-balance">
@@ -112,8 +91,8 @@ export default function Dashboard({ profile, horizon, forecast, activities, char
           </div>
         </section>
         <section className="flowsense-banner">
-          <div className="banner-copy"><span className="banner-label"><Sparkles size={13} /> ออมตามสภาพคล่อง</span><h2>เริ่มเล็ก ๆ<br />ออมเมื่อพร้อม</h2><p>แนะนำออมรอบนี้ ฿{money(horizon.recommended_sweep_amount, 2)}<br />เผื่อเงินใช้และบิลที่กำลังจะถึง</p><button onClick={() => openTab('savings')}>ดูคำแนะนำการออม <ArrowRight size={15} /></button></div>
-          <PhonePreview dailyLimit={horizon.remaining_today} />
+          <div className="banner-copy"><span className="banner-label">เงินออมของคุณ</span><h2>{horizon.recommended_sweep_amount > 0 ? 'มีเงินส่วนที่พร้อมออม' : 'เผื่อเงินใช้ ก่อนเริ่มออม'}</h2><p>{horizon.recommended_sweep_amount > 0 ? `แนะนำออมรอบนี้ ฿${money(horizon.recommended_sweep_amount, 2)}` : 'รอบนี้ยังไม่แนะนำออมเพิ่ม เพื่อกันเงินไว้สำหรับบิลและรายจ่าย'}</p><button onClick={() => openTab('savings')}>จัดการเงินออม <ArrowRight size={16} /></button></div>
+          <SavingsBloom />
         </section>
       </div>
 
@@ -122,7 +101,7 @@ export default function Dashboard({ profile, horizon, forecast, activities, char
 
       <div className="dashboard-timeline"><ForecastPanel horizon={horizon} chart={chart} /></div>
 
-      <div className="dashboard-bottom-grid"><ActivityList activities={activities} openTab={openTab} /><section className="surface journey-card"><div className="journey-copy"><span className="section-kicker">SMALL STEPS, BETTER FLOW</span><h2>ออมทีละนิด<br />พร้อมใช้ในทุกจังหวะ</h2><p>ลองให้ FlowSense ช่วยกันเงิน แล้วดูว่าเงินวันนี้ดูแลวันข้างหน้าได้อย่างไร</p><button className="primary-button" onClick={() => openTab('savings')}>เริ่มแผนเงินของคุณ <ArrowRight size={16} /></button></div><SavingsBloom /></section></div>
+      <div className="dashboard-activity"><ActivityList activities={activities} openTab={openTab} /></div>
     </div>
   );
 }

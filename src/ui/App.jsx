@@ -203,7 +203,7 @@ function App() {
           {navItems.map(({ id, label, icon: Icon }) => <button key={id} className={tab === id ? 'active' : ''} aria-label={label} title={label} aria-current={tab === id ? 'page' : undefined} onClick={() => openTab(id)}><Icon size={19} strokeWidth={1.6} /><span>{label}</span>{tab === id && <ChevronRight className="side-chevron" size={14} />}</button>)}
         </nav>
         <div className="sidebar-spacer" />
-        <div className="sidebar-feature"><ShieldCheck size={19} /><strong>FlowSense × TrustGraph</strong><p>ผู้ช่วยการเงินและความปลอดภัย<br />ที่คุณลองใช้ได้ด้วยตัวเอง</p></div>
+        <div className="sidebar-feature"><strong>FlowSense × TrustGraph</strong><p>ข้อมูลสมมติสำหรับทดลองใช้งาน</p></div>
         <div className="sidebar-profile"><div className={`avatar ${persona.color}`}>{persona.initials}</div><div><strong>คุณ{persona.name}</strong><small>บัญชีทดลอง</small></div></div>
       </aside>
 
