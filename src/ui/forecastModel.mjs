@@ -19,6 +19,13 @@ export function cashOut(point) {
   return Math.max(0, Number(point.is_past ? point.actual_spend : point.predicted_spend) || 0) + Math.max(0, Number(point.commitment_payment) || 0);
 }
 
+export function buildMoneyScale(points, top, bottom) {
+  const balances = points.map((point) => Number(point.projected_balance));
+  const axis = niceAxis(Math.min(0, ...balances), Math.max(0, ...balances, ...points.map(cashOut)) * 1.12);
+  const y = (value) => bottom - (Number(value) - axis.min) / (axis.max - axis.min) * (bottom - top);
+  return { axis, y, baseline: y(0) };
+}
+
 export function niceAxis(minimum, maximum, intervals = 4) {
   const raw = Math.max(1, maximum - minimum) / intervals;
   const power = 10 ** Math.floor(Math.log10(raw));

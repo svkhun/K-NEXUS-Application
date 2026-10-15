@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { bangkokDate, buildForecastView, cashOut, niceAxis, paydayCountdown } from '../src/ui/forecastModel.mjs';
+import { bangkokDate, buildForecastView, buildMoneyScale, cashOut, niceAxis, paydayCountdown } from '../src/ui/forecastModel.mjs';
 
 const timeline = [
   { date: '2026-10-24', is_past: true, projected_balance: -100 },
@@ -41,6 +41,19 @@ test('axes include zero and do not clip deficits or produce an empty range', () 
     assert.ok(axis.max > axis.min);
     assert.ok(axis.ticks.includes(0));
   }
+});
+
+test('one money scale includes large expenses and keeps bars anchored at zero above deficits', () => {
+  const { axis, y, baseline } = buildMoneyScale([
+    { projected_balance: 10000, predicted_spend: 5000 },
+    { projected_balance: -2000, predicted_spend: 25000, commitment_payment: 5000 },
+  ], 40, 260);
+  assert.ok(axis.max >= 30000);
+  assert.ok(axis.min <= -2000);
+  assert.ok(y(30000) >= 40);
+  assert.ok(baseline < 260);
+  assert.ok(y(-2000) > baseline);
+  assert.ok(Math.abs((baseline - y(10000)) - 2 * (baseline - y(5000))) < 1e-9);
 });
 
 test('countdown uses the actual instant and Bangkok payday midnight, clamping expired dates', () => {

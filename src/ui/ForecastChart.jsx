@@ -1,10 +1,10 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { ArrowDownRight, CalendarClock, CalendarDays, ChevronLeft, ChevronRight, Clock3, Coins, Info, RefreshCw, ShieldCheck } from 'lucide-react';
-import { buildForecastView, cashOut, niceAxis, paydayCountdown } from './forecastModel.mjs';
+import { buildForecastView, buildMoneyScale, cashOut, paydayCountdown } from './forecastModel.mjs';
 
 const money = (value, digits = 0) => Number(value || 0).toLocaleString('th-TH', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 const dateLabel = (date, options = {}) => date ? new Date(`${date}T12:00:00+07:00`).toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', ...options }) : '—';
-const compact = (value) => `${value < 0 ? '−' : ''}฿${Math.abs(value) >= 1000 ? `${money(Math.abs(value) / 1000, Math.abs(value) % 1000 ? 1 : 0)}k` : money(Math.abs(value))}`;
+const axisLabel = (value) => `${value < 0 ? '−' : ''}฿${money(Math.abs(value))}`;
 const pad = (value) => String(value).padStart(2, '0');
 
 export default function ForecastChart({ timeline = [], horizon, onRefresh, busy = false }) {
@@ -37,14 +37,10 @@ export default function ForecastChart({ timeline = [], horizon, onRefresh, busy 
   const foundIndex = points.findIndex((point) => point.date === selectedDate);
   const selectedIndex = foundIndex < 0 ? todayIndex : foundIndex;
   const selected = points[selectedIndex];
-  const values = points.map((point) => Number(point.projected_balance));
-  const balanceAxis = niceAxis(Math.min(0, ...values), Math.max(...values) * 1.12);
-  const expenseAxis = niceAxis(0, Math.max(1, ...points.map(cashOut)), 3);
   const plot = { left: 66, right: 890, top: 39, bottom: 262 };
+  const { axis: balanceAxis, y, baseline } = buildMoneyScale(points, plot.top, plot.bottom);
   const gap = (plot.right - plot.left) / Math.max(1, points.length - 1);
   const x = (index) => plot.left + index * gap;
-  const y = (value) => plot.bottom - (Number(value) - balanceAxis.min) / (balanceAxis.max - balanceAxis.min) * (plot.bottom - plot.top);
-  const expenseY = (value) => plot.bottom - Number(value) / expenseAxis.max * 104;
   const coordinates = (subset) => subset.map((point) => `${x(points.indexOf(point))},${y(point.projected_balance)}`).join(' ');
   const historical = points.filter((point) => point.is_past || point.is_today);
   const projected = points.filter((point) => !point.is_past);
@@ -77,17 +73,16 @@ export default function ForecastChart({ timeline = [], horizon, onRefresh, busy 
       <div className="payday-countdown"><CalendarClock size={18} /><div><small>ถึงวันเงินเดือนเข้าจำลอง</small><span>{countdown ? <><b>{countdown.days}</b> วัน <b>{pad(countdown.hours)}</b> ชม. <b>{pad(countdown.minutes)}</b> นาที <b>{pad(countdown.seconds)}</b> วิ</> : 'กำลังคำนวณ'}</span></div></div>
       {onRefresh && <button className="timeline-refresh" aria-label="อัปเดตข้อมูลคาดการณ์" disabled={busy} onClick={onRefresh}><RefreshCw size={15} /><span>อัปเดตข้อมูล</span></button>}
     </div>
-    <div className="timeline-axis-head"><span>ยอดคงเหลือ <b>บาท</b></span><div className="timeline-display-toggles"><button aria-pressed={showHistory} onClick={() => { setShowHistory(!showHistory); setSelectedDate(null); }}>ย้อนหลัง</button><button aria-pressed={showExpenses} onClick={() => setShowExpenses(!showExpenses)}>แท่งรายจ่าย</button></div><span>รายจ่าย <b>บาท</b></span></div>
+    <div className="timeline-axis-head"><span>จำนวนเงิน (บาท) <b>สเกลเดียวกัน</b></span><div className="timeline-display-toggles"><button aria-pressed={showHistory} onClick={() => { setShowHistory(!showHistory); setSelectedDate(null); }}>ย้อนหลัง</button><button aria-pressed={showExpenses} onClick={() => setShowExpenses(!showExpenses)}>แท่งรายจ่าย</button></div></div>
     <div className="timeline-scroll" ref={scrollRef} tabIndex="0" aria-label="พื้นที่กราฟ เลื่อนแนวนอนบนมือถือเพื่อดูทุกวัน">
       <svg className="cashflow-svg" viewBox="0 0 960 306" role="img" aria-label={`เส้นยอดเงินย้อนหลังจำลองและคาดการณ์ ${range} วัน แท่งแสดงรายจ่าย เลือกวันที่แถบเลื่อนด้านล่าง`} onClick={selectFromPointer} onPointerMove={(event) => { if (event.pointerType === 'mouse') selectFromPointer(event); }}>
         <defs><linearGradient id={`${id}area`} x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#93d8ba" stopOpacity=".38" /><stop offset="1" stopColor="#bdebd5" stopOpacity=".03" /></linearGradient><linearGradient id={`${id}expense`} x1="0" x2="0" y1="0" y2="1"><stop stopColor="#e8b080" /><stop offset="1" stopColor="#f8d8b8" /></linearGradient></defs>
         {todayIndex > 0 && <rect x={plot.left} y={plot.top} width={x(todayIndex)-plot.left} height={plot.bottom-plot.top} fill="#eaf1fb" opacity=".5" rx="8" />}
         <rect x={x(todayIndex)} y={plot.top} width={plot.right-x(todayIndex)} height={plot.bottom-plot.top} fill="#eef8f1" opacity=".55" rx="8" />
-        {balanceAxis.ticks.map((tick) => <g key={tick}><line x1={plot.left} x2={plot.right} y1={y(tick)} y2={y(tick)} stroke={tick === 0 ? '#aebfb5' : '#e2eae3'} strokeDasharray={tick === 0 ? '4 4' : undefined} /><text x="52" y={y(tick)+4} textAnchor="end" className="balance-axis-label">{compact(tick)}</text></g>)}
-        {showExpenses && expenseAxis.ticks.map((tick) => <text key={tick} x="906" y={expenseY(tick)+4} className="expense-axis-label">{compact(tick)}</text>)}
+        {balanceAxis.ticks.map((tick) => <g key={tick}><line x1={plot.left} x2={plot.right} y1={y(tick)} y2={y(tick)} stroke={tick === 0 ? '#aebfb5' : '#e2eae3'} strokeDasharray={tick === 0 ? '4 4' : undefined} /><text x="52" y={y(tick)+4} textAnchor="end" className="balance-axis-label">{axisLabel(tick)}</text></g>)}
         {tickIndexes.map((index) => <line key={index} x1={x(index)} x2={x(index)} y1={plot.top} y2={plot.bottom} stroke="#e4ebe6" strokeDasharray="3 6" />)}
         <polygon points={`${plot.left},${y(0)} ${line} ${plot.right},${y(0)}`} fill={`url(#${id}area)`} />
-        {showExpenses && points.map((point, index) => <rect key={point.date} x={x(index)-Math.min(7, gap*.31)} y={expenseY(cashOut(point))} width={Math.min(14, gap*.62)} height={Math.max(0, plot.bottom-expenseY(cashOut(point)))} rx="3" fill={point.is_past ? '#adcbe3' : `url(#${id}expense)`} stroke={point.commitment_payment > 0 ? '#cb975e' : 'none'} strokeWidth="1" opacity={point.date === selected.date ? 1 : .75} />)}
+        {showExpenses && points.map((point, index) => <rect key={point.date} x={x(index)-Math.min(7, gap*.31)} y={y(cashOut(point))} width={Math.min(14, gap*.62)} height={Math.max(0, baseline-y(cashOut(point)))} rx="3" fill={point.is_past ? '#adcbe3' : `url(#${id}expense)`} stroke={point.commitment_payment > 0 ? '#cb975e' : 'none'} strokeWidth="1" opacity={point.date === selected.date ? 1 : .75} />)}
         <polyline points={coordinates(historical)} fill="none" stroke="#7aadd1" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
         <polyline points={coordinates(projected)} fill="none" stroke="#238c69" strokeWidth="3.2" strokeDasharray="5 6" strokeLinecap="round" strokeLinejoin="round" />
         <line x1={x(todayIndex)} x2={x(todayIndex)} y1={plot.top-4} y2={plot.bottom} stroke="#7aadd1" strokeDasharray="3 5" />
@@ -110,6 +105,6 @@ export default function ForecastChart({ timeline = [], horizon, onRefresh, busy 
       <article className="timeline-insight salary-point"><span className="insight-emblem"><Coins size={19} /></span><div><small>รอบเงินเดือนถัดไป</small><strong>{dateLabel(payday?.date || horizon?.payday_date)}</strong><span>{payday ? `เงินเข้าจำลอง +฿${money(payday.salary_inflow)}` : 'อยู่นอกช่วงคาดการณ์'}{payday && paydayIndex < 0 && ' · นอกช่วงกราฟที่เลือก'}</span></div></article>
       <article className={`timeline-insight runway-point ${horizon?.commitment_at_risk ? 'needs-plan' : ''}`}><span className="insight-emblem"><ShieldCheck size={19} /></span><div><small>{horizon?.commitment_at_risk ? 'ภาระใกล้ถึงกำหนดอาจไม่พอ' : 'ใช้ได้ต่อวันโดยประมาณ'}</small><strong>{horizon?.commitment_at_risk ? `ขาด ฿${money(horizon.deficit_amount)}` : `฿${money(horizon?.daily_safe_limit)}`}</strong><span>บัญชีหลักวันนี้ ฿{money(today.projected_balance, 2)} · {horizon?.alert_suppressed ? 'แจ้งเตือนเฉพาะภาระเสี่ยง' : 'ลองดึงเงินออมคืน'}</span></div></article>
     </div>
-    <div className="timeline-footnote"><Info size={14} /><p>ย้อนหลังและอนาคตใช้ข้อมูลจำลอง · เส้นคือยอดเงินคงเหลือ แท่งคือรายจ่ายประจำวันรวมภาระที่จ่าย · นาฬิกาแสดงเวลาไทย ไม่ใช่การอัปเดตยอดจากธนาคาร</p></div>
+    <div className="timeline-footnote"><Info size={14} /><p>เส้นยอดคงเหลือและแท่งรายจ่ายใช้สเกลเงินบาทเดียวกันทางซ้าย · แท่งรวมรายจ่ายประจำวันและภาระที่จ่าย · ข้อมูลการเงินจำลอง นาฬิกาแสดงเวลาไทย</p></div>
   </div>;
 }
