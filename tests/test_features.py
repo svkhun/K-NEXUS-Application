@@ -2,6 +2,7 @@
 import secrets
 import unittest
 from datetime import datetime
+from unittest.mock import patch
 from zoneinfo import ZoneInfo
 from fastapi.testclient import TestClient
 from src.app_v2 import app
@@ -87,6 +88,29 @@ class FeatureTests(unittest.TestCase):
             self.assertAlmostEqual(current['projected_balance'], previous['projected_balance']-current['predicted_spend']-current['commitment_payment']+current['salary_inflow'], delta=.02)
         for year, month, day, expected in ((2026,12,31,'2027-01-28'), (2028,2,29,'2028-03-28'), (2026,1,28,'2026-02-28')):
             self.assertEqual(next_payday(datetime(year,month,day,tzinfo=ZoneInfo('Asia/Bangkok'))).strftime('%Y-%m-%d'), expected)
+
+    def test_all_scenarios_use_current_thai_date_and_matching_forecast(self):
+        for instant, expected in (
+            ('2026-10-15T05:53:00+00:00', '2026-10-15'),
+            ('2026-10-15T17:00:00+00:00', '2026-10-16'),
+            ('2026-12-31T17:00:00+00:00', '2027-01-01'),
+            ('2028-02-28T17:00:00+00:00', '2028-02-29'),
+        ):
+            with patch('src.flowsense_engine.datetime') as clock:
+                clock.now.side_effect = lambda zone: datetime.fromisoformat(instant).astimezone(zone)
+                for scenario in ('default', 'healthy', 'normal_dip', 'commitment_risk', 'high_value'):
+                    if scenario == 'default':
+                        self.post('/flowsense/reset-state/ACC_0100')
+                        horizon = self.client.get(BASE + '/flowsense/horizon-status/ACC_0100').json()
+                    else:
+                        horizon = self.scenario(scenario)
+                    forecast = self.client.get(BASE + '/flowsense/forecast-30d/ACC_0100').json()
+                    with self.subTest(instant=instant, scenario=scenario):
+                        self.assertEqual(horizon['as_of_date'], expected)
+                        self.assertEqual(forecast['current_datetime'][:10], expected)
+                        self.assertEqual(next(p['date'] for p in forecast['timeline'] if p['is_today']), expected)
+                        self.assertEqual(horizon['payday_date'], forecast['payday_date'])
+                        self.assertEqual(horizon['days_to_payday'], forecast['days_to_payday'])
 
     def test_event_feed_scoped_and_graph_is_synthetic(self):
         self.scenario('healthy')

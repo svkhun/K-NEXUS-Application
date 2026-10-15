@@ -3,7 +3,7 @@ import { ArrowDownLeft, ArrowRight, CircleAlert, RotateCcw, Sparkles, Wallet } f
 const money = (v) => Number(v || 0).toLocaleString('th-TH', { maximumFractionDigits: 2 });
 
 export function ScenarioPicker({ horizon, busy, onScenario }) {
-  return <section className="surface scenario-lab"><div><span className="section-kicker">ลองสถานการณ์การออมเงิน</span><h2>เห็นผลลัพธ์เมื่อเงินเปลี่ยน</h2><p>เปลี่ยนยอดจำลองและใช้วันที่ 25 เพื่อเทียบก่อนเงินเดือนเข้า · {horizon.scenario === 'default' ? 'ขณะนี้ใช้วันที่ปัจจุบัน' : `วันที่จำลอง ${horizon.as_of_date}`}</p></div><div className="scenario-pills">{[['healthy', 'มีเงินพร้อมออม'], ['normal_dip', 'เงินลดปกติ'], ['commitment_risk', 'ภาระเสี่ยงไม่พอ']].map(([id, label]) => <button key={id} aria-pressed={horizon.scenario === id} disabled={busy} onClick={() => onScenario(id)}>{label}</button>)}</div></section>;
+  return <section className="surface scenario-lab"><div><span className="section-kicker">ลองสถานการณ์การออมเงิน</span><h2>เห็นผลลัพธ์เมื่อเงินเปลี่ยน</h2><p>ทดลองเปลี่ยนยอดเงินเพื่อเทียบสถานะสภาพคล่อง · ทุกสถานการณ์ใช้วันที่ปัจจุบันตามเวลาไทย</p></div><div className="scenario-pills">{[['healthy', 'มีเงินพร้อมออม'], ['normal_dip', 'เงินลดปกติ'], ['commitment_risk', 'ภาระเสี่ยงไม่พอ']].map(([id, label]) => <button key={id} aria-pressed={horizon.scenario === id} disabled={busy} onClick={() => onScenario(id)}>{label}</button>)}</div></section>;
 }
 
 export default function SavingsPage({ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doAutoSweep, doRecall, doReset, doUndo, onAutoToggle, onAutoCycle, onScenario }) {

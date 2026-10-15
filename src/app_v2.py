@@ -1046,6 +1046,13 @@ def set_liquidity_scenario(payload: LiquidityScenarioRequest):
             state["main_balance"] = round(obligations + burn + 1000, 2)
     else:
         state["main_balance"] = round(max(500, obligations * .45), 2)
+    if payload.scenario in {"healthy", "normal_dip"}:
+        # Keep safe presets safe for the current calendar and actual model forecast.
+        forecast = forecast_cashflow_30d(payload.account_id)
+        minimum = min(point["projected_balance"] for point in forecast["timeline"]
+                      if not point["is_past"] and point["date"] < forecast["payday_date"])
+        reserve = draft["emergency_buffer"] + 2000 if payload.scenario == "healthy" else 1000
+        state["main_balance"] = round(state["main_balance"] + max(0, reserve - minimum), 2)
     audit_log("SCENARIO_CHANGED", payload.account_id, {"scenario": payload.scenario})
     return get_flowsense_horizon_status(payload.account_id)
 

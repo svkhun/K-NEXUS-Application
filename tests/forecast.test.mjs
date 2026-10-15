@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildForecastView, cashOut, niceAxis, paydayCountdown } from '../src/ui/forecastModel.mjs';
+import { bangkokDate, buildForecastView, cashOut, niceAxis, paydayCountdown } from '../src/ui/forecastModel.mjs';
 
 const timeline = [
   { date: '2026-10-24', is_past: true, projected_balance: -100 },
@@ -43,10 +43,16 @@ test('axes include zero and do not clip deficits or produce an empty range', () 
   }
 });
 
-test('countdown uses Bangkok midnight, supports simulated dates and clamps expired dates', () => {
+test('countdown uses the actual instant and Bangkok payday midnight, clamping expired dates', () => {
   const now = new Date('2026-10-15T02:00:00Z');
   assert.deepEqual(paydayCountdown('2026-10-28', now), { days: 12, hours: 15, minutes: 0, seconds: 0 });
-  assert.deepEqual(paydayCountdown('2026-10-28', now, '2026-10-25'), { days: 2, hours: 15, minutes: 0, seconds: 0 });
+  assert.deepEqual(paydayCountdown('2026-10-16', new Date('2026-10-15T16:59:59Z')), { days: 0, hours: 0, minutes: 0, seconds: 1 });
   assert.deepEqual(paydayCountdown('2026-10-14', now), { days: 0, hours: 0, minutes: 0, seconds: 0 });
   assert.equal(paydayCountdown(null, now), null);
+});
+
+test('calendar rollover follows Bangkok midnight rather than the browser timezone', () => {
+  assert.equal(bangkokDate(new Date('2026-10-15T16:59:59Z')), '2026-10-15');
+  assert.equal(bangkokDate(new Date('2026-10-15T17:00:00Z')), '2026-10-16');
+  assert.equal(bangkokDate(new Date('2026-12-31T17:00:00Z')), '2027-01-01');
 });

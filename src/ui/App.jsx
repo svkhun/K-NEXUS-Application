@@ -12,6 +12,7 @@ import ForecastChart from './ForecastChart';
 import SavingsPage from './SavingsPage';
 import TransferResult from './TransferResult';
 import { describeEvent } from './InsightsLab';
+import { bangkokDate } from './forecastModel.mjs';
 
 const personas = [
   { id: 'ACC_0100', name: 'เมย์', role: 'วัยเริ่มทำงาน', initials: 'ม', color: 'mint' },
@@ -76,6 +77,23 @@ function App() {
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, [accountId]);
+
+  useEffect(() => {
+    const refreshOnNewDay = async () => {
+      if (loading || !horizon || inFlight.current || document.visibilityState === 'hidden' || horizon.as_of_date === bangkokDate(new Date())) return;
+      inFlight.current = true;
+      try { await refresh(); } catch (err) { setError(err.message); }
+      finally { inFlight.current = false; }
+    };
+    const timer = setInterval(refreshOnNewDay, 30000);
+    window.addEventListener('focus', refreshOnNewDay);
+    document.addEventListener('visibilitychange', refreshOnNewDay);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('focus', refreshOnNewDay);
+      document.removeEventListener('visibilitychange', refreshOnNewDay);
+    };
+  }, [horizon, loading, refresh]);
 
   const run = async (action) => {
     if (inFlight.current) return;

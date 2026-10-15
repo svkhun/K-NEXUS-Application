@@ -4,8 +4,8 @@ from zoneinfo import ZoneInfo
 
 
 def demo_now(state):
-    now = datetime.now(ZoneInfo("Asia/Bangkok"))
-    return now.replace(day=25) if state.get("scenario") in {"healthy", "normal_dip", "commitment_risk", "high_value"} else now
+    # Financial presets must never move the calendar away from the real Thai date.
+    return datetime.now(ZoneInfo("Asia/Bangkok"))
 
 
 def next_payday(now):
@@ -54,7 +54,7 @@ def horizon(prof, state, projection=None):
     fixed = sum(row["amount"] for row in upcoming)
     projected = round((projection or {}).get((payday-timedelta(days=1)).strftime("%Y-%m-%d"), balance - burn * days - fixed), 2)
     risk = any(row["is_at_risk"] for row in rows)
-    normal = balance < salary * .5 and not risk
+    normal = (balance < salary * .5 or state.get("scenario") == "normal_dip") and not risk
     buffer = float(prof.get("emergency_buffer", salary * .12))
     before_salary = [value for date, value in (projection or {}).items() if now.strftime("%Y-%m-%d") <= date < payday.strftime("%Y-%m-%d")]
     surplus = max(0, round(min([projected - buffer, balance - 500] + [value-buffer for value in before_salary]), 2))

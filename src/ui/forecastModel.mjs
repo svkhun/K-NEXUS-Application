@@ -1,4 +1,8 @@
 // Derive chart insights from the API timeline, never from illustrative values.
+export function bangkokDate(now) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+}
+
 export function buildForecastView(timeline = [], days = 30, includeHistory = true) {
   const ordered = [...timeline].sort((a, b) => a.date.localeCompare(b.date));
   const today = ordered.find((point) => point.is_today);
@@ -27,13 +31,9 @@ export function niceAxis(minimum, maximum, intervals = 4) {
   return { min, max, ticks };
 }
 
-export function paydayCountdown(paydayDate, now, simulationDate) {
+export function paydayCountdown(paydayDate, now) {
   if (!paydayDate) return null;
-  let instant = now.getTime();
-  if (simulationDate) {
-    const time = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).format(now);
-    instant = new Date(`${simulationDate}T${time}+07:00`).getTime();
-  }
+  const instant = now.getTime();
   const seconds = Math.max(0, Math.floor((new Date(`${paydayDate}T00:00:00+07:00`).getTime() - instant) / 1000));
   return { days: Math.floor(seconds / 86400), hours: Math.floor(seconds / 3600) % 24, minutes: Math.floor(seconds / 60) % 60, seconds: seconds % 60 };
 }

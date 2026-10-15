@@ -56,8 +56,7 @@ export default function ForecastChart({ timeline = [], horizon, onRefresh, busy 
     paydayLabelX = x(todayIndex)+90 <= plot.right-50 ? x(todayIndex)+90 : x(todayIndex)-90;
   }
   const tickIndexes = [...new Set([0, Math.round(points.length * .2), todayIndex, Math.round(points.length * .55), Math.round(points.length * .78), points.length - 1])].filter((index) => index >= 0 && index < points.length).sort((a, b) => a-b).filter((index, order, indexes) => order === 0 || index-indexes[order-1] >= 3);
-  const simulation = horizon?.scenario && horizon.scenario !== 'default';
-  const countdown = paydayCountdown(payday?.date || horizon?.payday_date, now, simulation ? horizon.as_of_date : undefined);
+  const countdown = paydayCountdown(payday?.date || horizon?.payday_date, now);
   const timeLabel = now.toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour12: false });
   const selectFromPointer = (event) => {
     const bounds = event.currentTarget.getBoundingClientRect();
@@ -74,7 +73,7 @@ export default function ForecastChart({ timeline = [], horizon, onRefresh, busy 
       <div className="timeline-ranges" role="group" aria-label="ช่วงคาดการณ์ล่วงหน้า">{[7, 14, 30].map((days) => <button key={days} aria-pressed={range === days} onClick={() => { setRange(days); setSelectedDate(null); }}>{days} วัน</button>)}</div>
     </div>
     <div className="timeline-clock-strip">
-      <div className="timeline-clock"><span className="clock-emblem"><Clock3 size={17} /></span><div><small>เวลาไทย · {simulation ? `ฐานข้อมูลจำลอง ${dateLabel(horizon.as_of_date)}` : dateLabel(today.date, { weekday: 'short' })}</small><time dateTime={now.toISOString()}>{timeLabel}<span> ICT</span></time></div></div>
+      <div className="timeline-clock"><span className="clock-emblem"><Clock3 size={17} /></span><div><small>เวลาไทย · {dateLabel(today.date, { weekday: 'short' })}</small><time dateTime={now.toISOString()}>{timeLabel}<span> ICT</span></time></div></div>
       <div className="payday-countdown"><CalendarClock size={18} /><div><small>ถึงวันเงินเดือนเข้าจำลอง</small><span>{countdown ? <><b>{countdown.days}</b> วัน <b>{pad(countdown.hours)}</b> ชม. <b>{pad(countdown.minutes)}</b> นาที <b>{pad(countdown.seconds)}</b> วิ</> : 'กำลังคำนวณ'}</span></div></div>
       {onRefresh && <button className="timeline-refresh" aria-label="อัปเดตข้อมูลคาดการณ์" disabled={busy} onClick={onRefresh}><RefreshCw size={15} /><span>อัปเดตข้อมูล</span></button>}
     </div>
