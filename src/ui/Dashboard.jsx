@@ -1,13 +1,13 @@
 import React from 'react';
 import InsightsLab from './InsightsLab';
-import { AccountGarden, SavingsBloom } from './FinanceDecor';
+import { AccountGarden } from './FinanceDecor';
 import { ScenarioPicker } from './SavingsPage';
 import { DailySummary } from './DailyPlan';
 import {
   ArrowDownLeft, ArrowRight,
   Bell, ChevronRight, Clock3, CreditCard, Eye, EyeOff,
   Home, RotateCcw, Send, ShieldAlert, ShieldCheck,
-  Sparkles, Target, Wallet,
+  Sparkles, Target, TrendingUp, Wallet,
 } from 'lucide-react';
 
 const money = (value, digits = 0) => new Intl.NumberFormat('th-TH', {
@@ -70,37 +70,26 @@ export function ForecastPanel({ horizon, chart }) {
   );
 }
 
-export default function Dashboard({ profile, horizon, forecast, activities, chart, hidden, setHidden, busy, doRecall, openTab, tryScenario }) {
+export default function Dashboard({ profile, horizon, activities, hidden, setHidden, openTab, tryScenario }) {
   const total = Number(profile.main_balance) + Number(profile.vault_balance);
   return (
     <div className="bank-dashboard">
-      <DailySummary {...{horizon, forecast, openTab}} />
-      <div className="feature-entry-grid" aria-label="เริ่มทดลองฟังก์ชันหลัก">
-        <button className="feature-entry" onClick={() => openTab('plan')}><span className="plan-icon mint"><Target size={22} /></span><span><strong>วางแผนใช้เงิน</strong><small>ตั้งงบให้พอถึงเงินเดือน</small></span><ChevronRight size={17} /></button>
-        <button className="feature-entry" onClick={() => openTab('savings')}><span className="plan-icon peach"><Wallet size={22} /></span><span><strong>ออมเงิน</strong><small>ดูยอดแนะนำและจัดการเงินออม</small></span><ChevronRight size={17} /></button>
-        <button className="feature-entry" onClick={() => tryScenario(1)}><span className="plan-icon lilac"><ShieldCheck size={22} /></span><span><strong>ตรวจความเสี่ยงก่อนโอน</strong><small>ดูคำเตือนและเหตุผลของรายการ</small></span><ChevronRight size={17} /></button>
-      </div>
-      <div className="welcome-grid">
-        <section className="surface total-balance">
-          <div className="total-balance-top"><div><span>ยอดเงินรวมทุกบัญชี</span><div className="total-amount">{hidden ? '••••••••' : `฿ ${money(total, 2)}`}<button className="icon-button balance-eye" aria-label={hidden ? 'แสดงยอดเงิน' : 'ซ่อนยอดเงิน'} onClick={() => setHidden(!hidden)}>{hidden ? <EyeOff size={17} /> : <Eye size={17} />}</button></div></div><button className="text-link" onClick={() => openTab('accounts')}>ดูรายละเอียด <ChevronRight size={14} /></button></div>
+      <section className="home-wallet surface" aria-label="ภาพรวมบัญชี">
+          <div className="total-balance-top"><div><span>เงินรวมของคุณ</span><div className="total-amount">{hidden ? '••••••••' : `฿${money(total, 2)}`}<button className="icon-button balance-eye" aria-label={hidden ? 'แสดงยอดเงิน' : 'ซ่อนยอดเงิน'} onClick={() => setHidden(!hidden)}>{hidden ? <EyeOff size={17} /> : <Eye size={17} />}</button></div></div><button className="text-link" onClick={() => openTab('accounts')}>ดูบัญชี <ChevronRight size={14} /></button></div>
+          <div className="home-pockets"><button onClick={() => openTab('accounts')}><span>บัญชีหลัก</span><strong>฿{money(profile.main_balance, 2)}</strong></button><button onClick={() => openTab('savings')}><span>เงินออม</span><strong>฿{money(profile.vault_balance, 2)}</strong></button></div>
           <div className="bank-quick-actions">
             <button onClick={() => openTab('transfer')}><span className="bank-action-icon action-primary"><Send size={21} /></span><strong>โอนเงิน</strong></button>
             <button onClick={() => openTab('savings')}><span className="bank-action-icon"><ArrowDownLeft size={21} /></span><strong>ออมเงิน</strong></button>
             <button onClick={() => openTab('savings')}><span className="bank-action-icon"><RotateCcw size={21} /></span><strong>ดึงเงินคืน</strong></button>
             <button onClick={() => openTab('plan')}><span className="bank-action-icon"><Target size={21} /></span><strong>แผนใช้เงิน</strong></button>
           </div>
-        </section>
-        <section className="flowsense-banner">
-          <div className="banner-copy"><span className="banner-label">เงินออมของคุณ</span><h2>{horizon.recommended_sweep_amount > 0 ? 'มีเงินส่วนที่พร้อมออม' : 'เผื่อเงินใช้ ก่อนเริ่มออม'}</h2><p>{horizon.recommended_sweep_amount > 0 ? `แนะนำออมรอบนี้ ฿${money(horizon.recommended_sweep_amount, 2)}` : 'รอบนี้ยังไม่แนะนำออมเพิ่ม เพื่อกันเงินไว้สำหรับบิลและรายจ่าย'}</p><button onClick={() => openTab('savings')}>จัดการเงินออม <ArrowRight size={16} /></button></div>
-          <SavingsBloom />
-        </section>
-      </div>
-
-      <div className="section-title-row"><h2>บัญชีของฉัน</h2><button className="text-link" onClick={() => openTab('accounts')}>ดูทั้งหมด <ChevronRight size={14} /></button></div>
-      <AccountTiles profile={profile} openTab={openTab} hidden={hidden} />
-
-      <div className="dashboard-timeline"><ForecastPanel horizon={horizon} chart={chart} /></div>
-
+      </section>
+      <DailySummary {...{ horizon, openTab }} />
+      <section className="home-services" aria-label="ตัวช่วยดูแลเงิน">
+        <button className="home-service trend-service" onClick={() => openTab('accounts')}><span className="section-icon sky"><TrendingUp size={21} /></span><div><h2>แนวโน้มเงินเข้า–ออก</h2><p>ดูกราฟเงินเหลือและบิล<br />ล่วงหน้าสูงสุด 30 วัน</p></div><ChevronRight size={17} /></button>
+        <button className="home-service saving-service" onClick={() => openTab('savings')}><span className="section-icon mint"><Wallet size={21} /></span><div><h2>เงินส่วนที่พร้อมออม</h2><strong>฿{money(horizon.recommended_sweep_amount, 2)}</strong><p>{horizon.recommended_sweep_amount > 0 ? 'ยอดแนะนำสำหรับรอบนี้' : 'รอบนี้พักการออมเพิ่มไว้ก่อน'}</p></div><ChevronRight size={17} /></button>
+        <button className="home-service trust-service" onClick={() => tryScenario(1)}><span className="section-icon lilac"><ShieldCheck size={21} /></span><div><h2>ตรวจความเสี่ยงก่อนโอน</h2><p>ลองดูคำเตือนและเหตุผล<br />ก่อนตัดสินใจทำรายการ</p></div><ChevronRight size={17} /></button>
+      </section>
       <div className="dashboard-activity"><ActivityList activities={activities} openTab={openTab} /></div>
     </div>
   );
