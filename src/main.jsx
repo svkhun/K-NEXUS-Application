@@ -4,5 +4,6 @@ import App from './ui/App.jsx';
 import './ui/styles.css';
 import './ui/reference.css';
 import './ui/enhancements.css';
+import './ui/pastel.css';
 
 createRoot(document.getElementById('root')).render(<App />);

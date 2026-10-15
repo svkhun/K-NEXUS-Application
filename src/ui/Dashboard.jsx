@@ -1,5 +1,6 @@
 import React from 'react';
 import InsightsLab from './InsightsLab';
+import { AccountGarden, SavingsBloom } from './FinanceDecor';
 import { ScenarioPicker } from './SavingsPage';
 import {
   Activity, ArrowDownLeft, ArrowRight, BadgeCheck,
@@ -39,15 +40,15 @@ export function AccountTiles({ profile, openTab, hidden = false }) {
     <div className="account-tiles">
       <button className="account-tile main-account" onClick={() => openTab('accounts')}>
         <div className="account-tile-top"><span className="account-emblem"><Wallet size={16} /></span><div><strong>บัญชีออมทรัพย์</strong><small>{profile.masked_account_id} · บัญชีหลัก</small></div><ChevronRight size={16} /></div>
-        <b>{value(profile.main_balance)}</b><span className="account-caption">พร้อมใช้สำหรับทุกวัน</span>
+        <AccountGarden /><b>{value(profile.main_balance)}</b><span className="account-caption">พร้อมใช้สำหรับทุกวัน</span>
       </button>
       <button className="account-tile savings-account" onClick={() => openTab('savings')}>
         <div className="account-tile-top"><span className="account-emblem"><Sparkles size={16} /></span><div><strong>กระเป๋าเงินออม</strong><small>FlowSense · Flexible Savings</small></div><ChevronRight size={16} /></div>
-        <b>{value(profile.vault_balance)}</b><span className="account-caption">ออมได้ ดึงคืนได้เมื่อจำเป็น</span>
+        <AccountGarden /><b>{value(profile.vault_balance)}</b><span className="account-caption">ออมได้ ดึงคืนได้เมื่อจำเป็น</span>
       </button>
       <div className="account-tile protection-account">
         <div className="account-tile-top"><span className="account-emblem"><ShieldCheck size={16} /></span><div><strong>TrustGraph</strong><small>ผู้ช่วยตรวจความเสี่ยงก่อนโอน</small></div><span className="protection-dot" /></div>
-        <b>พร้อมดูแลทุกการโอน</b><button className="protection-link" onClick={() => openTab('transfer')}>ทดลองใช้งาน <ArrowRight size={14} /></button>
+        <AccountGarden /><b>พร้อมดูแลทุกการโอน</b><button className="protection-link" onClick={() => openTab('transfer')}>ทดลองใช้งาน <ArrowRight size={14} /></button>
       </div>
     </div>
   );
@@ -69,13 +70,13 @@ export function Commitments({ horizon }) {
   );
 }
 
-function ActivityList({ activities }) {
+function ActivityList({ activities, openTab }) {
   return (
     <section className="surface activity-card">
       <div className="surface-heading"><div><h2>รายการทดลองล่าสุด</h2><p className="heading-description">ติดตามสิ่งที่คุณเพิ่งลองใช้งาน</p></div><Clock3 size={18} color="#90a19d" /></div>
       {activities.length ? <div className="activity-list">{activities.map(({ title, description, icon: Icon, time }, index) => (
         <div key={index} className="activity-row"><span className="activity-icon"><Icon size={17} /></span><div><strong>{title}</strong><small>{description}</small></div><time>{time}</time></div>
-      ))}</div> : <div className="empty-state"><span><Activity size={23} /></span><strong>เริ่มรายการแรกของคุณ</strong><p>ลองออมเงินหรือโอนเงิน แล้วดูผลลัพธ์ที่นี่</p></div>}
+      ))}</div> : <div className="activity-starter"><p>เริ่มทดลอง แล้วรายการของคุณจะแสดงที่นี่</p><button onClick={() => openTab('savings')}><span className="starter-icon mint"><Wallet size={18} /></span><span><strong>เริ่มออมตามจังหวะของคุณ</strong><small>ลองออม ดึงคืน และดูสภาพคล่อง</small></span><ArrowRight size={16} /></button><button onClick={() => openTab('transfer')}><span className="starter-icon lilac"><ShieldCheck size={18} /></span><span><strong>ลองโอนอย่างเข้าใจความเสี่ยง</strong><small>เห็นเหตุผลก่อนตัดสินใจ</small></span><ArrowRight size={16} /></button></div>}
     </section>
   );
 }
@@ -83,10 +84,8 @@ function ActivityList({ activities }) {
 export function ForecastPanel({ horizon, chart }) {
   return (
     <section className="surface forecast-card">
-      <div className="surface-heading"><div><h2>มองเห็นเงินในวันข้างหน้า</h2><p className="heading-description">แนวโน้ม 30 วัน · เลื่อนเลือกวันเพื่อดูรายละเอียด</p></div><span className="soft-chip"><TrendingUp size={14} /> คาดการณ์</span></div>
-      <div className="forecast-stats"><div><span>ใช้ได้ต่อวันโดยประมาณ</span><strong>฿{money(horizon.daily_safe_limit)}</strong></div><div><span>ถึงรอบเงินเดือน</span><strong>{horizon.days_to_payday} วัน</strong></div><div><span>คงเหลือก่อนรอบเงินเดือน</span><strong className={horizon.commitment_at_risk ? 'amount-warning' : ''}>฿{money(horizon.raw_projected_end_balance)}</strong></div></div>
+      <div className="surface-heading timeline-heading"><div className="timeline-heading-copy"><span className="timeline-title-icon"><TrendingUp size={23} /></span><div><span className="section-kicker">YOUR MONEY TIMELINE</span><h2>เห็นเส้นทางเงิน ก่อนถึงวันข้างหน้า</h2><p className="heading-description">ย้อนหลัง 7 วัน เชื่อมวันนี้ สู่แผนการเงินอีก 30 วัน</p></div></div><span className={`runway-badge ${horizon.commitment_at_risk ? 'is-risk' : ''}`}><ShieldCheck size={15} />{horizon.commitment_at_risk ? 'ควรเตรียมสภาพคล่อง' : 'ภาระก่อนเงินเดือนมีเงินรองรับ'}</span></div>
       {chart}
-      <p className="chart-note">คาดการณ์จากข้อมูลจำลอง ผลลัพธ์อาจเปลี่ยนตามการใช้จ่าย</p>
     </section>
   );
 }
@@ -114,6 +113,8 @@ export default function Dashboard({ profile, horizon, activities, chart, hidden,
       <div className="section-title-row"><h2>บัญชีของฉัน</h2><button className="text-link" onClick={() => openTab('accounts')}>ดูทั้งหมด <ChevronRight size={14} /></button></div>
       <AccountTiles profile={profile} openTab={openTab} hidden={hidden} />
 
+      <div className="dashboard-timeline"><ForecastPanel horizon={horizon} chart={chart} /></div>
+
       <div className="section-title-row assistant-title"><div><h2>ผู้ช่วยการเงินสำหรับคุณ</h2><p>สองฟังก์ชันใหม่ที่อยากให้คุณลอง</p></div><span className="new-feature-tag">NEW EXPERIENCE</span></div>
       <div className="assistant-grid">
         <section className="surface flowsense-assistant">
@@ -130,7 +131,7 @@ export default function Dashboard({ profile, horizon, activities, chart, hidden,
         </section>
       </div>
 
-      <div className="dashboard-grid"><ForecastPanel horizon={horizon} chart={chart} /><ActivityList activities={activities} /></div>
+      <div className="dashboard-bottom-grid"><ActivityList activities={activities} openTab={openTab} /><section className="surface journey-card"><div className="journey-copy"><span className="section-kicker">SMALL STEPS, BETTER FLOW</span><h2>ออมทีละนิด<br />พร้อมใช้ในทุกจังหวะ</h2><p>ลองให้ FlowSense ช่วยกันเงิน แล้วดูว่าเงินวันนี้ดูแลวันข้างหน้าได้อย่างไร</p><button className="primary-button" onClick={() => openTab('savings')}>เริ่มแผนเงินของคุณ <ArrowRight size={16} /></button></div><SavingsBloom /></section></div>
     </div>
   );
 }
@@ -139,7 +140,7 @@ export function AccountsPage({ profile, horizon, chart, openTab, hidden, doReset
   return (
     <div className="accounts-page"><ScenarioPicker {...{ horizon, busy, onScenario }} />
       <AccountTiles profile={profile} openTab={openTab} hidden={hidden} />
-      <div className="account-detail-grid"><ForecastPanel horizon={horizon} chart={chart} /><Commitments horizon={horizon} /></div>
+      <div className="account-timeline"><ForecastPanel horizon={horizon} chart={chart} /></div><div className="account-planning-grid"><Commitments horizon={horizon} /><section className="surface reserve-overview"><span className="icon-box lilac"><Wallet size={23} /></span><span className="section-kicker">YOUR FINANCIAL CUSHION</span><h2>กันเงินให้พร้อม แล้วค่อยออม</h2><p>FlowSense แยกเงินสำรองและภาระก่อนแนะนำยอดออม เพื่อให้ยังมีเงินพร้อมใช้</p><div className="reserve-amounts"><div><span>เงินสำรองที่กันไว้</span><strong>฿{money(horizon.emergency_buffer)}</strong></div><div><span>เงินส่วนที่พร้อมออม</span><strong>฿{money(horizon.savings_capacity)}</strong></div></div><button className="text-link" onClick={() => openTab('savings')}>จัดการเงินออม <ArrowRight size={15} /></button></section></div>
       {horizon.commitment_at_risk && <div className="liquidity-warning"><ShieldAlert size={21} /><div><strong>เตรียมสภาพคล่องก่อนถึงรอบเงินเดือน</strong><p>คาดว่าเงินอาจขาดประมาณ ฿{money(horizon.deficit_amount)} ลองดึงเงินออมคืนแล้วดูการคาดการณ์ที่เปลี่ยนไป</p></div><button onClick={() => openTab('savings')}>จัดการเงินออม <ArrowRight size={15} /></button></div>}
       <InsightsLab {...{ profile, busy, refresh }} /><div className="account-tools"><span><ShieldCheck size={15} /> ข้อมูลของโปรไฟล์ทดลองนี้</span><button className="reset-button" onClick={doReset} disabled={busy}><RotateCcw size={15} /> รีเซ็ตบัญชีทดลอง</button></div>
     </div>

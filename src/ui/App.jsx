@@ -173,7 +173,7 @@ function App() {
   }, [transferResult]);
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell page-${tab}`}>
       <aside className="sidebar">
         <div className="bank-brand" aria-label="K แอปต้นแบบ"><span className="k-mark">K</span><small>CONCEPT EXPERIENCE</small></div>
         <nav className="side-nav" aria-label="เมนูหลัก">
@@ -204,8 +204,8 @@ function App() {
           {notice && <div className="message success" role="status"><Check size={18} /><span>{notice}</span><button aria-label="ปิดข้อความ" onClick={() => setNotice('')}><X size={16} /></button></div>}
 
           {loading ? <div className="loading-card"><div className="spinner" /> กำลังโหลดข้อมูลจำลอง...</div> : profile && horizon ? <>
-            {tab === 'home' && <Dashboard profile={profile} horizon={horizon} activities={(profile.events || []).slice(0, 5).map(describeEvent)} chart={<ForecastChart timeline={forecast?.timeline} />} hidden={hidden} setHidden={setHidden} busy={busy} doRecall={doRecall} openTab={openTab} tryScenario={tryScenario} />}
-            {tab === 'accounts' && <AccountsPage profile={profile} horizon={horizon} chart={<ForecastChart timeline={forecast?.timeline} />} openTab={openTab} hidden={hidden} doReset={doReset} busy={busy} onScenario={onScenario} refresh={() => run(() => refresh())} />}
+            {tab === 'home' && <Dashboard profile={profile} horizon={horizon} activities={(profile.events || []).slice(0, 5).map(describeEvent)} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} hidden={hidden} setHidden={setHidden} busy={busy} doRecall={doRecall} openTab={openTab} tryScenario={tryScenario} />}
+            {tab === 'accounts' && <AccountsPage profile={profile} horizon={horizon} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} openTab={openTab} hidden={hidden} doReset={doReset} busy={busy} onScenario={onScenario} refresh={() => run(() => refresh())} />}
 
             {tab === 'savings' && <SavingsPage {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doAutoSweep, doRecall, doReset, doUndo, onAutoToggle, onAutoCycle, onScenario }} />}
 

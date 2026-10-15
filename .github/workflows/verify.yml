@@ -27,6 +27,7 @@ jobs:
         run: |
           npm ci
           npm audit --audit-level=low
+          npm run test:ui
           npm run build
       - name: Install and audit backend
         run: |
