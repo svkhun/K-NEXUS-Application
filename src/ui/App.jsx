@@ -28,7 +28,7 @@ const navItems = [
   { id: 'home', label: 'หน้าหลัก', icon: Home },
   { id: 'accounts', label: 'บัญชี', icon: CreditCard },
   { id: 'transfer', label: 'โอน / จ่าย', icon: Send },
-  { id: 'savings', label: 'FlowSense', icon: Wallet },
+  { id: 'savings', label: 'ออมเงิน', icon: Wallet },
 ];
 
 function App() {
@@ -159,11 +159,11 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
   const searchItems = navItems.filter((item) => {
-    const terms = { home: 'หน้าหลัก ภาพรวม ยอดเงิน', accounts: 'บัญชี สภาพคล่อง คาดการณ์ กราฟ ภาระ', transfer: 'โอน จ่าย trustgraph ความเสี่ยง', savings: 'flowsense เงินออม ดึงคืน' };
+    const terms = { home: 'หน้าหลัก ภาพรวม ยอดเงิน', accounts: 'บัญชี สภาพคล่อง คาดการณ์ กราฟ ภาระ', transfer: 'โอน จ่าย trustgraph ความเสี่ยง', savings: 'flowsense การออมเงิน ออมเงิน เงินออม ดึงคืน' };
     return search.trim() && terms[item.id].includes(search.trim().toLowerCase());
   });
   const tryScenario = (index) => { changeRecipient(recipients[index]); openTab('transfer'); };
-  const title = { home: `สวัสดี, คุณ${persona.name}`, accounts: 'บัญชีของฉัน', savings: 'FlowSense · เงินออม', transfer: 'โอนเงิน' }[tab];
+  const title = { home: `สวัสดี, คุณ${persona.name}`, accounts: 'บัญชีของฉัน', savings: 'ออมเงิน', transfer: 'โอนเงิน' }[tab];
 
   useEffect(() => {
     if (transferResult && window.innerWidth <= 640) {

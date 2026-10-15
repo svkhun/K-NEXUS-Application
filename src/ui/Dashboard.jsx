@@ -20,7 +20,7 @@ function PhonePreview({ dailyLimit }) {
       <span className="scene-leaf leaf-one" /><span className="scene-leaf leaf-two" /><span className="scene-leaf leaf-three" />
       <div className="concept-phone">
         <div className="phone-speaker" />
-        <div className="phone-brand">K<small>FlowSense</small></div>
+        <div className="phone-brand">K<small>เงินออม</small></div>
         <div className="phone-greeting">เงินที่ใช้ได้วันนี้</div>
         <strong className="phone-amount">฿{money(dailyLimit)}</strong>
         <div className="phone-status"><span /> พร้อมสำหรับทุกวัน</div>
@@ -105,7 +105,7 @@ export default function Dashboard({ profile, horizon, activities, chart, hidden,
           </div>
         </section>
         <section className="flowsense-banner">
-          <div className="banner-copy"><span className="banner-label"><Sparkles size={13} /> FLOWSENSE</span><h2>เงินวันนี้<br />พร้อมสำหรับวันข้างหน้า</h2><p>รู้ว่าใช้ได้เท่าไร ออมได้เท่าไหน<br />ให้ผู้ช่วยการเงินดูแลไปกับคุณ</p><button onClick={() => openTab('savings')}>ลองใช้ FlowSense <ArrowRight size={15} /></button></div>
+          <div className="banner-copy"><span className="banner-label"><Sparkles size={13} /> การออมเงิน</span><h2>เงินวันนี้<br />พร้อมสำหรับวันข้างหน้า</h2><p>รู้ว่าใช้ได้เท่าไร ออมได้เท่าไหน<br />ให้ผู้ช่วยการเงินดูแลไปกับคุณ</p><button onClick={() => openTab('savings')}>เริ่มออมเงิน <ArrowRight size={15} /></button></div>
           <PhonePreview dailyLimit={horizon.daily_safe_limit} />
         </section>
       </div>
@@ -118,7 +118,7 @@ export default function Dashboard({ profile, horizon, activities, chart, hidden,
       <div className="section-title-row assistant-title"><div><h2>ผู้ช่วยการเงินสำหรับคุณ</h2><p>สองฟังก์ชันใหม่ที่อยากให้คุณลอง</p></div><span className="new-feature-tag">NEW EXPERIENCE</span></div>
       <div className="assistant-grid">
         <section className="surface flowsense-assistant">
-          <div className="assistant-heading"><span className="assistant-icon"><Activity size={22} /></span><div><span>FlowSense</span><h3>ใช้จ่ายได้แค่ไหน สบายใจได้เท่าไร</h3></div><span className={`status-pill ${horizon.commitment_at_risk ? 'risk' : 'safe'}`}><span />{horizon.horizon_badge_th}</span></div>
+          <div className="assistant-heading"><span className="assistant-icon"><Activity size={22} /></span><div><span>ผู้ช่วยการออมเงิน</span><h3>ใช้จ่ายได้แค่ไหน สบายใจได้เท่าไร</h3></div><span className={`status-pill ${horizon.commitment_at_risk ? 'risk' : 'safe'}`}><span />{horizon.horizon_badge_th}</span></div>
           <div className="flowsense-amount-row"><div><span>ใช้ได้ต่อวันโดยประมาณ</span><strong>฿ {money(horizon.daily_safe_limit)}</strong></div><div className="payday-note"><Clock3 size={14} /><span>อีก {horizon.days_to_payday} วัน<br />ถึงรอบเงินเดือน</span></div></div>
           <div className="health-meter"><div><span>ระดับสภาพคล่อง</span><strong>{money(horizon.horizon_health_pct)}%</strong></div><div className="meter-track"><i style={{ width: `${horizon.horizon_health_pct}%` }} /></div></div>
           <p className="assistant-description">{horizon.nudge_message}</p>
