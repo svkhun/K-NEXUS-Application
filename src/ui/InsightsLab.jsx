@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Activity, ArrowRight, Network, RefreshCw, ShieldCheck } from 'lucide-react';
 import { api } from './api';
-const money = (v) => Number(v || 0).toLocaleString('th-TH', { maximumFractionDigits: 0 });
+const money = (v, digits = 0) => Number(v || 0).toLocaleString('th-TH', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 const eventNames = { MICRO_SWEEP_EXECUTED: 'ย้ายเงินออม', SAVINGS_WITHDRAWAL: 'ถอนเงินออม', SAVINGS_PREFERENCE_UPDATED: 'ตั้งค่าการแยกเงินออม', TRANSFER_EXECUTED: 'โอนเงินจำลอง', TRANSFER_EXECUTED_ZERO_DELAY: 'โอนปกติ', TRANSFER_CANCELLED_BY_USER: 'ยกเลิกการโอน', ACCOUNT_STATE_RESET: 'รีเซ็ตบัญชี', SCENARIO_CHANGED: 'เปลี่ยนสถานการณ์', TRANSFER_BLOCKED: 'ระงับรายการเสี่ยง', TRANSFER_CHECK_REQUIRED: 'รอยืนยันตัวตน', TRANSFER_REJECTED_INVALID_TOKEN: 'การยืนยันไม่ผ่าน' };
 export const describeEvent = (event) => {
   const d = event.details || {};
-  return { title: eventNames[event.event_type] || event.event_type, description: d.amount ? `฿${money(d.amount)} · ${d.target || 'บัญชีจำลอง'}` : d.swept ? `ออม ฿${money(d.swept)}` : d.withdrawn ? `ถอน ฿${money(d.withdrawn)}` : typeof d.enabled === 'boolean' ? (d.enabled ? 'เปิดการแยกเงินออม' : 'ปิดการแยกเงินออม') : d.scenario ? ({ healthy: 'มีเงินพร้อมออม', normal_dip: 'เงินลดปกติ', commitment_risk: 'ภาระเสี่ยงไม่พอ', high_value: 'รายการมูลค่าสูง' }[d.scenario]) : 'ข้อมูลของ session ทดลองนี้', icon: Activity, time: new Date(event.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) };
+  return { title: eventNames[event.event_type] || event.event_type, description: d.amount ? `฿${money(d.amount, 2)} · ${d.target || 'บัญชีจำลอง'}` : d.swept ? `ออม ฿${money(d.swept, 2)}` : d.withdrawn ? `ถอน ฿${money(d.withdrawn, 2)}` : typeof d.enabled === 'boolean' ? (d.enabled ? 'เปิดการแยกเงินออม' : 'ปิดการแยกเงินออม') : d.scenario ? ({ healthy: 'มีเงินพร้อมออม', normal_dip: 'เงินลดปกติ', commitment_risk: 'ภาระเสี่ยงไม่พอ', high_value: 'รายการมูลค่าสูง' }[d.scenario]) : 'ข้อมูลของ session ทดลองนี้', icon: Activity, time: new Date(event.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) };
 };
 function GraphExplorer({ graph }) {
   const [selected, setSelected] = useState(graph.nodes[0]?.id);
