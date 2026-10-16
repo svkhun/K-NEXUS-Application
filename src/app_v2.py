@@ -606,7 +606,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
     if account_age_days <= 45:
         direct_reasons.append(f"บัญชีปลายทางเปิดใหม่เพียง {account_age_days} วัน")
     if inflow_velocity < 180:
-        direct_reasons.append(f"เงินเข้าแล้วโอนออกเร็วภายใน {int(inflow_velocity)} วินาที")
+        direct_reasons.append(f"หลังรับเงิน บัญชีผู้รับโอนออกต่อโดยเฉลี่ยใน {int(inflow_velocity)} วินาที")
     if payload.session_duration_sec < 15:
         direct_reasons.append(f"เริ่มทำรายการอย่างรวดเร็วภายใน {payload.session_duration_sec} วินาที")
     if payload.ratio_to_daily_avg > 5.0:

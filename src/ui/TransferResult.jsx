@@ -40,7 +40,28 @@ export default function TransferResult({ result, amount, recipient, busy, cleara
       <p>{success ? result.zero_delay_baseline ? 'รายการปกติผ่านทันที · ไม่มีขั้นตอนยืนยันเพิ่ม' : 'ดำเนินการตามการตัดสินใจของคุณแล้ว' : canceled || expired ? 'ยังไม่ได้โอนเงิน รายการใหม่ต้องตรวจความเสี่ยงอีกครั้ง' : result.primary_reason_th || result.direct_risk_reasoning}</p>
       {success ? <><div className="demo-slip"><span>ใบรายการทดลอง</span><strong>฿{money(amount)}</strong><p>{recipient.name}</p><small>{result.receipt_id}</small><b>ไม่มีการโอนเงินจริง</b></div><button className="secondary-button" onClick={() => saveReceipt(result, amount, recipient)}><Download size={17} /> บันทึกใบรายการทดลอง</button></> : !canceled && !expired && <>
         <div className="risk-explanation"><CircleAlert size={17} /><span>ยังไม่มีการหักเงินจากบัญชีของคุณ</span></div>
-        <details className="risk-details" open={!result.cooldown_required}><summary>เหตุผลที่ตรวจเพิ่ม</summary><ul>{result.direct_risk_reasons_list?.map((reason, i) => <li key={i}>{reason}</li>)}</ul>{result.target_meta && <div className="risk-meta"><span>อายุบัญชี <b>{result.target_meta.account_age_days} วัน</b></span><span>เงินเข้า → ออก <b>{Math.floor(result.target_meta.velocity_sec)} วินาที</b></span><span>ระดับ KYC <b>{result.target_meta.kyc_level}</b></span></div>}<p className="small-note">สัญญาณและคะแนนมาจากโมเดลกับข้อมูลสมมติ ไม่ใช่การตรวจบัญชีจริง</p></details>
+        <details className="risk-details" open={!result.cooldown_required}>
+          <summary>เหตุผลที่ตรวจเพิ่ม</summary>
+          <ul>{result.direct_risk_reasons_list?.map((reason, i) => <li key={i}>{reason}</li>)}</ul>
+          {result.target_meta && <dl className="risk-meta" aria-label="ข้อมูลบัญชีผู้รับ อธิบายเพิ่มเติม">
+            <div>
+              <dt>อายุบัญชีผู้รับ</dt>
+              <dd>{result.target_meta.account_age_days == null ? 'ไม่มีข้อมูล' : `${result.target_meta.account_age_days} วัน`}</dd>
+              <dd className="risk-meta-description">นับตั้งแต่วันที่เปิดบัญชีผู้รับ</dd>
+            </div>
+            <div>
+              <dt>รับเงินแล้วโอนต่อเร็วแค่ไหน</dt>
+              <dd>{result.target_meta.velocity_sec == null ? 'ไม่มีข้อมูล' : `เฉลี่ย ${Math.floor(result.target_meta.velocity_sec).toLocaleString('th-TH')} วินาที`}</dd>
+              <dd className="risk-meta-description">เวลาระหว่างเงินเข้าบัญชีผู้รับกับการโอนออกต่อ ไม่ใช่ระยะเวลาโอนของคุณ</dd>
+            </div>
+            <div>
+              <dt>การยืนยันตัวตนเจ้าของบัญชี</dt>
+              <dd>ไม่มีรายละเอียดให้ตรวจสอบ</dd>
+              <dd className="risk-meta-description">หมายถึงการตรวจว่าเจ้าของบัญชีเป็นใคร ข้อมูลทดลองนี้ยังใช้ยืนยันตัวผู้รับไม่ได้</dd>
+            </div>
+          </dl>}
+          <p className="small-note">ข้อมูลทั้งหมดเป็นข้อมูลสมมติ ใช้ประกอบการทดลองเท่านั้น สัญญาณเหล่านี้ไม่ได้ยืนยันว่าผู้รับปลอดภัยหรือเป็นมิจฉาชีพ</p>
+        </details>
       </>}
       {!terminal && <>
         <div className="risk-transfer-summary"><span>{recipient.name}</span><strong>฿{money(amount)}</strong><small>{recipient.id} · บัญชีสมมติ</small></div>
