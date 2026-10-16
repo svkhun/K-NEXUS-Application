@@ -16,7 +16,7 @@ Reviewed the original `README.md`, `src/app_v2.py`, `frontend/js/app.js`, genera
 | Standard savings withdrawal | ออมเงิน → ถอนเงินออม | Explicit positive amount or full balance selected before submission; works with savings disabled; no Undo or implicit all-balance withdrawal |
 | Routine transfers with no added steps | Transfer / known recipient | Real ONNX evaluation; debit once; visible receipt and measured server inference latency |
 | Critical anomaly / direct reasoning | Transfer / inspect recipient | Full Thai reasons, recipient age, velocity and KYC metadata; model signals are synthetic; no funds moved while waiting |
-| Micro-Auth / final user autonomy | Transfer warning panel | Visible five-second simulated verification, then proceed or cancel; signed clearance still binds source, target, amount, visitor and evaluation nonce, expires after 120 seconds and is single-use |
+| Risk-only cooldown / Micro-Auth | Transfer settings and warning panel | Optional 15-minute server-enforced pause, enabled by default, then five-second simulated verification and explicit proceed/cancel; signed clearance still binds source, target, amount, visitor and evaluation nonce, expires after 120 seconds and is single-use |
 | High-value step-up | Transfer / “ลองรายการมูลค่าสูง ฿50,000” | Resets and funds that visitor's simulated account to 60,000 so the 50,000 demo gate can actually be tried |
 | Confirmed blocked destination | Transfer / blocked preset | Stops before high-value or verification branches; no debit |
 | Transaction slip | Successful transfer | Downloadable UTF-8 text receipt with DEMO identifier and explicit statement that it is not proof of real payment |
@@ -39,3 +39,8 @@ Session state and the bounded event history remain in memory. They survive a pag
 - Production Vite build; no new runtime dependencies.
 - Browser trials: explicit opt-in, savings, partial/full withdrawals with savings disabled, resolving a commitment warning, forecast day selection, graph node inspection, CASA slider, mobile search, risky transfer with simulated verification, confirmation and receipt download.
 - Responsive checks at 320, 390, 768 and 1440 pixels; 320px body minimum-width overflow corrected.
+
+
+## Risk-only cooldown update — 16 October 2026
+
+See [the cooldown policy](transfer-cooldown.md). Default-on 15-minute review is restricted to risky transfers; ordinary payments remain immediate and the blocked destination remains blocked. Settings affect new holds only. The current suite contains 41 backend and 13 frontend tests.

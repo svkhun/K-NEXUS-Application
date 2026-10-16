@@ -42,6 +42,8 @@ class SecurityTests(unittest.TestCase):
                 "is_first_time_transfer": 1 if target == "ACC_0001" else 0}
 
     def clearance(self):
+        # These cases isolate signed-token invariants; cooldown has its own suite.
+        self.post("/trustgraph/transfer-preference", {"account_id": SOURCE, "enabled": False})
         body = self.transfer()
         self.assertEqual(self.post("/trustgraph/evaluate-transfer", body).json()["status"], "MICRO_AUTH_REQUIRED")
         token_body = {key: body[key] for key in ("source_account_id", "target_account_id", "amount")}

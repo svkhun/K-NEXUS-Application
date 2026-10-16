@@ -272,3 +272,29 @@ button.account-tile:hover { border-color: #86b29b; }.account-tile-top { display:
 .withdraw-all input { width: 20px; height: 20px; accent-color: var(--green); }
 .recall-card .withdrawal-hint { color: #995e2e; font-size: 12px; }
 .recall-card > .small-note { margin-top: 14px; font-size: 12px; }
+.transfer-protection-settings { margin-bottom: 16px; border-block: 1px solid var(--line); }
+.transfer-protection-settings > summary { display: flex; gap: 10px; align-items: center; min-height: 62px; padding: 10px 4px; color: var(--green); font-size: 13px; }
+.transfer-protection-settings summary > span { flex: 1; }
+.transfer-protection-settings summary small { display: block; font-size: 12px; color: var(--muted); }
+.protection-settings-body { padding: 0 12px 16px; max-width: 680px; }
+.protection-settings-body p { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.disable-cooldown-confirm { padding: 14px; border-left: 3px solid #be874d; background: #fbf1e4; margin-top: 14px; font-size: 13px; }
+.disable-cooldown-confirm > button { width: 100%; margin-top: 10px; }
+.transfer-cooldown { padding: 16px; margin-block: 16px; background: #fcf2e4; border-left: 3px solid #bf9258; border-radius: 4px; }
+.transfer-cooldown.ready { background: #eaf5ef; border-left-color: #4c956f; }
+.cooldown-heading { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; }
+.cooldown-heading svg { flex-shrink: 0; margin-top: 3px; }
+.cooldown-clock { font: 600 36px/1.7 var(--number-font); letter-spacing: .02em; color: #775728; margin-top: 6px; }
+.transfer-cooldown p,.transfer-cooldown li { font-size: 12px; line-height: 1.8; color: #6e644e; }
+.transfer-cooldown ul { padding-left: 18px; margin-block: 12px; }
+.transfer-cooldown > button { font-size: 12px; min-height: 44px; }
+.auth-steps { flex-wrap: wrap; gap: 12px 10px; padding-left: 0; list-style: none; }
+.auth-actions > button { white-space: normal; }
+.pending-transfer-banner { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 16px; background: #fcf2e4; border-left: 3px solid #bf9258; margin-bottom: 16px; font-size: 13px; }
+.pending-transfer-banner > span { flex: 1; min-width: 180px; }
+.transfer-result-panel { scroll-margin-top: 76px; }
+.transfer-result-panel:focus { outline: none; }
+.risk-transfer-summary { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 12px; border-block: 1px solid var(--line); padding-block: 12px; margin-block: 12px; font-size: 13px; }
+.risk-transfer-summary strong { font: 600 20px/1.6 var(--number-font); }
+.risk-transfer-summary small { width: 100%; color: var(--muted); font-size: 11px; }
+.review-expiry { display: block; margin-top: 8px; color: #796b53; font-size: 11px; }

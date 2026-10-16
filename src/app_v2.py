@@ -12,6 +12,7 @@ import onnxruntime as rt
 import pandas as pd
 import numpy as np
 import time
+import math
 import os
 import hmac
 import hashlib
@@ -265,14 +266,60 @@ PENDING_STEP_UP_LOCK = threading.Lock()
 def step_up_key(source_acc: str, target_acc: str, amount: float) -> tuple:
     return (source_acc, target_acc, round(amount, 2))
 
-def remember_step_up(source_acc: str, target_acc: str, amount: float):
+TRANSFER_COOLDOWN_SECONDS = 15 * 60
+
+
+def cooldown_status(pending):
+    now = time.time()
+    return {"cooldown_required": pending.get("cooldown_duration_sec", 0) > 0,
+            "cooldown_duration_sec": pending.get("cooldown_duration_sec", 0),
+            "cooldown_ends_at": pending.get("cooldown_ends_at", now),
+            "cooldown_remaining_sec": max(0, math.ceil(pending.get("cooldown_ends_at", now) - now)),
+            "server_now": now, "review_expires_at": pending["expires"]}
+
+
+def remember_step_up(source_acc: str, target_acc: str, amount: float, risky=False):
     with PENDING_STEP_UP_LOCK:
+        now = time.time()
         for key in list(PENDING_STEP_UP):
-            if PENDING_STEP_UP[key]["expires"] <= time.time():
+            if PENDING_STEP_UP[key]["expires"] <= now or key[0] == source_acc:
                 del PENDING_STEP_UP[key]
         while len(PENDING_STEP_UP) >= 32:
             del PENDING_STEP_UP[next(iter(PENDING_STEP_UP))]
-        PENDING_STEP_UP[step_up_key(source_acc, target_acc, amount)] = {"expires": time.time() + 120, "nonce": secrets.token_hex(16)}
+        state = LIVE_ACCOUNT_STATES[source_acc]
+        holds = state.setdefault("transfer_cooldowns", {})
+        for target in list(holds):
+            if holds[target]["expires"] <= now:
+                del holds[target]
+        duration = 0
+        ready_at = now
+        if risky:
+            hold = holds.get(target_acc)
+            if hold is None and state.get("transfer_cooldown_enabled", True):
+                hold = {"ready_at": now + TRANSFER_COOLDOWN_SECONDS,
+                        "expires": now + TRANSFER_COOLDOWN_SECONDS + 600}
+                holds[target_acc] = hold
+            if hold:
+                ready_at = hold["ready_at"]
+                duration = TRANSFER_COOLDOWN_SECONDS
+        PENDING_STEP_UP[step_up_key(source_acc, target_acc, amount)] = {
+            "expires": ready_at + (600 if risky else 120), "nonce": secrets.token_hex(16),
+            "cooldown_duration_sec": duration, "cooldown_ends_at": ready_at,
+            "source_account_id": source_acc, "target_account_id": target_acc, "amount": amount,
+            "created_at": now}
+
+
+def retain_transfer_review(result, payload):
+    pending = PENDING_STEP_UP[step_up_key(payload.source_account_id, payload.target_account_id, payload.amount)]
+    pending["evaluation"] = result
+    return {**result, **cooldown_status(pending)}
+
+
+def require_cooldown_complete(source_acc, target_acc, amount):
+    pending = PENDING_STEP_UP.get(step_up_key(source_acc, target_acc, amount), {})
+    remaining = max(0, math.ceil(pending.get("cooldown_ends_at", 0) - time.time()))
+    if remaining:
+        raise HTTPException(status_code=409, detail=f"รายการนี้อยู่ระหว่างพักก่อนโอน เหลืออีก {remaining} วินาที กรุณาตรวจสอบผู้รับก่อนยืนยัน")
 
 def has_pending_step_up(source_acc: str, target_acc: str, amount: float) -> bool:
     with PENDING_STEP_UP_LOCK:
@@ -281,6 +328,13 @@ def has_pending_step_up(source_acc: str, target_acc: str, amount: float) -> bool
 def clear_step_up(source_acc: str, target_acc: str, amount: float):
     with PENDING_STEP_UP_LOCK:
         PENDING_STEP_UP.pop(step_up_key(source_acc, target_acc, amount), None)
+
+
+def clear_account_reviews(source_acc):
+    with PENDING_STEP_UP_LOCK:
+        for key in list(PENDING_STEP_UP):
+            if key[0] == source_acc:
+                del PENDING_STEP_UP[key]
 
 def consume_step_up(source_acc: str, target_acc: str, amount: float) -> bool:
     with PENDING_STEP_UP_LOCK:
@@ -358,6 +412,10 @@ class SavingsPreferenceRequest(StrictRequest):
     account_id: str
     enabled: bool
 
+class TransferPreferenceRequest(StrictRequest):
+    account_id: str
+    enabled: bool
+
 class VaultWithdrawalRequest(StrictRequest):
     account_id: str
     amount: float = Field(..., gt=0, le=10_000_000)
@@ -370,7 +428,8 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
     """
     TrustGraph Targeted Anti-Scam Verification:
     - Zero-Delay Baseline: Routine transfers to known or low-risk accounts execute immediately with zero added steps (<80ms SLA).
-    - Micro-Auth for Critical Anomaly: Rapid dynamic verification.
+    - Risky transfers: optional server-timed 15-minute review, enabled by default.
+    - Micro-Auth for Critical Anomaly: simulated verification after review readiness.
       Triggers a 5-second face liveness check and displays a single confirmation prompt.
     - Direct Risk Reasoning: Tells the user plainly why a recipient looks suspicious
       (e.g., 'Recipient account opened 48 hours ago with rapid pass-through fund patterns')
@@ -427,6 +486,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
     # HIGH-VALUE DEMO GATE (>= 50,000 THB)
     # --------------------------------------------------------------------------
     if payload.target_account_id == "ACC_0000":
+        clear_account_reviews(payload.source_account_id)
         audit_log("TRANSFER_BLOCKED", payload.source_account_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount, "latency_ms": round(latency_ms, 2)})
         return {
             "status": "BLOCKED_MULE_INTERDICTION",
@@ -456,10 +516,10 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
             "latency_ms": round(latency_ms, 2)
         }
 
-    if payload.amount >= 50000.0:
+    if payload.amount >= 50000.0 and current_risk < 0.45:
         audit_log("TRANSFER_CHECK_REQUIRED", payload.source_account_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount, "latency_ms": round(latency_ms, 2)})
         remember_step_up(payload.source_account_id, payload.target_account_id, payload.amount)
-        return {
+        result = {
             "status": "MICRO_AUTH_REQUIRED",
             "risk_tier": "HIGH_VALUE_DEMO_CHECK",
             "current_risk_score": round(current_risk, 4),
@@ -486,6 +546,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
             },
             "latency_ms": round(latency_ms, 2)
         }
+        return retain_transfer_review(result, payload)
 
     # --------------------------------------------------------------------------
     # HARD INTERDICTION: CONFIRMED MULE RING (Royal Decree B.E. 2566)
@@ -495,6 +556,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
     # ZERO-DELAY BASELINE: Routine / Low-Risk Transfers Execute Immediately
     # --------------------------------------------------------------------------
     if current_risk < 0.45:
+        clear_account_reviews(payload.source_account_id)
         src_id = payload.source_account_id
         res_main_balance = None
         with get_account_lock(src_id):
@@ -536,7 +598,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
         }
 
     # --------------------------------------------------------------------------
-    # MICRO-AUTH FOR CRITICAL ANOMALY: No arbitrary waiting periods!
+    # Risky transfers use the optional server-timed review period before Micro-Auth.
     # Triggers 5-second face liveness check & Direct Risk Reasoning
     # Leaves final transfer decision to user.
     # --------------------------------------------------------------------------
@@ -557,9 +619,9 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
     reason_summary = " | ".join(direct_reasons)
 
     audit_log("TRANSFER_CHECK_REQUIRED", payload.source_account_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount, "latency_ms": round(latency_ms, 2)})
-    remember_step_up(payload.source_account_id, payload.target_account_id, payload.amount)
+    remember_step_up(payload.source_account_id, payload.target_account_id, payload.amount, risky=True)
 
-    return {
+    result = {
         "status": "MICRO_AUTH_REQUIRED",
         "risk_tier": "CRITICAL_ANOMALY",
         "current_risk_score": round(current_risk, 4),
@@ -568,7 +630,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
         "step_up_required": True,
         "friction_type": "5_SECOND_LIVENESS",
         "auth_duration_sec": 5,
-        "eliminates_arbitrary_waiting": True,
+        "eliminates_arbitrary_waiting": False,
         "direct_risk_reasoning": f"Recipient account opened {account_age_days} days ago with rapid pass-through fund patterns ({int(inflow_velocity)}s)",
         "counterfactual_message": f"Recipient account opened {account_age_days} days ago with rapid pass-through fund patterns ({int(inflow_velocity)}s)",
         "reason_summary": reason_summary,
@@ -585,6 +647,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
         },
         "latency_ms": round(latency_ms, 2)
     }
+    return retain_transfer_review(result, payload)
 
 @app.post("/api/v2/trustgraph/verify-micro-auth")
 def verify_micro_auth(payload: MicroAuthRequest):
@@ -594,6 +657,9 @@ def verify_micro_auth(payload: MicroAuthRequest):
     """
     if not has_pending_step_up(payload.source_account_id, payload.target_account_id, payload.amount):
         raise HTTPException(status_code=400, detail="กรุณาตรวจสอบความเสี่ยงของรายการโอนก่อนยืนยันตัวตน")
+    require_cooldown_complete(payload.source_account_id, payload.target_account_id, payload.amount)
+    pending = PENDING_STEP_UP[step_up_key(payload.source_account_id, payload.target_account_id, payload.amount)]
+    pending["expires"] = max(pending["expires"], int(time.time()) + 120)
 
     # Generate tamper-proof HMAC-SHA256 clearance token bound to accounts & amount
     token = generate_signed_micro_auth_token(payload.source_account_id, payload.target_account_id, payload.amount)
@@ -603,6 +669,8 @@ def verify_micro_auth(payload: MicroAuthRequest):
         "verification_mode": "SIMULATED",
         "auth_duration_sec": 0,
         "clearance_token": token,
+        "clearance_expires_at": int(time.time()) + 120,
+        "cooldown": cooldown_status(PENDING_STEP_UP[step_up_key(payload.source_account_id, payload.target_account_id, payload.amount)]),
         "message": "ยืนยันตัวตนจำลองสำเร็จ กรุณาพิจารณาความเสี่ยงและตัดสินใจว่าจะโอนต่อหรือยกเลิก",
         "prompt_title": "ยืนยันการทำรายการโอนเงิน",
         "prompt_message": "ระบบได้ชี้แจงความเสี่ยงของบัญชีปลายทางแล้ว คุณต้องการดำเนินการโอนเงินต่อไปหรือไม่?",
@@ -636,7 +704,10 @@ def confirm_transfer(payload: TransferConfirmRequest, x_idempotency_key: Optiona
 
         return res
 
-    if not verify_signed_micro_auth_token(payload.auth_token, src_id, payload.target_account_id, payload.amount) or not consume_step_up(src_id, payload.target_account_id, payload.amount):
+    valid_token = verify_signed_micro_auth_token(payload.auth_token, src_id, payload.target_account_id, payload.amount)
+    if valid_token:
+        require_cooldown_complete(src_id, payload.target_account_id, payload.amount)
+    if not valid_token or not consume_step_up(src_id, payload.target_account_id, payload.amount):
         audit_log("TRANSFER_REJECTED_INVALID_TOKEN", src_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount})
         raise HTTPException(status_code=401, detail="กรุณาตรวจความเสี่ยงและยืนยันตัวตนจำลองก่อนโอนต่อ")
 
@@ -649,6 +720,7 @@ def confirm_transfer(payload: TransferConfirmRequest, x_idempotency_key: Optiona
 
         state["main_balance"] = round(state["main_balance"] - payload.amount, 2)
         state["daily_spent_today"] = round(state.get("daily_spent_today", 0.0) + payload.amount, 2)
+        state.get("transfer_cooldowns", {}).pop(payload.target_account_id, None)
         remaining = round(state["main_balance"], 2)
 
     res = {
@@ -667,6 +739,28 @@ def confirm_transfer(payload: TransferConfirmRequest, x_idempotency_key: Optiona
 # ==============================================================================
 # 4. FLOWSENSE SERVICES (FLEXIBLE LIQUIDITY & AUTONOMOUS SAVING)
 # ==============================================================================
+@app.post("/api/v2/trustgraph/transfer-preference")
+def set_transfer_preference(payload: TransferPreferenceRequest):
+    LIVE_ACCOUNT_STATES[payload.account_id]["transfer_cooldown_enabled"] = payload.enabled
+    audit_log("TRANSFER_PREFERENCE_UPDATED", payload.account_id, {"enabled": payload.enabled})
+    return {"enabled": payload.enabled, "cooldown_seconds": TRANSFER_COOLDOWN_SECONDS,
+            "applies_to": "NEW_RISKY_TRANSFERS", "existing_cooldowns_unchanged": True}
+
+
+@app.get("/api/v2/trustgraph/pending-transfer/{account_id}")
+def pending_transfer(account_id: str):
+    if account_id not in DEMO_ACCOUNTS:
+        raise HTTPException(status_code=404, detail="Unknown demo account")
+    rows = [row for row in PENDING_STEP_UP.values() if row.get("source_account_id") == account_id
+            and row["expires"] > time.time() and row.get("evaluation")]
+    if not rows:
+        return {"pending": None}
+    pending = max(rows, key=lambda row: row["created_at"])
+    return {"pending": {**pending["evaluation"], **cooldown_status(pending),
+                        "source_account_id": account_id, "target_account_id": pending["target_account_id"],
+                        "amount": pending["amount"]}}
+
+
 @app.get("/api/v2/flowsense/profile/{account_id}")
 def get_flowsense_profile(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,30}$", description="Sanitized Banking Account ID")):
     """
@@ -695,6 +789,8 @@ def get_flowsense_profile(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
         "total_swept": round(state["total_swept"], 2),
         "daily_spent_today": round(state["daily_spent_today"], 2),
         "savings_enabled": state.get("savings_enabled", False),
+        "transfer_cooldown_enabled": state.get("transfer_cooldown_enabled", True),
+        "transfer_cooldown_minutes": TRANSFER_COOLDOWN_SECONDS // 60,
         "savings_capacity": get_flowsense_horizon_status(account_id)["savings_estimate"],
         "events": state.get("events", []),
         "persona": {

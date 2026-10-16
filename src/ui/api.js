@@ -49,4 +49,6 @@ export const api = {
   evaluate: (payload) => post('/trustgraph/evaluate-transfer', payload),
   verify: (payload) => post('/trustgraph/verify-micro-auth', payload),
   confirm: (payload) => post('/trustgraph/confirm-transfer', payload),
+  transferPreference: (id, enabled) => post('/trustgraph/transfer-preference', { account_id: id, enabled }),
+  pendingTransfer: (id) => request(`/trustgraph/pending-transfer/${id}`),
 };

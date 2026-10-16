@@ -14,6 +14,7 @@ import TransferResult from './TransferResult';
 import { describeEvent } from './InsightsLab';
 import { bangkokDate } from './forecastModel.mjs';
 import DailyPlan from './DailyPlan';
+import TransferProtectionSettings from './TransferProtectionSettings';
 
 const personas = [
   { id: 'ACC_0100', name: 'เมย์', role: 'วัยเริ่มทำงาน', initials: 'ม', color: 'mint' },
@@ -58,6 +59,13 @@ function App() {
   const [clearanceToken, setClearanceToken] = useState(null);
   const inFlight = useRef(false);
   const activeAccount = useRef(accountId);
+  const transferPanel = useRef(null);
+  useEffect(() => {
+    if (tab === 'transfer' && transferResult) {
+      transferPanel.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      transferPanel.current?.focus({ preventScroll: true });
+    }
+  }, [tab, transferResult?.status]);
   const persona = useMemo(() => personas.find((item) => item.id === accountId) ?? personas[0], [accountId]);
 
   const refresh = useCallback(async (id = accountId) => {
@@ -72,10 +80,15 @@ function App() {
     let active = true;
     setLoading(true);
     setError('');
-    Promise.all([api.profile(accountId), api.horizon(accountId), api.forecast(accountId)])
-      .then(([nextProfile, nextHorizon, nextForecast]) => {
+    Promise.all([api.profile(accountId), api.horizon(accountId), api.forecast(accountId), api.pendingTransfer(accountId)])
+      .then(([nextProfile, nextHorizon, nextForecast, review]) => {
         if (!active) return;
         setProfile(nextProfile); setHorizon(nextHorizon); setForecast(nextForecast);
+        if (review.pending) {
+          const pending = review.pending;
+          const target = recipientTemplates.find((item) => item.id === pending.target_account_id) || { ...recipientTemplates[0], id: pending.target_account_id };
+          setRecipient(target); setAmount(String(pending.amount)); setClearanceToken(null); setTransferResult(pending);
+        }
       })
       .catch((err) => { if (active) setError(err.message); })
       .finally(() => { if (active) setLoading(false); });
@@ -166,8 +179,25 @@ function App() {
     try { for (let seconds = 5; seconds > 0; seconds--) { setScanning(seconds); await new Promise((resolve) => setTimeout(resolve, 1000)); } } finally { setScanning(0); }
     const result = await api.verify({ source_account_id: accountId, target_account_id: recipient.id, amount: Number(amount) });
     setClearanceToken(result.clearance_token);
+    setTransferResult((current) => ({ ...current, ...result.cooldown, clearance_expires_at: result.clearance_expires_at }));
     setNotice('จำลองการยืนยันตัวตนสำเร็จ กรุณาตัดสินใจว่าจะโอนต่อหรือยกเลิก');
   });
+  const onTransferPreference = (enabled) => run(async () => {
+    await api.transferPreference(accountId, enabled); await refresh();
+    setNotice(enabled ? 'เปิดพักก่อนโอนรายการเสี่ยง 15 นาทีแล้ว' : 'ปิดเวลาพักเสริมสำหรับรายการเสี่ยงใหม่แล้ว การตรวจความเสี่ยงยังทำงาน');
+  });
+  const checkCooldown = async () => {
+    if (inFlight.current) return;
+    try {
+      const { pending } = await api.pendingTransfer(accountId);
+      if (activeAccount.current !== accountId) return;
+      setTransferResult((current) => {
+        if (current?.status !== 'MICRO_AUTH_REQUIRED') return current;
+        if (!pending || pending.target_account_id !== recipient.id || Number(pending.amount) !== Number(amount)) return { status: 'REVIEW_EXPIRED' };
+        return { ...current, ...pending };
+      });
+    } catch (err) { setError(err.message); }
+  };
   const decide = (decision) => run(async () => {
     const result = await api.confirm({ source_account_id: accountId, target_account_id: recipient.id, amount: Number(amount), decision, auth_token: decision === 'PROCEED' ? clearanceToken : undefined });
     setTransferResult(result); setClearanceToken(null);
@@ -226,13 +256,15 @@ function App() {
           {notice && !hidden && <div className="message success" role="status"><Check size={18} /><span>{notice}</span><button aria-label="ปิดข้อความ" onClick={() => setNotice('')}><X size={16} /></button></div>}
 
           {hidden ? <section className="surface privacy-cover"><EyeOff size={32} /><h2>ซ่อนข้อมูลการเงินแล้ว</h2><p>ยอดเงิน กราฟ และรายการต่าง ๆ จะกลับมาเมื่อคุณเลือกแสดงข้อมูล</p><button className="primary-button" onClick={() => setHidden(false)}>แสดงข้อมูลการเงิน <Eye size={17} /></button></section> : loading ? <div className="loading-card"><div className="spinner" /> กำลังโหลดข้อมูลจำลอง...</div> : profile && horizon ? <>
+            {tab !== 'transfer' && transferResult?.status === 'MICRO_AUTH_REQUIRED' && <div className="pending-transfer-banner"><ShieldAlert size={19} /><span>มีรายการรอตรวจสอบก่อนโอน · ยังไม่ได้หักเงิน</span><button className="text-link" onClick={() => openTab('transfer')}>กลับไปดูรายการ <ArrowRight size={16} /></button></div>}
             {tab === 'home' && <Dashboard profile={profile} horizon={horizon} activities={(profile.events || []).slice(0, 5).map(describeEvent)} hidden={hidden} setHidden={setHidden} openTab={openTab} tryScenario={tryScenario} />}
             {tab === 'plan' && <DailyPlan key={`${accountId}-${horizon.scenario}`} {...{ horizon, forecast, busy, onScenario, openTab }} />}
             {tab === 'accounts' && <AccountsPage profile={profile} horizon={horizon} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} openTab={openTab} hidden={hidden} doReset={doReset} busy={busy} onScenario={onScenario} refresh={() => run(() => refresh())} />}
 
             {tab === 'savings' && <SavingsPage key={accountId} {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, onScenario, openTab }} />}
 
-            {tab === 'transfer' && <div className="feature-layout transfer-layout"><TransferForm profile={profile} persona={persona} recipients={recipients} recipient={recipient} amount={amount} setAmount={setAmount} changeRecipient={changeRecipient} clearResult={() => { setTransferResult(null); setClearanceToken(null); }} busy={busy} evaluate={evaluate} prepareHighValue={prepareHighValue} telemetry={telemetry} setTelemetry={(value) => { setTelemetry(value); setTransferResult(null); setClearanceToken(null); }} /><aside className="feature-aside"><TransferResult result={transferResult} {...{ amount, recipient, busy, clearanceToken, verify, decide, scanning }} clear={() => setTransferResult(null)} /><div className="surface aside-card trust-note"><span className="icon-box mint"><LockKeyhole size={21} /></span><h3>ดูเหตุผลก่อนตัดสินใจโอน</h3><p>รายการปกติผ่านได้ทันที ส่วนรายการที่น่าสงสัยแสดงเหตุผลให้เห็นก่อนตัดสินใจ</p></div></aside></div>}
+            {tab === 'transfer' && <TransferProtectionSettings key={accountId} profile={profile} busy={busy} onChange={onTransferPreference} />}
+            {tab === 'transfer' && <div className="feature-layout transfer-layout"><TransferForm profile={profile} persona={persona} recipients={recipients} recipient={recipient} amount={amount} setAmount={setAmount} changeRecipient={changeRecipient} clearResult={() => { setTransferResult(null); setClearanceToken(null); }} busy={busy} evaluate={evaluate} prepareHighValue={prepareHighValue} telemetry={telemetry} setTelemetry={(value) => { setTelemetry(value); setTransferResult(null); setClearanceToken(null); }} /><aside className="feature-aside transfer-result-panel" ref={transferPanel} tabIndex={-1} aria-label="ผลตรวจรายการโอน"><TransferResult result={transferResult} {...{ amount, recipient, busy, clearanceToken, verify, decide, scanning, checkCooldown }} clear={() => setTransferResult(null)} /><div className="surface aside-card trust-note"><span className="icon-box mint"><LockKeyhole size={21} /></span><h3>ดูเหตุผลก่อนตัดสินใจโอน</h3><p>รายการปกติผ่านได้ทันที ส่วนรายการที่น่าสงสัยแสดงเหตุผลให้เห็นก่อนตัดสินใจ</p></div></aside></div>}
           </> : null}
           <footer className="page-footer"><span>FlowSense × TrustGraph · Prototype experience</span><span>Inspired by everyday banking · ไม่ใช่ผลิตภัณฑ์ทางการของ KBank</span></footer>
         </main>

@@ -55,3 +55,8 @@ The backend now prevents manual/automatic sweeps from consuming projected funds 
 ## Savings update — 16 October 2026
 
 The savings/Undo/automatic-cycle observations above describe the earlier revision. The current app uses explicit opt-in savings (THB 500 maximum per action) and standard explicit-amount withdrawals. See [source sync and verification](savings-sync-2026-10-16.md) for the current behavior.
+
+
+## Risk-only cooldown boundary — 16 October 2026
+
+The server stores recipient deadlines separately from pending confirmation tokens, preventing preference changes, cancellation/retry or amount changes from erasing an active pause. Authentication and confirmation both enforce readiness; token expiry starts at authentication after the wait. A new evaluation invalidates the source persona's previous review/token. Pending status omits nonces and tokens and remains session/persona-scoped. Ordinary transfers and blocked destinations retain their separate paths. See [the cooldown policy and tests](transfer-cooldown.md). The demo reset/restart still clears in-memory state; this is not a durable production bank hold.

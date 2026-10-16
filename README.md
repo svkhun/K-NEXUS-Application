@@ -39,6 +39,7 @@ Built with a responsive mobile/desktop interface and isolated visitor sessions. 
 ### 2. TrustGraph — Pre-Transfer Fraud & Mule Interdiction
 - **Risk Scoring with Precomputed Graph Features:** ONNX inference uses saved graph embeddings and synthetic account/behavioral features. It does not build a live banking graph.
 - **Explainable AI (XAI) Risk Factors:** Human-readable risk explanations (e.g., dormant account reactivated, sudden deviation from historical averages, recipient velocity surge).
+- **Risky Transfer Review Period:** Enabled by default: a 15-minute server-enforced pause only for risky transfers, with reasons and verification guidance. The optional pause can be disabled for new risky transfers; existing pauses, risk evaluation, simulated authentication and blocked destinations remain enforced. Reload restores the pending review within the in-memory visitor session. Time elapsed never automatically sends money or certifies safety. See [cooldown policy and verification](docs/transfer-cooldown.md).
 - **Simulated Micro-Auth (5s Step-Up):** A simulated 5-second facial liveness verification gate that generates a cryptographically signed clearance token (HMAC-SHA256, 120s TTL) binding source, recipient, amount, and visitor session.
 - **Blocked Mule Interdiction:** Immediate transfer prevention for known or flagged mule accounts before debit execution.
 - **Downloadable E-Slip:** Generates plain-text demo receipts with unique demo transaction references.
