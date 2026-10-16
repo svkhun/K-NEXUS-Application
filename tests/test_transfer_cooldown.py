@@ -96,18 +96,49 @@ class TransferCooldownTests(unittest.TestCase):
         self.assertEqual(self.post('/trustgraph/verify-micro-auth', self.proof('ACC_0000')).status_code, 400)
         self.assertEqual(self.evaluate('ACC_0101', 350)['status'], 'APPROVED')
 
-    def test_disabling_rechecking_changing_amount_and_cancel_do_not_erase_started_wait(self):
+    def test_setting_change_does_not_rewrite_an_active_transaction(self):
         before = self.profile()['main_balance']
         first = self.evaluate()
         self.mock_time.return_value += 60
         self.preference(False)
-        second = self.evaluate(amount=1000)
+        second = self.evaluate()
         self.assertEqual(second['cooldown_ends_at'], first['cooldown_ends_at'])
         self.assertEqual(second['cooldown_remaining_sec'], 840)
-        self.assertEqual(self.post('/trustgraph/confirm-transfer', dict(**self.proof(amount=1000), decision='CANCEL')).status_code, 200)
+        self.assertEqual(self.profile()['main_balance'], before)
+
+    def test_cancel_then_new_identical_transfer_uses_disabled_setting_without_old_timer(self):
+        before = self.profile()['main_balance']
+        self.evaluate()
+        self.mock_time.return_value += 60
+        self.preference(False)
+        cancelled = self.post('/trustgraph/confirm-transfer', dict(**self.proof(), decision='CANCEL'))
+        self.assertEqual(cancelled.status_code, 200)
+        self.assertTrue(cancelled.json()['cooldown_cleared'])
         self.assertIsNone(self.pending())
-        retry = self.evaluate(amount=500)
-        self.assertEqual(retry['cooldown_ends_at'], first['cooldown_ends_at'])
+        retry = self.evaluate()
+        self.assertFalse(retry['cooldown_required'])
+        self.assertEqual(retry['cooldown_remaining_sec'], 0)
+        token = self.post('/trustgraph/verify-micro-auth', self.proof()).json()['clearance_token']
+        executed = self.post('/trustgraph/confirm-transfer', dict(**self.proof(), decision='PROCEED', auth_token=token))
+        self.assertEqual(executed.status_code, 200)
+        self.assertEqual(self.profile()['main_balance'], before - 1200)
+
+    def test_cancel_then_new_enabled_transfer_starts_its_own_full_period(self):
+        first = self.evaluate()
+        self.mock_time.return_value += 125
+        self.post('/trustgraph/confirm-transfer', dict(**self.proof(), decision='CANCEL'))
+        retry = self.evaluate()
+        self.assertEqual(retry['cooldown_remaining_sec'], 900)
+        self.assertEqual(retry['cooldown_ends_at'], first['cooldown_ends_at'] + 125)
+
+    def test_replacing_the_amount_creates_a_new_review_with_current_settings(self):
+        before = self.profile()['main_balance']
+        self.evaluate()
+        self.mock_time.return_value += 60
+        self.preference(False)
+        changed = self.evaluate(amount=500)
+        self.assertFalse(changed['cooldown_required'])
+        self.assertEqual(self.pending()['amount'], 500)
         self.assertEqual(self.profile()['main_balance'], before)
 
     def test_reload_status_preserves_deadline_and_is_scoped_to_persona_and_session(self):

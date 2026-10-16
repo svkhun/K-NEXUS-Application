@@ -15,6 +15,7 @@ import { describeEvent } from './InsightsLab';
 import { bangkokDate } from './forecastModel.mjs';
 import DailyPlan from './DailyPlan';
 import TransferProtectionSettings from './TransferProtectionSettings';
+import TransferReviewDialog from './TransferReviewDialog';
 
 const personas = [
   { id: 'ACC_0100', name: 'เมย์', role: 'วัยเริ่มทำงาน', initials: 'ม', color: 'mint' },
@@ -56,16 +57,19 @@ function App() {
   const [recipient, setRecipient] = useState(recipientTemplates[0]);
   const [amount, setAmount] = useState('350');
   const [transferResult, setTransferResult] = useState(null);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [focusSettings, setFocusSettings] = useState(false);
   const [clearanceToken, setClearanceToken] = useState(null);
   const inFlight = useRef(false);
   const activeAccount = useRef(accountId);
-  const transferPanel = useRef(null);
   useEffect(() => {
-    if (tab === 'transfer' && transferResult) {
-      transferPanel.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      transferPanel.current?.focus({ preventScroll: true });
+    if (!reviewOpen && focusSettings) {
+      const control = document.getElementById('transfer-cooldown-toggle');
+      control?.focus({ preventScroll: true });
+      control?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setFocusSettings(false);
     }
-  }, [tab, transferResult?.status]);
+  }, [reviewOpen, focusSettings]);
   const persona = useMemo(() => personas.find((item) => item.id === accountId) ?? personas[0], [accountId]);
 
   const refresh = useCallback(async (id = accountId) => {
@@ -121,7 +125,7 @@ function App() {
   };
   const changePersona = (id) => {
     activeAccount.current = id;
-    setAccountId(id); setTransferResult(null); setClearanceToken(null);
+    setAccountId(id); setTransferResult(null); setClearanceToken(null); setReviewOpen(false);
     setRecipient({ ...recipientTemplates[0], id: id === 'ACC_0101' ? 'ACC_0100' : 'ACC_0101' });
     setAmount('350'); setTelemetry({ device: false, first: false, duration: 90, ratio: 1.1, auth: 'pin' });
     setError(''); setNotice('');
@@ -146,13 +150,13 @@ function App() {
     await refresh();
     setNotice(`ถอนเงินออม ฿${money(result.withdrawn_amount, 2)} เข้าบัญชีหลักแล้ว`);
   });
-  const onScenario = (scenario) => run(async () => { await api.scenario(accountId, scenario); await refresh(); setTransferResult(null); setClearanceToken(null); setNotice('เปลี่ยนสถานการณ์จำลองแล้ว ลองดูคำแนะนำและกราฟที่เปลี่ยนไป'); });
+  const onScenario = (scenario) => run(async () => { await api.scenario(accountId, scenario); await refresh(); setTransferResult(null); setClearanceToken(null); setReviewOpen(false); setNotice('เปลี่ยนสถานการณ์จำลองแล้ว ลองดูคำแนะนำและกราฟที่เปลี่ยนไป'); });
   const prepareHighValue = () => run(async () => { await api.scenario(accountId, 'high_value'); await refresh(); changeRecipient(recipients[0]); setAmount('50000'); setNotice('เตรียมยอดบัญชีสมมติ ฿60,000 สำหรับทดลองการตรวจรายการมูลค่าสูงแล้ว'); });
   const onSavingsToggle = (enabled) => run(async () => { await api.savingsPreference(accountId, enabled); await refresh(); setNotice(enabled ? 'เปิดการแยกเงินออมแล้ว เลือกจำนวนแล้วกดออมเมื่อพร้อม' : 'ปิดการแยกเงินออมแล้ว ยังถอนเงินออมที่มีอยู่ได้ตามปกติ'); });
   const doReset = () => run(async () => {
     await api.reset(accountId);
     await refresh();
-    setTransferResult(null); setClearanceToken(null);
+    setTransferResult(null); setClearanceToken(null); setReviewOpen(false);
     setNotice('รีเซ็ตข้อมูลของบัญชีจำลองแล้ว');
   });
   const transferPayload = () => ({
@@ -170,9 +174,9 @@ function App() {
     const value = Number(amount);
     if (!Number.isFinite(value) || value <= 0) throw new Error('กรุณาระบุจำนวนเงินที่จะโอน');
     if (value > Number(profile?.main_balance)) throw new Error('ยอดเงินในบัญชีหลักไม่เพียงพอ');
-    setTransferResult(null); setClearanceToken(null);
+    setTransferResult(null); setClearanceToken(null); setReviewOpen(false);
     const result = await api.evaluate(transferPayload());
-    setTransferResult(result);
+    setTransferResult(result); setReviewOpen(true);
     await refresh();
   });
   const verify = () => run(async () => {
@@ -184,7 +188,7 @@ function App() {
   });
   const onTransferPreference = (enabled) => run(async () => {
     await api.transferPreference(accountId, enabled); await refresh();
-    setNotice(enabled ? 'เปิดพักก่อนโอนรายการเสี่ยง 15 นาทีแล้ว' : 'ปิดเวลาพักเสริมสำหรับรายการเสี่ยงใหม่แล้ว การตรวจความเสี่ยงยังทำงาน');
+    setNotice(enabled ? 'เปิดพักก่อนโอนรายการเสี่ยง 15 นาทีแล้ว' : transferResult?.status === 'MICRO_AUTH_REQUIRED' ? 'ปิดสำหรับรายการใหม่แล้ว หากต้องการใช้ค่านี้ ให้ยกเลิกรายการเดิมแล้วเริ่มใหม่' : 'ปิดเวลาพักเสริมแล้ว รายการเสี่ยงใหม่ยังตรวจความเสี่ยงและยืนยันจำลองตามปกติ');
   });
   const checkCooldown = async () => {
     if (inFlight.current) return;
@@ -200,12 +204,16 @@ function App() {
   };
   const decide = (decision) => run(async () => {
     const result = await api.confirm({ source_account_id: accountId, target_account_id: recipient.id, amount: Number(amount), decision, auth_token: decision === 'PROCEED' ? clearanceToken : undefined });
-    setTransferResult(result); setClearanceToken(null);
+    setTransferResult(result); setClearanceToken(null); setReviewOpen(true);
     await refresh();
+    if (decision === 'CANCEL') setNotice('ยกเลิกรายการและเวลาพักเดิมแล้ว รายการใหม่จะใช้ค่าตั้งค่าปัจจุบัน');
   });
+  const showTransferReview = () => { setTab('transfer'); setReviewOpen(true); checkCooldown(); };
+  const editTransferSettings = () => { setReviewOpen(false); setFocusSettings(true); };
+  const clearTransferResult = () => { setTransferResult(null); setClearanceToken(null); setReviewOpen(false); };
   const changeRecipient = (item) => {
     setTelemetry({ device: false, first: item.tone !== 'green', duration: item.tone === 'green' ? 90 : 8, ratio: item.tone === 'green' ? 1.1 : 8, auth: 'pin' });
-    setRecipient(item); setAmount(String(item.amount)); setTransferResult(null); setClearanceToken(null); setError(''); setNotice('');
+    setRecipient(item); setAmount(String(item.amount)); setTransferResult(null); setClearanceToken(null); setReviewOpen(false); setError(''); setNotice('');
   };
   const openTab = (id) => {
     setTab(id); setError(''); setNotice(''); setSearch(''); setShowAlerts(false); setSearchOpen(false);
@@ -256,15 +264,21 @@ function App() {
           {notice && !hidden && <div className="message success" role="status"><Check size={18} /><span>{notice}</span><button aria-label="ปิดข้อความ" onClick={() => setNotice('')}><X size={16} /></button></div>}
 
           {hidden ? <section className="surface privacy-cover"><EyeOff size={32} /><h2>ซ่อนข้อมูลการเงินแล้ว</h2><p>ยอดเงิน กราฟ และรายการต่าง ๆ จะกลับมาเมื่อคุณเลือกแสดงข้อมูล</p><button className="primary-button" onClick={() => setHidden(false)}>แสดงข้อมูลการเงิน <Eye size={17} /></button></section> : loading ? <div className="loading-card"><div className="spinner" /> กำลังโหลดข้อมูลจำลอง...</div> : profile && horizon ? <>
-            {tab !== 'transfer' && transferResult?.status === 'MICRO_AUTH_REQUIRED' && <div className="pending-transfer-banner"><ShieldAlert size={19} /><span>มีรายการรอตรวจสอบก่อนโอน · ยังไม่ได้หักเงิน</span><button className="text-link" onClick={() => openTab('transfer')}>กลับไปดูรายการ <ArrowRight size={16} /></button></div>}
+            {tab !== 'transfer' && transferResult?.status === 'MICRO_AUTH_REQUIRED' && <div className="pending-transfer-banner"><ShieldAlert size={19} /><span>มีรายการรอตรวจสอบก่อนโอน · ยังไม่ได้หักเงิน</span><button className="text-link" onClick={showTransferReview}>กลับไปดูรายการ <ArrowRight size={16} /></button></div>}
             {tab === 'home' && <Dashboard profile={profile} horizon={horizon} activities={(profile.events || []).slice(0, 5).map(describeEvent)} hidden={hidden} setHidden={setHidden} openTab={openTab} tryScenario={tryScenario} />}
             {tab === 'plan' && <DailyPlan key={`${accountId}-${horizon.scenario}`} {...{ horizon, forecast, busy, onScenario, openTab }} />}
             {tab === 'accounts' && <AccountsPage profile={profile} horizon={horizon} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} openTab={openTab} hidden={hidden} doReset={doReset} busy={busy} onScenario={onScenario} refresh={() => run(() => refresh())} />}
 
             {tab === 'savings' && <SavingsPage key={accountId} {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, onScenario, openTab }} />}
 
-            {tab === 'transfer' && <TransferProtectionSettings key={accountId} profile={profile} busy={busy} onChange={onTransferPreference} />}
-            {tab === 'transfer' && <div className="feature-layout transfer-layout"><TransferForm profile={profile} persona={persona} recipients={recipients} recipient={recipient} amount={amount} setAmount={setAmount} changeRecipient={changeRecipient} clearResult={() => { setTransferResult(null); setClearanceToken(null); }} busy={busy} evaluate={evaluate} prepareHighValue={prepareHighValue} telemetry={telemetry} setTelemetry={(value) => { setTelemetry(value); setTransferResult(null); setClearanceToken(null); }} /><aside className="feature-aside transfer-result-panel" ref={transferPanel} tabIndex={-1} aria-label="ผลตรวจรายการโอน"><TransferResult result={transferResult} {...{ amount, recipient, busy, clearanceToken, verify, decide, scanning, checkCooldown }} clear={() => setTransferResult(null)} /><div className="surface aside-card trust-note"><span className="icon-box mint"><LockKeyhole size={21} /></span><h3>ดูเหตุผลก่อนตัดสินใจโอน</h3><p>รายการปกติผ่านได้ทันที ส่วนรายการที่น่าสงสัยแสดงเหตุผลให้เห็นก่อนตัดสินใจ</p></div></aside></div>}
+            {tab === 'transfer' && <TransferProtectionSettings key={accountId} profile={profile} busy={busy} hasPending={transferResult?.status === 'MICRO_AUTH_REQUIRED'} onChange={onTransferPreference} />}
+            {tab === 'transfer' && <>
+              {transferResult?.status === 'MICRO_AUTH_REQUIRED' && <div className="transfer-active-review"><div><strong>มีรายการที่กำลังตรวจสอบ</strong><p>฿{money(amount, 2)} · {recipient.name} · ยังไม่ได้หักเงิน</p></div><div><button id="transfer-review-open" className="primary-button" disabled={busy} onClick={showTransferReview}>ดูรายการที่รอ <ArrowRight size={16} /></button><button className="text-link" disabled={busy} onClick={() => decide('CANCEL')}>ยกเลิกรายการเดิม</button></div></div>}
+              {transferResult && transferResult.status !== 'MICRO_AUTH_REQUIRED' && <button className="transfer-last-result text-link" onClick={() => setReviewOpen(true)}>ดูผลรายการล่าสุด <ArrowRight size={16} /></button>}
+              <div className="transfer-workspace"><TransferForm profile={profile} persona={persona} recipients={recipients} recipient={recipient} amount={amount} setAmount={setAmount} changeRecipient={changeRecipient} clearResult={clearTransferResult} busy={busy} evaluate={evaluate} prepareHighValue={prepareHighValue} telemetry={telemetry} setTelemetry={(value) => { setTelemetry(value); clearTransferResult(); }} /><div className="transfer-flow-note"><ShieldCheck size={19} /><p>ผลการตรวจสอบจะแสดงในหน้าต่าง Pop-up · เมื่อยกเลิก รายการและเวลาพักนั้นจะสิ้นสุด รายการใหม่ใช้ค่าตั้งค่าปัจจุบัน</p></div></div>
+            </>}
+            {reviewOpen && transferResult && <TransferReviewDialog busy={busy} pending={transferResult.status === 'MICRO_AUTH_REQUIRED'} error={error} onClose={() => setReviewOpen(false)} onSettings={editTransferSettings} onCancelTransfer={() => decide('CANCEL')}><TransferResult result={transferResult} {...{ amount, recipient, busy, clearanceToken, verify, decide, scanning, checkCooldown }} cancelInFooter clear={clearTransferResult} /></TransferReviewDialog>}
+
           </> : null}
           <footer className="page-footer"><span>FlowSense × TrustGraph · Prototype experience</span><span>Inspired by everyday banking · ไม่ใช่ผลิตภัณฑ์ทางการของ KBank</span></footer>
         </main>

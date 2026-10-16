@@ -7,7 +7,7 @@ function saveReceipt(result, amount, recipient) {
   const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
   const a = document.createElement('a'); a.href = url; a.download = 'K-demo-receipt.txt'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-export default function TransferResult({ result, amount, recipient, busy, clearanceToken, verify, decide, clear, scanning, checkCooldown }) {
+export default function TransferResult({ result, amount, recipient, busy, clearanceToken, verify, decide, clear, scanning, checkCooldown, cancelInFooter = false }) {
   const [, tick] = useState(0);
   const anchor = useMemo(() => performance.now(), [result]);
   useEffect(() => {
@@ -47,13 +47,13 @@ export default function TransferResult({ result, amount, recipient, busy, cleara
         <ol className="auth-steps" aria-label="ขั้นตอนการตรวจเพิ่ม">{steps.map((label, i) => <li key={label} className={i < step ? 'done' : i === step ? 'current' : ''}><span aria-hidden="true">{i + 1}</span>{label}</li>)}</ol>
         {result.cooldown_required && <section className={`transfer-cooldown ${waiting ? '' : 'ready'}`} aria-label="สถานะพักก่อนโอน">
           <div className="cooldown-heading"><Clock3 size={20} /><strong>{waiting ? 'ให้เวลาตัวเองตรวจสอบผู้รับ' : 'ครบเวลาพักแล้ว'}</strong></div>
-          {waiting ? <><div className="cooldown-clock" role="timer" aria-label="เวลาพักที่เหลือ">{formatCooldown(seconds)}</div><p>ยืนยันได้หลัง {new Date(result.cooldown_ends_at * 1000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' })} น. เวลาไทย</p><p>ออกจากหน้านี้หรือรีเฟรชได้ เวลาจะไม่เริ่มใหม่ ภายใน session ทดลองเดิม</p><small className="review-expiry">รายการทดลองหมดอายุ {new Date(result.review_expires_at * 1000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' })} น.</small></> : <p role="status">ยังต้องตรวจผู้รับและยืนยันเอง การครบเวลาไม่ได้แปลว่ารายการปลอดภัย และไม่มีการโอนอัตโนมัติ</p>}
+          {waiting ? <><div className="cooldown-clock" role="timer" aria-label="เวลาพักที่เหลือ">{formatCooldown(seconds)}</div><p>ยืนยันได้หลัง {new Date(result.cooldown_ends_at * 1000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' })} น. เวลาไทย</p><p>ปิดหน้าต่างหรือรีเฟรชได้ เวลาของรายการเดิมจะนับต่อ · กดยกเลิกเพื่อจบรายการและเวลาพัก</p><small className="review-expiry">รายการทดลองหมดอายุ {new Date(result.review_expires_at * 1000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' })} น.</small></> : <p role="status">ยังต้องตรวจผู้รับและยืนยันเอง การครบเวลาไม่ได้แปลว่ารายการปลอดภัย และไม่มีการโอนอัตโนมัติ</p>}
           <ul><li>หยุดคุยกับผู้ที่กำลังเร่งให้โอนเงิน</li><li>ติดต่อผู้รับผ่านเบอร์หรือช่องทางที่คุณรู้จักอยู่แล้ว</li><li>ตรวจชื่อผู้รับ ยอดเงิน และเหตุผลที่ต้องโอน</li></ul>
           <button className="text-link" disabled={busy} onClick={checkCooldown}>อัปเดตเวลาจากเซิร์ฟเวอร์</button>
         </section>}
         {!result.cooldown_required && result.risk_tier === 'CRITICAL_ANOMALY' && <p className="small-note">รายการนี้ปิดเวลาพักเสริมไว้ การตรวจความเสี่ยงและยืนยันจำลองยังทำงาน</p>}
         {scanning > 0 && <div className="simulated-scan" role="status"><Fingerprint size={36} /><strong>กำลังจำลอง Micro-Auth · {scanning} วินาที</strong><div className="meter-track"><i style={{ width: `${(5-scanning) * 20}%` }} /></div></div>}
-        <div className="auth-actions">{!tokenValid ? <button className="primary-button" disabled={busy || waiting} onClick={verify}><Fingerprint size={18} />{waiting ? `รอพักก่อนโอน · ${formatCooldown(seconds)}` : 'จำลองยืนยันตัวตน 5 วินาที'}</button> : <button className="primary-button" disabled={busy || waiting} onClick={() => decide('PROCEED')}><Check size={18} /> ยืนยันโอนต่อ ฿{money(amount)}</button>}<button className="secondary-button" disabled={busy} onClick={() => decide('CANCEL')}><X size={17} /> ยกเลิกรายการ</button></div>
+        <div className="auth-actions">{!tokenValid ? <button className="primary-button" disabled={busy || waiting} onClick={verify}><Fingerprint size={18} />{waiting ? `รอพักก่อนโอน · ${formatCooldown(seconds)}` : 'จำลองยืนยันตัวตน 5 วินาที'}</button> : <button className="primary-button" disabled={busy || waiting} onClick={() => decide('PROCEED')}><Check size={18} /> ยืนยันโอนต่อ ฿{money(amount)}</button>}{!cancelInFooter && <button className="secondary-button" disabled={busy} onClick={() => decide('CANCEL')}><X size={17} /> ยกเลิกรายการ</button>}</div>
         <small className="auth-note">จำลองเท่านั้น ไม่เปิดกล้องหรือเก็บใบหน้า · หลังยืนยันจำลองแล้วมีเวลา 2 นาทีในการยืนยันโอน หากหมดเวลายืนยันใหม่ได้</small>
       </>}
       {result.latency_ms !== undefined && <div className="inference-note">ใช้เวลาประมวลผลในเซิร์ฟเวอร์ {result.latency_ms} ms · ไม่รวมเวลาเครือข่าย</div>}

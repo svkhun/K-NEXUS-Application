@@ -281,29 +281,29 @@ def cooldown_status(pending):
 def remember_step_up(source_acc: str, target_acc: str, amount: float, risky=False):
     with PENDING_STEP_UP_LOCK:
         now = time.time()
+        review_key = step_up_key(source_acc, target_acc, amount)
+        previous = PENDING_STEP_UP.get(review_key)
+        if previous and (previous["expires"] <= now or previous.get("is_risky") != risky):
+            previous = None
         for key in list(PENDING_STEP_UP):
             if PENDING_STEP_UP[key]["expires"] <= now or key[0] == source_acc:
                 del PENDING_STEP_UP[key]
         while len(PENDING_STEP_UP) >= 32:
             del PENDING_STEP_UP[next(iter(PENDING_STEP_UP))]
         state = LIVE_ACCOUNT_STATES[source_acc]
-        holds = state.setdefault("transfer_cooldowns", {})
-        for target in list(holds):
-            if holds[target]["expires"] <= now:
-                del holds[target]
         duration = 0
         ready_at = now
-        if risky:
-            hold = holds.get(target_acc)
-            if hold is None and state.get("transfer_cooldown_enabled", True):
-                hold = {"ready_at": now + TRANSFER_COOLDOWN_SECONDS,
-                        "expires": now + TRANSFER_COOLDOWN_SECONDS + 600}
-                holds[target_acc] = hold
-            if hold:
-                ready_at = hold["ready_at"]
-                duration = TRANSFER_COOLDOWN_SECONDS
-        PENDING_STEP_UP[step_up_key(source_acc, target_acc, amount)] = {
-            "expires": ready_at + (600 if risky else 120), "nonce": secrets.token_hex(16),
+        if previous:
+            # Rechecking the same active transaction retains its own policy/deadline.
+            # Cancellation deletes this record, so a new request uses current settings.
+            ready_at = previous["cooldown_ends_at"]
+            duration = previous["cooldown_duration_sec"]
+        elif risky and state.get("transfer_cooldown_enabled", True):
+            duration = TRANSFER_COOLDOWN_SECONDS
+            ready_at = now + duration
+        PENDING_STEP_UP[review_key] = {
+            "expires": max(previous["expires"] if previous else 0, ready_at + (600 if risky else 120)),
+            "nonce": secrets.token_hex(16), "is_risky": risky,
             "cooldown_duration_sec": duration, "cooldown_ends_at": ready_at,
             "source_account_id": source_acc, "target_account_id": target_acc, "amount": amount,
             "created_at": now}
@@ -697,7 +697,8 @@ def confirm_transfer(payload: TransferConfirmRequest, x_idempotency_key: Optiona
         res = {
             "status": "TRANSFER_CANCELLED",
             "decision": "CANCEL",
-            "message": "ยกเลิกรายการโอนเงินเรียบร้อยแล้ว เงินของคุณยังคงปลอดภัย 100% ในบัญชี",
+            "cooldown_cleared": True,
+            "message": "ยกเลิกรายการและเวลาพักของรายการนี้แล้ว ยังไม่มีการหักเงินจากบัญชี",
             "current_balance": round(state["main_balance"], 2)
         }
         audit_log("TRANSFER_CANCELLED_BY_USER", src_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount})
@@ -720,7 +721,6 @@ def confirm_transfer(payload: TransferConfirmRequest, x_idempotency_key: Optiona
 
         state["main_balance"] = round(state["main_balance"] - payload.amount, 2)
         state["daily_spent_today"] = round(state.get("daily_spent_today", 0.0) + payload.amount, 2)
-        state.get("transfer_cooldowns", {}).pop(payload.target_account_id, None)
         remaining = round(state["main_balance"], 2)
 
     res = {

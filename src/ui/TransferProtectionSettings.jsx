@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
-import { ChevronDown, ShieldCheck } from 'lucide-react';
+import { Clock3, ShieldCheck } from 'lucide-react';
 
-export default function TransferProtectionSettings({ profile, busy, onChange }) {
+export default function TransferProtectionSettings({ profile, busy, onChange, hasPending = false }) {
   const [confirmOff, setConfirmOff] = useState(false);
   const enabled = profile.transfer_cooldown_enabled;
-  return <details className="transfer-protection-settings">
-    <summary><ShieldCheck size={18} /><span>ตั้งค่าพักก่อนโอนรายการเสี่ยง<small>{enabled ? 'เปิด · 15 นาที' : 'ปิดเวลาพักเสริม'}</small></span><ChevronDown size={17} /></summary>
-    <div className="protection-settings-body">
-      <div className="auto-setting"><div><strong>พักก่อนโอนรายการเสี่ยง 15 นาที</strong><small>รายการปกติไม่ต้องรอ</small></div><button className="saving-switch" role="switch" aria-label="พักก่อนโอนรายการเสี่ยง 15 นาที" aria-checked={enabled} disabled={busy} onClick={() => enabled ? setConfirmOff(true) : onChange(true)}><i /></button></div>
-      <p>ให้เวลาหยุดคิดและตรวจผู้รับผ่านช่องทางที่คุณเชื่อถือ ครบเวลาแล้วต้องยืนยันเอง เงินจะไม่โอนอัตโนมัติ</p>
-      <p>การตั้งค่านี้ใช้กับรายการเสี่ยงใหม่ เวลาพักที่เริ่มแล้วจะยังคงเดิม การตรวจความเสี่ยง การยืนยันจำลอง และการระงับบัญชีต้องห้ามยังทำงานเมื่อปิดเวลาพัก</p>
-      {confirmOff && enabled && <div className="disable-cooldown-confirm" role="group" aria-label="ยืนยันปิดเวลาพักเสริม"><strong>ปิดเวลาพักสำหรับรายการใหม่?</strong><p>คุณจะไม่มีช่วงพัก 15 นาทีเพื่อทบทวนรายการเสี่ยงใหม่</p><button className="secondary-button" disabled={busy} onClick={() => { setConfirmOff(false); onChange(false); }}>ยืนยันปิดเวลาพักเสริม</button><button className="text-link" disabled={busy} onClick={() => setConfirmOff(false)}>เปิดไว้เหมือนเดิม</button></div>}
-    </div>
-  </details>;
+  return <section className={`transfer-protection-settings ${enabled ? 'is-enabled' : 'is-disabled'}`} aria-labelledby="cooldown-settings-title">
+    <div className="protection-settings-main"><span className="protection-settings-icon"><Clock3 size={23} /></span><div className="protection-settings-copy"><span className="section-kicker">ตั้งค่าการโอนเงิน</span><h2 id="cooldown-settings-title">พักก่อนโอนรายการเสี่ยง</h2><p>{enabled ? 'เปิดอยู่ · ให้เวลาตรวจสอบผู้รับ 15 นาที' : 'ปิดอยู่ · รายการเสี่ยงใหม่ไม่ต้องพัก 15 นาที'}</p></div><div className="protection-setting-toggle"><span>{enabled ? 'เปิด · 15 นาที' : 'ปิดเวลาพัก'}</span><button id="transfer-cooldown-toggle" className="saving-switch" role="switch" aria-label="พักก่อนโอนรายการเสี่ยง 15 นาที" aria-checked={enabled} disabled={busy} onClick={() => enabled ? setConfirmOff(true) : onChange(true)}><i /></button></div></div>
+    <div className="protection-settings-caption"><ShieldCheck size={16} /><span>รายการปกติไม่ต้องรอ · ยังตรวจความเสี่ยงและป้องกันโอนไปบัญชีที่ถูกระงับ</span></div>
+    {hasPending && <p className="pending-policy-note">มีรายการเดิมที่กำลังตรวจสอบอยู่ หากต้องการใช้ค่าใหม่ ให้ยกเลิกรายการเดิมแล้วเริ่มใหม่</p>}
+    {confirmOff && enabled && <div className="disable-cooldown-confirm" role="group" aria-label="ยืนยันปิดเวลาพักเสริม"><strong>ปิดเวลาพักสำหรับรายการใหม่?</strong><p>รายการใหม่จะไม่มีช่วงพัก 15 นาที แต่ยังต้องตรวจความเสี่ยงและยืนยันจำลอง รายการที่เปิดอยู่ยังใช้ค่าเดิมจนกว่าจะยกเลิก</p><div><button className="secondary-button" disabled={busy} onClick={() => { setConfirmOff(false); onChange(false); }}>ยืนยันปิดเวลาพักเสริม</button><button className="text-link" disabled={busy} onClick={() => setConfirmOff(false)}>เปิดไว้เหมือนเดิม</button></div></div>}
+  </section>;
 }
