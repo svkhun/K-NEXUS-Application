@@ -54,7 +54,7 @@ export default function DailyPlan({ horizon, forecast, busy, onScenario, openTab
           <div className="budget-result-title">{plan.withinReserve ? <ShieldCheck size={19} /> : <CircleAlert size={19} />}<strong>{plan.withinReserve ? 'งบนี้ยังรักษาเงินสำรองได้' : plan.minimum < 0 ? 'งบนี้อาจทำให้เงินไม่พอ' : 'งบนี้ต้องใช้เงินสำรองบางส่วน'}</strong></div>
           <div className="budget-result-main"><span>เงินเหลือก่อนเงินเดือน</span><strong>฿{money(plan.endBalance, 2)}</strong></div>
           <div className="budget-result-reserve"><span>{plan.withinReserve ? 'เงินสำรองที่คงไว้' : 'ต่ำกว่าเงินสำรองที่ตั้งไว้'}</span><b>฿{money(plan.withinReserve ? horizon.emergency_buffer : plan.shortfall, 2)}</b></div>
-          {!plan.withinReserve && <><p>{plan.billAtRisk ? 'มีบิลที่เงินอาจไม่พอ ลองลดงบหรือเตรียมเงินเพิ่ม' : 'ลองลดงบรายวัน หรือดูเงินออมที่สามารถดึงคืนได้'}</p><button className="text-link" onClick={() => openTab('savings')}>ดูทางเลือกดึงเงินออมคืน <ArrowRight size={15} /></button></>}
+          {!plan.withinReserve && <><p>{plan.billAtRisk ? 'มีบิลที่เงินอาจไม่พอ ลองลดงบหรือเตรียมเงินเพิ่ม' : 'ลองลดงบรายวัน หรือดูเงินออมที่สามารถถอนได้'}</p><button className="text-link" onClick={() => openTab('savings')}>ดูทางเลือกถอนเงินออม <ArrowRight size={15} /></button></>}
         </div>}
         <p className="plan-note"><Info size={15} /><span>ผลจำลองตามงบที่ตั้ง ยังไม่เปลี่ยนยอดบัญชี โดยคิดรายจ่ายวันนี้ที่ใช้ไปแล้ว ฿{money(horizon.spent_today, 2)} รวมอยู่ด้วย</span></p>
       </section>

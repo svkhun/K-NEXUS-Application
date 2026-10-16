@@ -43,36 +43,29 @@ class FeatureTests(unittest.TestCase):
             self.assertEqual(risk['recommended_sweep_amount'], 0)
             self.assertGreater(self.scenario('healthy', account)['recommended_sweep_amount'], 0)
 
-    def test_guard_reserves_buffer_and_skips_auto_saving(self):
-        horizon = self.scenario('commitment_risk')
+    def test_guard_reserves_living_cost_bills_buffer_and_forecast_minimum(self):
+        self.scenario('commitment_risk')
+        self.post('/flowsense/savings-preference', account_id='ACC_0100', enabled=True)
         before = self.profile()
         self.assertEqual(self.post('/flowsense/micro-sweep', account_id='ACC_0100', custom_sweep_amount=100).status_code, 400)
-        self.assertEqual(self.post('/flowsense/auto-cycle', account_id='ACC_0100').status_code, 400)
-        self.post('/flowsense/auto-saving', account_id='ACC_0100', enabled=True)
-        self.assertEqual(self.post('/flowsense/auto-cycle', account_id='ACC_0100').json()['status'], 'SKIPPED')
         self.assertEqual(before['main_balance'], self.profile()['main_balance'])
         horizon = self.scenario('healthy')
-        self.assertEqual(self.post('/flowsense/micro-sweep', account_id='ACC_0100', custom_sweep_amount=round(horizon['savings_capacity']+.01, 2)).status_code, 400)
-        self.post('/flowsense/auto-saving', account_id='ACC_0100', enabled=True)
-        result = self.post('/flowsense/auto-cycle', account_id='ACC_0100').json()
+        self.post('/flowsense/savings-preference', account_id='ACC_0100', enabled=True)
+        self.assertEqual(self.post('/flowsense/micro-sweep', account_id='ACC_0100', custom_sweep_amount=round(horizon['max_sweep_amount']+.01, 2)).status_code, 400)
+        result = self.post('/flowsense/micro-sweep', account_id='ACC_0100').json()
         self.assertEqual(result['status'], 'SWEEP_SUCCESS')
         forecast = self.client.get(BASE + '/flowsense/forecast-30d/ACC_0100').json()
         minimum = min(point['projected_balance'] for point in forecast['timeline'] if not point['is_past'] and point['date'] < horizon['payday_date'])
         self.assertGreaterEqual(minimum, horizon['emergency_buffer'])
 
-    def test_undo_only_latest_sweep_and_partial_or_full_recall(self):
-        self.scenario('healthy')
+    def test_standard_partial_and_full_withdrawal_conserves_funds_without_opt_in(self):
         original = self.profile()
-        for amount in (100, 200):
-            self.assertEqual(self.post('/flowsense/micro-sweep', account_id='ACC_0100', custom_sweep_amount=amount).status_code, 200)
-        self.assertEqual(self.profile()['undo_amount'], 200)
-        self.assertEqual(self.post('/flowsense/recall', account_id='ACC_0100', mode='undo').json()['recalled_amount'], 200)
-        self.assertEqual(self.post('/flowsense/recall', account_id='ACC_0100', mode='undo').status_code, 400)
-        partial = self.post('/flowsense/recall', account_id='ACC_0100', mode='partial', amount=50)
-        self.assertEqual(partial.json()['recalled_amount'], 50)
+        partial = self.post('/flowsense/vault/withdraw', account_id='ACC_0100', amount=50)
+        self.assertEqual(partial.json()['withdrawn_amount'], 50)
         before = self.profile()
-        self.assertEqual(self.post('/flowsense/recall', account_id='ACC_0100', mode='partial', amount=before['vault_balance']+.01).status_code, 400)
-        self.assertEqual(self.post('/flowsense/recall', account_id='ACC_0100', mode='all').json()['recalled_amount'], before['vault_balance'])
+        self.assertFalse(before['savings_enabled'])
+        self.assertEqual(self.post('/flowsense/vault/withdraw', account_id='ACC_0100', amount=before['vault_balance']+.01).status_code, 400)
+        self.assertEqual(self.post('/flowsense/vault/withdraw', account_id='ACC_0100', amount=before['vault_balance']).json()['withdrawn_amount'], before['vault_balance'])
         final = self.profile()
         self.assertEqual(final['vault_balance'], 0)
         self.assertAlmostEqual(final['main_balance'], original['main_balance']+original['vault_balance'], places=2)
@@ -114,6 +107,7 @@ class FeatureTests(unittest.TestCase):
 
     def test_event_feed_scoped_and_graph_is_synthetic(self):
         self.scenario('healthy')
+        self.post('/flowsense/savings-preference', account_id='ACC_0100', enabled=True)
         self.post('/flowsense/micro-sweep', account_id='ACC_0100', custom_sweep_amount=100)
         self.assertIn('MICRO_SWEEP_EXECUTED', [e['event_type'] for e in self.profile()['events']])
         with TestClient(app) as visitor:

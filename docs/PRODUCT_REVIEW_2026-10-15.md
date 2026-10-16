@@ -59,3 +59,8 @@
 ## สิ่งที่ควรวัดกับผู้ใช้จริงในรอบถัดไป
 
 ให้ผู้ใช้ใหม่ห้าคนลองตอบ “วันนี้ใช้เพิ่มได้อีกเท่าไร” และ “ถ้าใช้วันละ 1,000 บาทจะเกิดอะไรขึ้น” โดยไม่อธิบายหน้าจอล่วงหน้า บันทึกความสำเร็จ เวลาในการหา คำที่เข้าใจผิด และความมั่นใจในการตัดสินใจ การเปลี่ยนครั้งนี้ยังไม่ใช่หลักฐานว่า retention, conversion, เงินออม หรือความเสียหายจากการหลอกลวงดีขึ้นจริง
+
+
+## Savings update — 16 October 2026
+
+The savings/Undo/automatic-cycle observations above describe the earlier revision. The current app uses explicit opt-in savings (THB 500 maximum per action) and standard explicit-amount withdrawals. See [source sync and verification](savings-sync-2026-10-16.md) for the current behavior.

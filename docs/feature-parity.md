@@ -1,6 +1,6 @@
 # Function review: k-flowsense-trustgraph → K web application
 
-Reviewed the original `README.md`, `src/app_v2.py`, `frontend/js/app.js`, generated datasets, and the new application's UI/API on 2026-10-15.
+Reviewed the original `README.md`, `src/app_v2.py`, `frontend/js/app.js`, generated datasets, and the new application's UI/API on 2026-10-15; savings rechecked against source commits `cd66187` and `c484c16` on 2026-10-16.
 
 ## Functional coverage
 
@@ -12,8 +12,8 @@ Reviewed the original `README.md`, `src/app_v2.py`, `frontend/js/app.js`, genera
 | 30-day forecast and past spending | Home / Accounts chart | **30 future days plus today and seven synthetic past days**; original UI/API included only 22 future days; ONNX projection incorporates payday, rent, debt and utilities |
 | Forecast inspection | Chart range buttons and day slider | 7 / 14 / 30 days, accessible keyboard/touch slider, daily spending / fixed debit / salary details, expandable simulated history |
 | Surplus-only Micro-Sweep | FlowSense | The backend uses the forecast's minimum balance before payday, obligations, emergency buffer and minimum main balance; recommendation and manual amount share the same guard |
-| Autonomous saving concept | FlowSense switch + trial cycle | One explicit simulated event cycle; pauses without debiting if liquidity is insufficient; no scheduler or automatic daily transaction is claimed |
-| 1-Tap Undo / immediate recall | FlowSense | Undo only the latest sweep; partial recall, full vault recall, zero demo penalty; any recall invalidates the latest Undo; money is conserved |
+| Optional savings | ออมเงิน → เปิดการแยกเงินออม | Disabled by default; explicit per-persona/session consent; no balance change on enabling; reserve living costs, all profile bills, minimum THB 500 buffer and forecast minimum; at most THB 500 per action |
+| Standard savings withdrawal | ออมเงิน → ถอนเงินออม | Explicit positive amount or full balance selected before submission; works with savings disabled; no Undo or implicit all-balance withdrawal |
 | Routine transfers with no added steps | Transfer / known recipient | Real ONNX evaluation; debit once; visible receipt and measured server inference latency |
 | Critical anomaly / direct reasoning | Transfer / inspect recipient | Full Thai reasons, recipient age, velocity and KYC metadata; model signals are synthetic; no funds moved while waiting |
 | Micro-Auth / final user autonomy | Transfer warning panel | Visible five-second simulated verification, then proceed or cancel; signed clearance still binds source, target, amount, visitor and evaluation nonce, expires after 120 seconds and is single-use |
@@ -31,11 +31,11 @@ Reviewed the original `README.md`, `src/app_v2.py`, `frontend/js/app.js`, genera
 
 This is an independent prototype, not K PLUS, MAKE or a bank integration. All source datasets and account presets are synthetic. There is no real identity verification, background bank event ingestion, real deposit interest, production fraud-detection claim or money movement. The graph is a labeled sample, not a reconstruction of the full network. The latency shown is measured server inference time for the current evaluation, not an SLA or a full end-to-end benchmark.
 
-Session state and the bounded event history remain in memory. They survive a page reload during the session but expire after one hour or restart/deploy. More than one worker/instance requires shared storage. Changing a preset deliberately resets that persona before applying its demonstration balances; the date for presets is the 25th of the current Bangkok month.
+Session state and the bounded event history remain in memory. They survive a page reload during the session but expire after one hour or restart/deploy. More than one worker/instance requires shared storage. Changing a preset deliberately resets that persona before applying its demonstration balances; all presets use the current Bangkok date. Resetting or changing a preset also disables savings.
 
 ## Verification
 
-- 19 HTTP/model tests: original 13 security checks plus six tests covering scenario suppression, forecast/currency conservation, sweep guard, auto-cycle skip, Undo/recall, calendar boundaries, event isolation, graph integrity and high-value receipt.
+- 34 HTTP/model tests: budget/calendar rules, source savings formula, explicit opt-in, savings limits and repeated depletion, standard withdrawal validation/replay/conservation, session isolation and the original transfer/security boundaries. Ten frontend logic tests also pass.
 - Production Vite build; no new runtime dependencies.
-- Browser trials: automatic sweep, Undo, partial/all recall, resolving a commitment warning, forecast day selection, graph node inspection, CASA slider, mobile search, risky transfer with simulated verification, confirmation and receipt download.
+- Browser trials: explicit opt-in, savings, partial/full withdrawals with savings disabled, resolving a commitment warning, forecast day selection, graph node inspection, CASA slider, mobile search, risky transfer with simulated verification, confirmation and receipt download.
 - Responsive checks at 320, 390, 768 and 1440 pixels; 320px body minimum-width overflow corrected.

@@ -33,8 +33,8 @@ Built with a responsive mobile/desktop interface and isolated visitor sessions. 
 - **Budget Simulator:** Try a daily budget and see the projected balance before payday, reserve shortfall, and bill risk without changing account balances.
 - **Status Horizon:** Calendar-aware bill-risk checks and a model-based 30-day balance projection. These are prototype estimates, not verified financial recommendations.
 - **Normal-Dip Suppression:** Intelligent alert gating that suppresses noise during routine balance drops, alerting only when upcoming fixed obligations (rent, bills, debt) are projected to be at risk.
-- **Surplus-Only Micro-Sweep:** Simulated savings recommendations reserve projected expenses, bills, and a buffer before moving money to a demo vault. Automatic-saving cycles are manually triggered; no interest accrual or scheduled background saving is implemented.
-- **1-Tap Undo & Immediate Recall:** Instant one-tap reversal of the latest sweep, with partial or full emergency vault recall at zero penalty.
+- **Optional Savings:** Off by default, enabled per visitor/persona. Enabling never moves money; each saving action is explicitly requested. Every sweep reserves living costs, all profile bills and an emergency buffer of at least THB 500, with the existing forecast-minimum guard applied as an additional check. Each sweep is limited to the available capacity and THB 500.
+- **Standard Savings Withdrawals:** Withdraw an explicit positive amount or select the full savings balance, including while new saving is disabled. No Undo, scheduled saving, interest accrual or real bank transaction is implemented. See [the source-sync notes](docs/savings-sync-2026-10-16.md).
 
 ### 2. TrustGraph — Pre-Transfer Fraud & Mule Interdiction
 - **Risk Scoring with Precomputed Graph Features:** ONNX inference uses saved graph embeddings and synthetic account/behavioral features. It does not build a live banking graph.

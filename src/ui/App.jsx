@@ -116,26 +116,26 @@ function App() {
   const doSweep = () => run(async () => {
     const value = Number(sweepAmount);
     if (!Number.isFinite(value) || value <= 0) throw new Error('กรุณาระบุจำนวนเงินออมที่มากกว่า 0 บาท');
+    if (Math.abs(value * 100 - Math.round(value * 100)) > 1e-7) throw new Error('ระบุจำนวนเงินไม่เกินทศนิยม 2 ตำแหน่ง');
     const result = await api.sweep(accountId, value);
     await refresh();
-    setNotice(`ย้าย ฿${money(result.swept_amount)} เข้ากระเป๋าเงินออมแล้ว`);
+    setNotice(`แยกเงินออม ฿${money(result.swept_amount, 2)} แล้ว`);
   });
-  const doAutoSweep = () => run(async () => {
+  const doRecommendedSweep = () => run(async () => {
     const result = await api.sweep(accountId);
     await refresh();
-    setNotice(`FlowSense ย้าย ฿${money(result.swept_amount, 2)} เข้ากระเป๋าเงินออมแล้ว`);
+    setNotice(`แยกเงินออมตามคำแนะนำ ฿${money(result.swept_amount, 2)} แล้ว`);
   });
-  const doRecall = (mode = 'all', value) => run(async () => {
-    if (mode === 'partial' && (!Number.isFinite(value) || value <= 0)) throw new Error('กรุณาระบุจำนวนเงินที่ต้องการดึงคืน');
-    const result = await api.recall(accountId, mode, value);
+  const doWithdraw = (value) => run(async () => {
+    if (!Number.isFinite(value) || value <= 0) throw new Error('กรุณาระบุจำนวนเงินที่ต้องการถอน');
+    if (Math.abs(value * 100 - Math.round(value * 100)) > 1e-7) throw new Error('ระบุจำนวนเงินไม่เกินทศนิยม 2 ตำแหน่ง');
+    const result = await api.withdraw(accountId, value);
     await refresh();
-    setNotice(`ดึงคืน ฿${money(result.recalled_amount, 2)} เข้าบัญชีหลักแล้ว`);
+    setNotice(`ถอนเงินออม ฿${money(result.withdrawn_amount, 2)} เข้าบัญชีหลักแล้ว`);
   });
-  const doUndo = () => doRecall('undo');
   const onScenario = (scenario) => run(async () => { await api.scenario(accountId, scenario); await refresh(); setTransferResult(null); setClearanceToken(null); setNotice('เปลี่ยนสถานการณ์จำลองแล้ว ลองดูคำแนะนำและกราฟที่เปลี่ยนไป'); });
   const prepareHighValue = () => run(async () => { await api.scenario(accountId, 'high_value'); await refresh(); changeRecipient(recipients[0]); setAmount('50000'); setNotice('เตรียมยอดบัญชีสมมติ ฿60,000 สำหรับทดลองการตรวจรายการมูลค่าสูงแล้ว'); });
-  const onAutoToggle = (enabled) => run(async () => { await api.autoSaving(accountId, enabled); await refresh(); setNotice(enabled ? 'เปิดตัวช่วยออมแล้ว ลองกดทดลองรอบออม' : 'ปิดตัวช่วยออมแล้ว'); });
-  const onAutoCycle = () => run(async () => { const result = await api.autoCycle(accountId); await refresh(); setNotice(result.status === 'SKIPPED' ? result.message : `รอบออมสำเร็จ ฿${money(result.swept_amount, 2)}`); });
+  const onSavingsToggle = (enabled) => run(async () => { await api.savingsPreference(accountId, enabled); await refresh(); setNotice(enabled ? 'เปิดการแยกเงินออมแล้ว เลือกจำนวนแล้วกดออมเมื่อพร้อม' : 'ปิดการแยกเงินออมแล้ว ยังถอนเงินออมที่มีอยู่ได้ตามปกติ'); });
   const doReset = () => run(async () => {
     await api.reset(accountId);
     await refresh();
@@ -182,7 +182,7 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
   const searchItems = navItems.filter((item) => {
-    const terms = { home: 'หน้าหลัก ภาพรวม ยอดเงิน', plan: 'แผนใช้เงิน งบ วันนี้ รายวัน วันละ ใช้ได้ ควรใช้ คาดการณ์รายจ่าย flowsense สภาพคล่อง', accounts: 'บัญชี สภาพคล่อง คาดการณ์ กราฟ ภาระ', transfer: 'โอน จ่าย trustgraph ความเสี่ยง', savings: 'flowsense การออมเงิน ออมเงิน เงินออม ดึงคืน' };
+    const terms = { home: 'หน้าหลัก ภาพรวม ยอดเงิน', plan: 'แผนใช้เงิน งบ วันนี้ รายวัน วันละ ใช้ได้ ควรใช้ คาดการณ์รายจ่าย flowsense สภาพคล่อง', accounts: 'บัญชี สภาพคล่อง คาดการณ์ กราฟ ภาระ', transfer: 'โอน จ่าย trustgraph ความเสี่ยง', savings: 'flowsense การออมเงิน ออมเงิน เงินออม ถอน ถอนเงิน ดึงคืน' };
     return search.trim() && terms[item.id].includes(search.trim().toLowerCase());
   });
   const tryScenario = (index) => { changeRecipient(recipients[index]); openTab('transfer'); };
@@ -219,7 +219,7 @@ function App() {
           </div>
         </header>
         <main className="main-content">
-          <div className="page-intro"><div><h1>{title}</h1><p>{tab === 'home' ? 'ภาพรวมเงินของคุณวันนี้' : tab === 'plan' ? 'ลองตั้งงบ ให้เงินพอถึงวันเงินเดือน' : tab === 'accounts' ? 'ยอดเงิน ภาระ และแนวโน้มวันข้างหน้า' : tab === 'savings' ? 'ออมเมื่อพร้อม ดึงคืนได้เมื่อจำเป็น' : 'ดูความเสี่ยงก่อนตัดสินใจ'}</p></div><details className="demo-context"><summary>บัญชีทดลอง · {persona.name}<ChevronDown size={15} /></summary><div className="demo-context-panel"><label htmlFor="persona">ลองเปลี่ยนโปรไฟล์</label><select id="persona" value={accountId} disabled={busy} onChange={(event) => changePersona(event.target.value)}>{personas.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.role}</option>)}</select><p>แอปต้นแบบอิสระ ใช้ข้อมูลสมมติ ไม่ใช่แอปทางการของ KBank</p><button className="text-link" disabled={busy || !profile} onClick={doReset}><RotateCcw size={15} /> รีเซ็ตบัญชีทดลอง</button></div></details></div>
+          <div className="page-intro"><div><h1>{title}</h1><p>{tab === 'home' ? 'ภาพรวมเงินของคุณวันนี้' : tab === 'plan' ? 'ลองตั้งงบ ให้เงินพอถึงวันเงินเดือน' : tab === 'accounts' ? 'ยอดเงิน ภาระ และแนวโน้มวันข้างหน้า' : tab === 'savings' ? 'ออมเมื่อพร้อม ถอนเงินได้ตามปกติ' : 'ดูความเสี่ยงก่อนตัดสินใจ'}</p></div><details className="demo-context"><summary>บัญชีทดลอง · {persona.name}<ChevronDown size={15} /></summary><div className="demo-context-panel"><label htmlFor="persona">ลองเปลี่ยนโปรไฟล์</label><select id="persona" value={accountId} disabled={busy} onChange={(event) => changePersona(event.target.value)}>{personas.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.role}</option>)}</select><p>แอปต้นแบบอิสระ ใช้ข้อมูลสมมติ ไม่ใช่แอปทางการของ KBank</p><button className="text-link" disabled={busy || !profile} onClick={doReset}><RotateCcw size={15} /> รีเซ็ตบัญชีทดลอง</button></div></details></div>
 
           <div className="demo-disclaimer"><ShieldCheck size={14} /><span>แอปต้นแบบ · ข้อมูลสมมติ · ไม่มีการโอนเงินจริง</span></div>
           {error && !hidden && <div className="message error" role="alert"><CircleAlert size={18} /><span>{error}</span><button aria-label="ปิดข้อความ" onClick={() => setError('')}><X size={16} /></button></div>}
@@ -230,7 +230,7 @@ function App() {
             {tab === 'plan' && <DailyPlan key={`${accountId}-${horizon.scenario}`} {...{ horizon, forecast, busy, onScenario, openTab }} />}
             {tab === 'accounts' && <AccountsPage profile={profile} horizon={horizon} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} openTab={openTab} hidden={hidden} doReset={doReset} busy={busy} onScenario={onScenario} refresh={() => run(() => refresh())} />}
 
-            {tab === 'savings' && <SavingsPage {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doAutoSweep, doRecall, doReset, doUndo, onAutoToggle, onAutoCycle, onScenario, openTab }} />}
+            {tab === 'savings' && <SavingsPage key={accountId} {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, onScenario, openTab }} />}
 
             {tab === 'transfer' && <div className="feature-layout transfer-layout"><TransferForm profile={profile} persona={persona} recipients={recipients} recipient={recipient} amount={amount} setAmount={setAmount} changeRecipient={changeRecipient} clearResult={() => { setTransferResult(null); setClearanceToken(null); }} busy={busy} evaluate={evaluate} prepareHighValue={prepareHighValue} telemetry={telemetry} setTelemetry={(value) => { setTelemetry(value); setTransferResult(null); setClearanceToken(null); }} /><aside className="feature-aside"><TransferResult result={transferResult} {...{ amount, recipient, busy, clearanceToken, verify, decide, scanning }} clear={() => setTransferResult(null)} /><div className="surface aside-card trust-note"><span className="icon-box mint"><LockKeyhole size={21} /></span><h3>ดูเหตุผลก่อนตัดสินใจโอน</h3><p>รายการปกติผ่านได้ทันที ส่วนรายการที่น่าสงสัยแสดงเหตุผลให้เห็นก่อนตัดสินใจ</p></div></aside></div>}
           </> : null}

@@ -23,8 +23,8 @@ export function AccountTiles({ profile, openTab, hidden = false }) {
         <AccountGarden /><b>{value(profile.main_balance)}</b><span className="account-caption">พร้อมใช้สำหรับทุกวัน</span>
       </button>
       <button className="account-tile savings-account" onClick={() => openTab('savings')}>
-        <div className="account-tile-top"><span className="account-emblem"><Sparkles size={16} /></span><div><strong>กระเป๋าเงินออม</strong><small>FlowSense · Flexible Savings</small></div><ChevronRight size={16} /></div>
-        <AccountGarden /><b>{value(profile.vault_balance)}</b><span className="account-caption">ออมได้ ดึงคืนได้เมื่อจำเป็น</span>
+        <div className="account-tile-top"><span className="account-emblem"><Sparkles size={16} /></span><div><strong>บัญชีเงินออม</strong><small>FlowSense · Flexible Savings</small></div><ChevronRight size={16} /></div>
+        <AccountGarden /><b>{value(profile.vault_balance)}</b><span className="account-caption">เลือกออมเอง ถอนเงินได้ตามปกติ</span>
       </button>
       <div className="account-tile protection-account">
         <div className="account-tile-top"><span className="account-emblem"><ShieldCheck size={16} /></span><div><strong>ตรวจความเสี่ยงก่อนโอน</strong><small>TrustGraph · สถานการณ์จำลอง</small></div><span className="protection-dot" /></div>
@@ -56,7 +56,7 @@ function ActivityList({ activities, openTab }) {
       <div className="surface-heading"><div><h2>รายการล่าสุด</h2><p className="heading-description">รายการออมและโอนในบัญชีทดลองนี้</p></div><Clock3 size={18} /></div>
       {activities.length ? <div className="activity-list">{activities.map(({ title, description, icon: Icon, time }, index) => (
         <div key={index} className="activity-row"><span className="activity-icon"><Icon size={17} /></span><div><strong>{title}</strong><small>{description}</small></div><time>{time}</time></div>
-      ))}</div> : <div className="activity-starter"><p>ยังไม่มีรายการ เมื่อทดลองออมหรือโอนเงิน รายการจะแสดงที่นี่</p><button onClick={() => openTab('savings')}><span className="starter-icon mint"><Wallet size={18} /></span><span><strong>ลองออมเงิน</strong><small>เลือกจำนวนเงิน และดึงคืนได้เมื่อจำเป็น</small></span><ArrowRight size={16} /></button><button onClick={() => openTab('transfer')}><span className="starter-icon lilac"><ShieldCheck size={18} /></span><span><strong>ลองโอนเงิน</strong><small>เลือกผู้รับเพื่อดูผลตรวจความเสี่ยง</small></span><ArrowRight size={16} /></button></div>}
+      ))}</div> : <div className="activity-starter"><p>ยังไม่มีรายการ เมื่อทดลองออมหรือโอนเงิน รายการจะแสดงที่นี่</p><button onClick={() => openTab('savings')}><span className="starter-icon mint"><Wallet size={18} /></span><span><strong>ลองออมเงิน</strong><small>เปิดใช้งาน เลือกจำนวนออม และถอนเงินได้</small></span><ArrowRight size={16} /></button><button onClick={() => openTab('transfer')}><span className="starter-icon lilac"><ShieldCheck size={18} /></span><span><strong>ลองโอนเงิน</strong><small>เลือกผู้รับเพื่อดูผลตรวจความเสี่ยง</small></span><ArrowRight size={16} /></button></div>}
     </section>
   );
 }
@@ -80,7 +80,7 @@ export default function Dashboard({ profile, horizon, activities, hidden, setHid
           <div className="bank-quick-actions">
             <button onClick={() => openTab('transfer')}><span className="bank-action-icon action-primary"><Send size={21} /></span><strong>โอนเงิน</strong></button>
             <button onClick={() => openTab('savings')}><span className="bank-action-icon"><ArrowDownLeft size={21} /></span><strong>ออมเงิน</strong></button>
-            <button onClick={() => openTab('savings')}><span className="bank-action-icon"><RotateCcw size={21} /></span><strong>ดึงเงินคืน</strong></button>
+            <button onClick={() => openTab('savings')}><span className="bank-action-icon"><RotateCcw size={21} /></span><strong>ถอนเงินออม</strong></button>
             <button onClick={() => openTab('plan')}><span className="bank-action-icon"><Target size={21} /></span><strong>แผนใช้เงิน</strong></button>
           </div>
       </section>
@@ -100,7 +100,7 @@ export function AccountsPage({ profile, horizon, chart, openTab, hidden, doReset
     <div className="accounts-page"><ScenarioPicker {...{ horizon, busy, onScenario }} />
       <AccountTiles profile={profile} openTab={openTab} hidden={hidden} />
       <div className="account-timeline"><ForecastPanel horizon={horizon} chart={chart} /></div><div className="account-planning-grid"><Commitments horizon={horizon} /><section className="surface reserve-overview"><span className="icon-box lilac"><Wallet size={23} /></span><span className="section-kicker">YOUR FINANCIAL CUSHION</span><h2>กันเงินให้พร้อม แล้วค่อยออม</h2><p>FlowSense แยกเงินสำรองและภาระก่อนแนะนำยอดออม เพื่อให้ยังมีเงินพร้อมใช้</p><div className="reserve-amounts"><div><span>เงินสำรองที่กันไว้</span><strong>฿{money(horizon.emergency_buffer)}</strong></div><div><span>เงินส่วนที่พร้อมออม</span><strong>฿{money(horizon.savings_capacity)}</strong></div></div><button className="text-link" onClick={() => openTab('savings')}>จัดการเงินออม <ArrowRight size={15} /></button></section></div>
-      {horizon.commitment_at_risk && <div className="liquidity-warning"><ShieldAlert size={21} /><div><strong>เตรียมสภาพคล่องก่อนถึงรอบเงินเดือน</strong><p>คาดว่าเงินอาจขาดประมาณ ฿{money(horizon.deficit_amount)} ลองดึงเงินออมคืนแล้วดูการคาดการณ์ที่เปลี่ยนไป</p></div><button onClick={() => openTab('savings')}>จัดการเงินออม <ArrowRight size={15} /></button></div>}
+      {horizon.commitment_at_risk && <div className="liquidity-warning"><ShieldAlert size={21} /><div><strong>เตรียมสภาพคล่องก่อนถึงรอบเงินเดือน</strong><p>คาดว่าเงินอาจขาดประมาณ ฿{money(horizon.deficit_amount)} ลองถอนเงินออมแล้วดูการคาดการณ์ที่เปลี่ยนไป</p></div><button onClick={() => openTab('savings')}>จัดการเงินออม <ArrowRight size={15} /></button></div>}
       <InsightsLab {...{ profile, busy, refresh }} /><div className="account-tools"><span><ShieldCheck size={15} /> ข้อมูลของโปรไฟล์ทดลองนี้</span><button className="reset-button" onClick={doReset} disabled={busy}><RotateCcw size={15} /> รีเซ็ตบัญชีทดลอง</button></div>
     </div>
   );

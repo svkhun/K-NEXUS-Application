@@ -108,6 +108,7 @@ class SecurityTests(unittest.TestCase):
 
     def test_visitors_have_separate_balances(self):
         self.post("/flowsense/scenario", {"account_id": SOURCE, "scenario": "healthy"})
+        self.post("/flowsense/savings-preference", {"account_id": SOURCE, "enabled": True})
         before = self.balance()
         with TestClient(app) as other:
             other_csrf = other.get(f"{BASE}/session").json()["csrf_token"]
@@ -115,7 +116,7 @@ class SecurityTests(unittest.TestCase):
             self.assertEqual(self.post("/flowsense/micro-sweep", {"account_id": SOURCE, "custom_sweep_amount": 200}).status_code, 200)
             self.assertEqual(self.balance(), before - 200)
             self.assertEqual(self.balance(other), before)
-        self.assertEqual(self.post("/flowsense/recall", {"account_id": SOURCE, "amount": 0}).status_code, 200)
+        self.assertEqual(self.post("/flowsense/vault/withdraw", {"account_id": SOURCE, "amount": 200}).status_code, 200)
         self.assertEqual(self.balance(), before)
         self.assertEqual(len(self.client.get(f"{BASE}/flowsense/forecast-30d/{SOURCE}").json()["timeline"]), 38)
 
@@ -131,6 +132,7 @@ class SecurityTests(unittest.TestCase):
 
     def test_concurrent_duplicate_request_runs_once(self):
         self.post("/flowsense/scenario", {"account_id": SOURCE, "scenario": "healthy"})
+        self.post("/flowsense/savings-preference", {"account_id": SOURCE, "enabled": True})
         before = self.balance()
         key = secrets.token_hex(16)
         body = {"account_id": SOURCE, "custom_sweep_amount": 200}

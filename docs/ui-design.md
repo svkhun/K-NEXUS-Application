@@ -30,6 +30,6 @@ The 16 October 2026 revision separates the home overview from the daily budget e
 
 ## Verification
 
-`npm run test:ui` checks budget simulations, model spending aggregation, payday minimums, range independence, expense totals, axes and Bangkok time. CI also runs API/security tests and a production container check. UI verification targets Home and Plan at 320/390px, every task at phone width, expanded formula/scenario controls, long/invalid amounts, transfer risk/cancel, saving/undo, privacy, and desktop/tablet breakpoints. This is developer QA, not a study with real banking customers.
+`npm run test:ui` checks budget simulations, model spending aggregation, payday minimums, range independence, expense totals, axes and Bangkok time. CI also runs API/security tests and a production container check. UI verification targets Home and Plan at 320/390px, every task at phone width, expanded formula/scenario controls, long/invalid amounts, transfer risk/cancel, savings opt-in/standard withdrawal, privacy, and desktop/tablet breakpoints. This is developer QA, not a study with real banking customers.
 
 Narrow-screen inspection found the demo settings panel could extend outside the screen when its trigger wrapped. The phone panel now anchors to the full intro width, while tablet/desktop use a trigger-anchored panel. At 320px the measured panel is inside the page (left 12px, right 293px), with no horizontal document scroll.

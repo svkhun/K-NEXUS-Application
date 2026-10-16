@@ -172,11 +172,9 @@ button.account-tile:hover { border-color: #86b29b; }.account-tile-top { display:
 .account-pair { display: flex; align-items: center; gap: 10px; padding: 15px; background: #f0f7f2; border-radius: 11px; }.account-pair > div:not(.pair-arrow) { flex: 1; min-width: 0; }.account-pair span { display: block; font-size: 11px; color: #5b7662; }.account-pair strong { display: block; font: 600 18px/1.65 var(--number-font); color: #396a48; overflow-wrap: anywhere; }.pair-arrow { color: #789e82; }
 .auto-save-recommendation { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 16px; margin: 16px 0; background: #e9f4e7; border-radius: 11px; border: 1px solid #dbe9d4; }.auto-save-icon { width: 33px; height: 33px; display: grid; place-items: center; color: #6a9757; background: #daebd1; border-radius: 10px; }.auto-save-recommendation > div { flex: 1; min-width: 150px; }.auto-save-recommendation div > span { font-size: 11px; color: #5a794c; }.auto-save-recommendation strong { display: block; color: #4f7e38; font-size: 21px; }.auto-save-recommendation small { color: #647f56; font-size: 11px; display: block; }.auto-save-recommendation button { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 7px; border: 0; border-radius: 9px; background: #3a7d4f; color: #fff; padding: 10px 12px; font-size: 13px; }
 .reserve-note { display: flex; align-items: flex-start; gap: 7px; color: #896333; padding: 13px; margin: 14px 0; border-radius: 10px; background: #fff6e8; font-size: 12px; line-height: 1.8; }.reserve-note svg { margin-top: 3px; }
-.auto-saving-options { margin-top: 16px; border-top: 1px solid var(--line); }.auto-saving-options > summary { display: flex; align-items: center; justify-content: space-between; min-height: 48px; font-size: 13px; color: #4e7658; }.auto-saving-options[open] > summary > svg { transform: rotate(180deg); }.auto-saving-options > .secondary-button { width: 100%; }
 .auto-setting { display: flex; align-items: center; gap: 12px; justify-content: space-between; padding: 12px 0; }.auto-setting strong { font-size: 13px; font-weight: 500; }.auto-setting small { display: block; font-size: 11px; color: var(--muted); margin-top: 3px; }
 .saving-switch { position: relative; width: 52px; height: 44px; padding: 0; border: 0; background: none; flex: none; }.saving-switch:before { content: ''; position: absolute; top: 8px; left: 0; width: 48px; height: 29px; border-radius: 20px; background: #d8e2d9; }.saving-switch i { position: absolute; left: 4px; top: 12px; display: block; width: 21px; height: 21px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px #153f2c25; transition: transform .15s ease; }.saving-switch[aria-checked=true]:before { background: #4b9363; }.saving-switch[aria-checked=true] i { transform: translateX(19px); }
 .feature-primary > .primary-button,.feature-primary > .secondary-button { width: 100%; }.divider { border-top: 1px solid var(--line); margin: 20px 0 0; }.feature-aside { display: grid; gap: 16px; }.aside-card { padding: 20px; }.aside-card h3 { font-size: 18px; margin: 10px 0 6px; }.aside-card p { font-size: 13px; color: var(--muted); }.recall-card { background: #f7f2f9; }.recall-card .primary-button,.recall-card .secondary-button { width: 100%; margin-top: 12px; }.aside-metric { margin-top: 16px; display: grid; gap: 3px; }.aside-metric span { font-size: 12px; color: var(--muted); }.aside-metric strong { font: 600 24px/1.55 var(--number-font); color: #3e6f4b; }
-.undo-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; background: var(--mint); border-radius: 10px; padding: 14px; margin-top: 16px; }.undo-banner strong { font-size: 13px; }.undo-banner small { display: block; font-size: 11px; color: var(--muted); }.undo-banner button { display: flex; align-items: center; gap: 6px; border: 1px solid #bfd6c6; border-radius: 8px; min-height: 44px; padding: 8px 12px; background: #fff; color: #26714b; }
 .transfer-tabbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 5px 12px; padding: 13px 18px; border-bottom: 1px solid var(--line); }.transfer-tabbar > span { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--green); }.transfer-tabbar .transfer-protection-label { color: #697d6e; font-size: 11px; }
 .transfer-columns { display: grid; gap: 22px; padding: 20px; }.transfer-columns h2 { font-size: 15px; margin-bottom: 9px; }.source-account-card { background: linear-gradient(125deg,#177e61,#1a634b); color: #fff; padding: 15px 17px; border-radius: 11px; }.source-account-card > div { display: flex; align-items: center; gap: 8px; font-size: 12px; }.source-account-card > div small { display: block; font-size: 11px; color: #c1dfcf; }.source-account-card > small { display: block; font-size: 11px; margin: 9px 0 2px; color: #cee4d8; }.source-account-card strong { display: block; font: 600 24px/1.6 var(--number-font); overflow-wrap: anywhere; }
 .transfer-source-column > p,.transfer-field-help { font-size: 12px; color: var(--muted); margin-top: 9px; }.high-value-preset { width: 100%; min-height: 44px; border: 1px solid #e8dec4; border-radius: 9px; background: #fbf4e5; color: #8a7445; padding: 9px; margin-top: 11px; font-size: 12px; }.source-protection { display: none; }
@@ -250,3 +248,27 @@ button.account-tile:hover { border-color: #86b29b; }.account-tile-top { display:
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* Savings: explicit consent, explainable reserves, ordinary withdrawals. */
+.savings-consent { margin-top: 18px; border-block: 1px solid var(--line); padding-bottom: 14px; }
+.savings-consent .auto-setting { padding: 14px 0 7px; }
+.savings-consent .auto-setting small { font-size: 12px; }
+.savings-consent p { max-width: 55ch; }
+.savings-calculation { margin-block: 16px; border-block: 1px solid var(--line); }
+.savings-calculation summary { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 48px; font-size: 13px; color: var(--green); }
+.savings-calculation summary svg { flex-shrink: 0; }
+.savings-calculation[open] summary svg { transform: rotate(180deg); }
+.savings-calculation dl { margin: 12px 0; }
+.savings-calculation dl > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding-block: 7px; font-size: 12px; }
+.savings-calculation dt { color: var(--muted); }
+.savings-calculation dd { margin: 0 0 0 auto; font-family: var(--number-font); }
+.savings-calculation .calculation-total { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 12px; font-weight: 600; }
+.savings-calculation > p:last-child { margin-bottom: 16px; }
+.feature-primary form > .primary-button { width: 100%; margin-top: 12px; }
+.withdrawal-balance { display: grid; gap: 3px; margin: 16px 0 8px; }
+.withdrawal-balance span { font-size: 12px; color: var(--muted); }
+.withdrawal-balance strong { font: 600 25px/1.6 var(--number-font); overflow-wrap: anywhere; }
+.withdraw-all { display: flex; align-items: center; gap: 10px; min-height: 48px; font-size: 13px; cursor: pointer; }
+.withdraw-all input { width: 20px; height: 20px; accent-color: var(--green); }
+.recall-card .withdrawal-hint { color: #995e2e; font-size: 12px; }
+.recall-card > .small-note { margin-top: 14px; font-size: 12px; }
