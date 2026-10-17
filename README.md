@@ -15,7 +15,7 @@ Built with a responsive mobile/desktop interface and isolated visitor sessions. 
 
 Users can preview and confirm their own planning reserve, with consistent effects on daily spending, savings capacity and transfer review. The liquidity guide explains reducing future spending, withdrawing existing savings and saving only surplus. See [reserve behavior and liquidity UX](docs/liquidity-reserve.md) for rules, limitations and verification.
 
-The home screen offers three guided examples with concrete actions and immediate results, so visitors can try budgeting, recipient checks and reserve previews without moving money. See [the try-first walkthrough](docs/try-first-demo.md) for completion criteria and review notes.
+The home screen keeps its illustrated hero and offers an eight-step spotlight tutorial with arrows, explanations, back/next controls and optional replay. It introduces budgeting, reserves, recipient checks and savings without confirming transfers or moving money. See [the tutorial walkthrough](docs/try-first-demo.md) for behavior and review notes.
 
 ---
 

@@ -50,7 +50,7 @@ export default function TransferReviewDialog({ children, busy, pending, canConta
     setShowContact((current) => !current);
   };
   const keepFocus = (event) => {
-    if (event.key !== 'Tab') return;
+    if (event.defaultPrevented || event.key !== 'Tab') return;
     const controls = [...event.currentTarget.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),a[href],summary,[tabindex]:not([tabindex="-1"])')].filter((node) => node.getClientRects().length > 0 && !node.closest('[hidden]'));
     if (!controls.length) { event.preventDefault(); return; }
     const first = controls[0], last = controls[controls.length - 1];

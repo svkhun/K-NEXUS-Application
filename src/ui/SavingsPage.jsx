@@ -9,7 +9,7 @@ export function ScenarioPicker({ horizon, busy, onScenario }) {
   return <details className="surface scenario-lab"><summary><span>เปลี่ยนสถานการณ์ทดลอง<small>กำลังใช้: {selected}</small></span><ChevronDown size={18} /></summary><div className="scenario-content"><p>เปรียบเทียบผลเมื่อยอดเงินเปลี่ยน ทุกสถานการณ์ใช้วันที่ปัจจุบันตามเวลาไทย</p><div className="scenario-pills">{scenarios.map(([id, label]) => <button key={id} aria-pressed={horizon.scenario === id} disabled={busy} onClick={() => onScenario(id)}>{label}</button>)}</div></div></details>;
 }
 
-export default function SavingsPage({ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, onScenario, openTab, onReservePreview, onReserveSave, reserveGuide }) {
+export default function SavingsPage({ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, onScenario, openTab, onReservePreview, onReserveSave }) {
   const [withdrawAmount, setWithdrawAmount] = useState('200');
   const [withdrawAll, setWithdrawAll] = useState(false);
   const enabled = profile.savings_enabled;
@@ -56,7 +56,7 @@ export default function SavingsPage({ profile, horizon, busy, sweepAmount, setSw
             <button className="primary-button" disabled={busy || !validWithdrawal}>ถอนเงินออมเข้าบัญชีหลัก <ArrowRight size={16} /></button>
           </form><p className="small-note">เป็นการย้ายยอดจำลองระหว่างบัญชีของคุณ ไม่มีการโอนเงินจริงหรือคำนวณดอกเบี้ย</p>
         </section>
-        <ReserveSettings {...{horizon, busy, onReservePreview, onReserveSave}} trialGuide={reserveGuide}/>
+        <ReserveSettings {...{horizon, busy, onReservePreview, onReserveSave}}/>
         <button className="reset-button" disabled={busy} onClick={doReset}><RotateCcw size={15} /> กลับข้อมูลเริ่มต้น</button>
       </aside>
     </div>

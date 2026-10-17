@@ -4,7 +4,6 @@ import { ScenarioPicker } from './SavingsPage';
 import { simulateDailyBudget, spendingOutlook } from './dailyPlanModel.mjs';
 import ReserveSettings from './ReserveSettings';
 import LiquidityGuide from './LiquidityGuide';
-import TrialGuide from './TrialGuide';
 
 const money = (value, digits = 0) => Number(value || 0).toLocaleString('th-TH', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 const dateLabel = (date) => date ? new Date(`${date}T12:00:00+07:00`).toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short' }) : '—';
@@ -34,14 +33,9 @@ function SpendingOutlook({ horizon, forecast }) {
   </section>;
 }
 
-export default function DailyPlan({ profile, horizon, forecast, busy, onScenario, openTab, onWithdraw, onReservePreview, onReserveSave, budgetGuide, reserveGuide }) {
+export default function DailyPlan({ profile, horizon, forecast, busy, onScenario, openTab, onWithdraw, onReservePreview, onReserveSave }) {
   const recommended = Math.floor(horizon.daily_safe_limit);
   const [amount, setAmount] = useState(String(recommended));
-  const changeBudget = (value) => {
-    setAmount(value);
-    if (value !== amount && value.trim() !== '' && Number.isFinite(Number(value)) && Number(value) >= 0 && Number(value) <= 100000) budgetGuide?.onComplete();
-  };
-  const exampleBudget = Number(amount) === 300 ? 500 : 300;
   const plan = useMemo(() => simulateDailyBudget(horizon, amount), [horizon, amount]);
   const outlook = spendingOutlook(forecast?.timeline, horizon.payday_date);
   const ceiling = Math.min(100000, Math.max(1000, Math.ceil(Math.max(horizon.daily_safe_limit * 2, outlook.average || 0) / 100) * 100));
@@ -52,17 +46,13 @@ export default function DailyPlan({ profile, horizon, forecast, busy, onScenario
     <LiquidityGuide {...{profile, horizon, openTab, onWithdraw}}/>
     <div className="daily-plan-grid">
       <section className="surface budget-simulator" aria-label="ทดลองตั้งงบรายวัน">
-        <TrialGuide id="budget" guide={budgetGuide} busy={busy} onAction={() => changeBudget(String(exampleBudget))} actionLabel={`ลองใช้วันละ ฿${money(exampleBudget)}`}>
-          {budgetGuide?.done && plan ? <div className="trial-outcome" aria-live="polite"><span>ลองใช้ ฿{money(amount)} / วัน → เงินเหลือก่อนเงินเดือน</span><strong>฿{money(plan.endBalance, 2)}</strong><small>{plan.withinReserve ? 'ตามงบนี้ ยังเหลือถึงเงินสำรองในแผน' : 'งบนี้อาจใช้เงินสำรองหรือทำให้เงินไม่พอ ลองปรับยอดเปรียบเทียบได้'}</small></div> : <p>กดตัวอย่างงบ แล้วดู <b>เงินเหลือก่อนเงินเดือน</b> คุณพิมพ์ยอดเองหรือเลื่อนแถบด้านล่างเพื่อเปรียบเทียบต่อได้</p>}
-          <p>เป็นการลองคำนวณ ไม่มีการหักเงินหรือเปลี่ยนงบที่ธนาคาร</p>
-        </TrialGuide>
         <div className="simulator-heading"><span className="section-kicker">ลองปรับแผนของคุณ</span><h2>อยากใช้วันละเท่าไร?</h2><p>ลองเปลี่ยนจำนวนเงิน แล้วดูว่าจะพอถึงเงินเดือนหรือไม่</p></div>
         <label className="field-label" htmlFor="daily-budget">งบรายจ่ายประจำวัน</label>
-        <div className="budget-input-row"><div className="amount-input"><span>฿</span><input id="daily-budget" type="number" inputMode="decimal" min="0" max="100000" step="1" value={amount} onChange={e => changeBudget(e.target.value)} aria-describedby="budget-advice" /><span>/ วัน</span></div></div>
-        <div className="budget-advice" id="budget-advice"><span>แนะนำไม่เกิน <b>฿{money(horizon.daily_safe_limit, 2)} / วัน</b></span><button className="text-link" onClick={() => changeBudget(String(recommended))}>ใช้งบแนะนำ</button></div>
-        <input className="budget-slider" type="range" aria-label="ปรับงบรายจ่ายต่อวัน" min="0" max={ceiling} step="1" value={Math.min(ceiling, Math.max(0, Number(amount) || 0))} onChange={e => changeBudget(e.target.value)} />
+        <div className="budget-input-row"><div className="amount-input"><span>฿</span><input id="daily-budget" type="number" inputMode="decimal" min="0" max="100000" step="1" value={amount} onChange={e => setAmount(e.target.value)} aria-describedby="budget-advice" /><span>/ วัน</span></div></div>
+        <div className="budget-advice" id="budget-advice"><span>แนะนำไม่เกิน <b>฿{money(horizon.daily_safe_limit, 2)} / วัน</b></span><button className="text-link" onClick={() => setAmount(String(recommended))}>ใช้งบแนะนำ</button></div>
+        <input className="budget-slider" type="range" aria-label="ปรับงบรายจ่ายต่อวัน" min="0" max={ceiling} step="1" value={Math.min(ceiling, Math.max(0, Number(amount) || 0))} onChange={e => setAmount(e.target.value)} />
         <div className="budget-slider-labels"><span>฿0</span><span>฿{money(ceiling)}</span></div>
-        <div className="budget-presets">{[300, 500, 1000].map(value => <button key={value} aria-pressed={Number(amount) === value} onClick={() => changeBudget(String(value))}>฿{money(value)}</button>)}</div>
+        <div className="budget-presets">{[300, 500, 1000].map(value => <button key={value} aria-pressed={Number(amount) === value} onClick={() => setAmount(String(value))}>฿{money(value)}</button>)}</div>
         {!plan ? <p className="budget-validation" role="alert">กรอกงบระหว่าง 0–100,000 บาท</p> : <div className={`budget-result ${plan.withinReserve ? 'on-track' : 'needs-plan'}`} aria-live="polite">
           <div className="budget-result-title">{plan.withinReserve ? <ShieldCheck size={19} /> : <CircleAlert size={19} />}<strong>{plan.withinReserve ? 'งบนี้ยังรักษาเงินสำรองได้' : plan.minimum < 0 ? 'งบนี้อาจทำให้เงินไม่พอ' : 'งบนี้ต้องใช้เงินสำรองบางส่วน'}</strong></div>
           <div className="budget-result-main"><span>เงินเหลือก่อนเงินเดือน</span><strong>฿{money(plan.endBalance, 2)}</strong></div>
@@ -73,7 +63,7 @@ export default function DailyPlan({ profile, horizon, forecast, busy, onScenario
       </section>
 
       <aside className="planning-evidence">
-        <ReserveSettings {...{horizon, busy, onReservePreview, onReserveSave}} trialGuide={reserveGuide}/>
+        <ReserveSettings {...{horizon, busy, onReservePreview, onReserveSave}}/>
         <SpendingOutlook {...{ horizon, forecast }} />
         <details className="surface budget-breakdown">
           <summary><span>งบแนะนำคิดอย่างไร?<small>ดูบิลและเงินสำรองที่เผื่อไว้</small></span><ChevronDown size={18} /></summary>
