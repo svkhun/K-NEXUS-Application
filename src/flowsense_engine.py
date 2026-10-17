@@ -42,6 +42,16 @@ def commitments(prof, now, state=None):
     return sorted(result, key=lambda row: row["due_days"])
 
 
+def reserve_settings(state, prof):
+    """Session-owned planning preference; the seed is an explicit demo assumption."""
+    suggested = max(500.0, float(prof.get("emergency_buffer", float(prof["monthly_salary"]) * .12)))
+    return {"amount": round(float(state.get("reserve_amount", suggested)), 2),
+            "suggested_amount": round(suggested, 2),
+            "confirmed": state.get("reserve_confirmed", False),
+            "minimum": 500, "maximum": 10_000_000,
+            "source": "SYNTHETIC_PROFILE_SEED"}
+
+
 def get_savings_capacity(state, prof, now=None):
     """Port the source project's opt-in savings estimate; amounts are demo THB."""
     now = now or demo_now(state)
@@ -49,7 +59,7 @@ def get_savings_capacity(state, prof, now=None):
     days = max(1, (payday.date() - now.date()).days)
     salary = float(prof["monthly_salary"])
     fixed = sum(row["amount"] for row in commitments(prof, now, state))
-    buffer = max(500.0, float(prof.get("emergency_buffer", salary * .12)))
+    buffer = reserve_settings(state, prof)["amount"]
     daily = max(0.0, float(prof.get("avg_daily_spend", 600)), float(state["daily_spent_today"]))
     living = round(daily * days, 2)
     end = round(float(state["main_balance"]) - living - fixed, 2)
@@ -145,6 +155,7 @@ def horizon(prof, state, projection=None):
         "max_sweep_amount": savings["max_sweep_amount"],
         "recommended_sweep_amount": suggested,
         "emergency_buffer": buffer,
+        "reserve_settings": reserve_settings(state, prof),
         "projected_daily_burn": round(burn, 2),
         "nudge_message": nudge,
         "breakdown": {

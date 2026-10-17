@@ -4,7 +4,9 @@
 
 The current visual reference is the set of ten redacted K+ screenshots supplied by the user. The teal overview, circular transaction grid, account geometry and light task surfaces are implemented in `src/ui/kplus.css` and `KBankSurfaces.jsx`. Home highlights the daily plan under important items; Transactions and Profile provide permanent financial entry points; the existing transfer review carries the cashflow impact. See [the Thai feature-placement plan](KPLUS_FEATURE_PLACEMENT_TH.md) for image analysis, current navigation, proposed integration into the real K+ structure and a discovery-study plan. Source screenshots are not bundled.
 
-The sections below record the 16 October layout foundation; its pastel visual palette is superseded by the current scoped skin. Core allocation and transfer policies are unchanged.
+The latest pass adds distinct lime, coral, blue and gold service accents, neutral task surfaces and a solid header that stays legible while scrolling. A session-scoped reserve editor previews before/after amounts before explicit confirmation; a liquidity guide explains concrete next actions. See [reserve and liquidity behavior](liquidity-reserve.md). The allocation formulas and transfer risk policy remain in place, with the chosen reserve shared by savings and transfer planning.
+
+The sections below record the 16 October layout foundation; its pastel visual palette is superseded by the current scoped skin.
 
 
 The 16 October 2026 revision separates the home overview from the daily budget editor and starts the layout at phone widths. The previous large summary was rendered on both pages, obscuring their different purposes. The previous typography pass also enlarged small roles indiscriminately across five cascading stylesheets. The replacement assigns sizes by role in one stylesheet.

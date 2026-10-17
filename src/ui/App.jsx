@@ -160,6 +160,12 @@ function App() {
   const onScenario = (scenario) => run(async () => { await api.scenario(accountId, scenario); setMatchedBillId(''); setTransferPurpose('general'); await refresh(); setTransferResult(null); setClearanceToken(null); setReviewOpen(false); setNotice('เปลี่ยนสถานการณ์จำลองแล้ว ลองดูคำแนะนำและกราฟที่เปลี่ยนไป'); });
   const prepareHighValue = () => run(async () => { await api.scenario(accountId, 'high_value'); await refresh(); changeRecipient(recipients[0]); setAmount('50000'); setNotice('เตรียมยอดบัญชีสมมติ ฿60,000 สำหรับทดลองการตรวจรายการมูลค่าสูงแล้ว'); });
   const onSavingsToggle = (enabled) => run(async () => { await api.savingsPreference(accountId, enabled); await refresh(); setNotice(enabled ? 'เปิดการแยกเงินออมแล้ว เลือกจำนวนแล้วกดออมเมื่อพร้อม' : 'ปิดการแยกเงินออมแล้ว ยังถอนเงินออมที่มีอยู่ได้ตามปกติ'); });
+  const onReservePreview = (value) => api.reservePreview(accountId, value);
+  const onReserveSave = (value) => run(async () => {
+    await api.reservePreference(accountId, value);
+    await refresh();
+    setNotice(`ใช้เงินสำรอง ฿${money(value, 2)} ในแผนแล้ว งบใช้จ่ายและยอดพร้อมออมคำนวณใหม่ โดยยอดบัญชีไม่เปลี่ยน`);
+  });
   const doReset = () => run(async () => {
     await api.reset(accountId); setMatchedBillId(''); setTransferPurpose('general');
     await refresh();
@@ -297,10 +303,10 @@ function App() {
             {tab === 'transactions' && <TransactionsHub {...{profile, horizon, openTab, onPayBill, onWithdraw, onTransferSettings}}/>}
             {tab === 'profile' && <ProfilePage {...{persona, profile, openTab, onTransferSettings, doReset, busy, setHidden}}/>}
             {['plan', 'accounts'].includes(tab) && <FinancialTabs active={tab} openTab={openTab}/>}
-            {tab === 'plan' && <DailyPlan key={`${accountId}-${horizon.scenario}`} {...{ horizon, forecast, busy, onScenario, openTab }} />}
+            {tab === 'plan' && <DailyPlan key={`${accountId}-${horizon.scenario}`} {...{ profile, horizon, forecast, busy, onScenario, openTab, onWithdraw, onReservePreview, onReserveSave }} />}
             {tab === 'accounts' && <AccountsPage profile={profile} horizon={horizon} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} openTab={openTab} hidden={hidden} doReset={doReset} busy={busy} onScenario={onScenario} refresh={() => run(() => refresh())} />}
 
-            {tab === 'savings' && <SavingsPage key={accountId} {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, onScenario, openTab }} />}
+            {tab === 'savings' && <SavingsPage key={accountId} {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, onScenario, openTab, onReservePreview, onReserveSave }} />}
 
             {tab === 'transfer' && <TransferProtectionSettings key={accountId} profile={profile} busy={busy} hasPending={isPendingTransfer(transferResult)} onChange={onTransferPreference} />}
             {tab === 'transfer' && <>

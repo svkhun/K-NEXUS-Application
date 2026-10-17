@@ -4,7 +4,7 @@ import hashlib
 import json
 from decimal import Decimal, ROUND_DOWN
 
-from src.flowsense_engine import commitments, demo_now, next_payday
+from src.flowsense_engine import commitments, demo_now, next_payday, reserve_settings
 
 
 def cents(value):
@@ -15,6 +15,7 @@ def plan_fingerprint(state, prof):
     now = demo_now(state)
     values = {"date": now.strftime("%Y-%m-%d"), "balance": state["main_balance"],
               "spent": state["daily_spent_today"], "paid": state.get("paid_commitments", {}),
+              "reserve": reserve_settings(state, prof)["amount"],
               "profile": {key: prof.get(key) for key in ("monthly_salary", "fixed_rent", "fixed_debt",
                           "fixed_utilities", "emergency_buffer", "avg_daily_spend")}}
     return hashlib.sha256(json.dumps(values, sort_keys=True).encode()).hexdigest()
@@ -45,7 +46,7 @@ def transfer_impact(state, prof, amount, bill_id=None):
     now = demo_now(state)
     days = max(1, (next_payday(now).date()-now.date()).days)
     bill = bill_for_transfer(state, prof, bill_id, amount)
-    buffer = max(500.0, float(prof.get("emergency_buffer", float(prof["monthly_salary"])*.12)))
+    buffer = reserve_settings(state, prof)["amount"]
 
     def summary(account):
         rows = [row for row in commitments(prof, now, account) if row["due_days"] < days]

@@ -27,7 +27,8 @@ export function QuickActions({ openTab, onPayBill, onWithdraw, onTransferSetting
     [expanded ? 'ถอนเงินออม' : 'การเงินของฉัน', expanded ? ArrowDownLeft : BarChart3, expanded ? onWithdraw : () => openTab('accounts')],
     ...(expanded ? [['บัญชีของฉัน', Wallet, () => openTab('accounts')], ['แผนใช้เงิน', Target, () => openTab('plan')], ['แนวโน้มเงิน', BarChart3, () => openTab('accounts')], ['ตั้งค่าการโอน', Settings2, onTransferSettings]] : []),
   ];
-  return <div className="kplus-quick-actions" aria-label="ธุรกรรมด่วน">{actions.map(([label, Icon, action]) => <button key={label} onClick={action}><span><Icon size={25} strokeWidth={1.6}/></span><strong>{label}</strong></button>)}</div>;
+  const tones = { 'โอนเงิน': 'mint', 'จ่ายบิล': 'coral', 'ออมเงิน': 'lime', 'ถอนเงินออม': 'gold', 'การเงินของฉัน': 'blue', 'บัญชีของฉัน': 'mint', 'แผนใช้เงิน': 'gold', 'แนวโน้มเงิน': 'blue', 'ตั้งค่าการโอน': 'coral' };
+  return <div className="kplus-quick-actions" aria-label="ธุรกรรมด่วน">{actions.map(([label, Icon, action]) => <button key={label} data-tone={tones[label]} onClick={action}><span><Icon size={25} strokeWidth={1.6}/></span><strong>{label}</strong></button>)}</div>;
 }
 
 export function TransactionsHub({ profile, horizon, openTab, onPayBill, onWithdraw, onTransferSettings }) {

@@ -1,8 +1,8 @@
-/* K+ reference interpretation: teal overview, mint actions, light task surfaces.
+/* K+ reference interpretation: teal/navy overview, varied service accents, light task surfaces.
    Layout/data-entry primitives remain in banking.css; this layer owns the app skin. */
 :root { background: #12313e; --number-font: 'Plus Jakarta Sans', 'IBM Plex Sans Thai', sans-serif; }
 body { background: #12313e; }
-.kplus-experience { --ink: #24494b; --green: #248d84; --forest: #184b51; --muted: #a9c9cd; --line: #ffffff1f; --mint: #e0f4ee; color: #eef9f8; background: radial-gradient(ellipse at 15% 0%, #2b8490 0%, #205e70 38%, #102e3c 90%); }
+.kplus-experience { --ink: #213b47; --green: #248d84; --forest: #184b51; --muted: #a9c9cd; --line: #ffffff1f; --mint: #e0f4ee; color: #eef9f8; background: linear-gradient(135deg, #287781 0%, #20485d 40%, #172e43 100%); }
 .kplus-experience .surface { background: #143b49; border: 0; border-radius: 15px; }
 .kplus-experience .main-content { padding-top: 12px; max-width: 1160px; }
 .kplus-experience h1 { font-size: 21px; }
@@ -13,7 +13,7 @@ body { background: #12313e; }
 .kplus-experience .demo-context-panel .text-link { color: #277b72; }
 .kplus-experience .demo-disclaimer { color: #c2dbde; font-size: 10px; margin: 4px 0 14px; }
 .kplus-experience .page-footer { color: #a0bec4; font-size: 10px; }
-.kplus-experience .topbar { background: #ffffff04; border: 0; backdrop-filter: blur(16px); gap: 12px; min-height: 68px; }
+.kplus-experience .topbar { background: #214d60fa; border: 0; gap: 12px; min-height: 68px; }
 .bank-wordmark { display: inline-flex; align-items: center; color: #f5fbfa; line-height: 1; font-family: var(--number-font); font-size: 35px; font-weight: 700; letter-spacing: -2px; }
 .bank-wordmark b { color: #8bd885; font-weight: 700; font-size: 30px; margin: -9px 0 0 1px; }
 .kplus-experience .mobile-brand { display: flex; align-items: center; gap: 9px; }
@@ -300,5 +300,117 @@ body { background: #12313e; }
   .inline-discovery { padding: 15px 12px; gap: 9px; }
   .inline-discovery strong { font-size: 13px; }
   .home-section-heading h2 { font-size: 16px; }
+}
+/* Services and money roles use distinct colours, as in the supplied K+ screens. */
+.kplus-quick-actions [data-tone=coral] > span { background: #653e48; color: #ffc2b6; border-color: #c68d8b60; }
+.kplus-quick-actions [data-tone=lime] > span { background: #3b562c; color: #c5ef6a; border-color: #b9d97466; }
+.kplus-quick-actions [data-tone=gold] > span { background: #665538; color: #ffe3a0; border-color: #d1b16f66; }
+.kplus-quick-actions [data-tone=blue] > span { background: #2d4c76; color: #b4d7ff; border-color: #90b5df66; }
+.kplus-home .today-budget { background: #f9faf4; color: #243b48; box-shadow: none; }
+.kplus-home .today-budget-heading, .kplus-home .today-budget-heading time { color: #5c7479; }
+.kplus-home .today-budget h2 { color: #36515a; }
+.kplus-home .today-budget-amount strong { color: #173f4c; }
+.kplus-home .today-budget-stats, .kplus-home .today-budget-footer p { color: #5c7074; }
+.kplus-home .today-budget-stats b { color: #233f4a; }
+.kplus-home .daily-progress { background: #dfe8dd; }
+.kplus-home .daily-progress i { background: #a6ca36; }
+.kplus-home .today-budget-footer .text-link { color: #22695e; }
+.kplus-home .round-link { background: #c1e971; color: #304b2c; }
+.kplus-home .today-budget.needs-attention { background: #fff0d1; }
+.kplus-home .needs-attention .today-budget-amount strong { color: #8a511d; }
+.home-introduction { background: #f6eedc; }
+.home-section-heading > span { background: #b6dc50; color: #263e28; }
+.kplus-home .saving-service { background: #344d36; }
+.kplus-home .saving-service .mint { background: #c3e868; color: #344d27; }
+.kplus-home .saving-service small { color: #d4e6ac; }
+.kplus-home .trust-service { background: #253c60; }
+.kplus-home .trust-service .lilac { background: #f5bcaa; color: #653e3c; }
+.kplus-home .trust-service small { color: #f3c6b6; }
+.kplus-experience .account-tile:nth-child(2) { background: #3c5236; }
+.kplus-experience .account-pair { background: #223e62; }
+.kplus-experience .account-pair > div:last-child strong { color: #d6ef8c; }
+.kplus-experience .account-pair > div:last-child span { color: #d0dfaf; }
+.kplus-experience .recall-card { border-top: 5px solid #f2c556; }
+.kplus-experience .recall-card .icon-box { background: #fff0c0; color: #7a5c24; }
+.kplus-experience .auto-save-recommendation { background: #ecf2d7; }
+.kplus-experience .auto-save-recommendation .auto-save-icon { color: #597927; background: #dceab5; }
+.kplus-experience .spending-outlook { background: #263f63; }
+.kplus-experience .reserve-overview { background: #554b3c; }
+.kplus-experience .reserve-overview .reserve-amounts strong { color: #ffe0a1; }
+.savings-purpose { font-size: 13px; line-height: 1.9; color: #d4e4e5; margin: -8px 0 18px; }
+
+.liquidity-guide { margin: 18px 0 26px; }
+.liquidity-guide-intro { margin-bottom: 18px; max-width: 65ch; }
+.liquidity-guide-intro > span { color: #d7eb92; font-size: 12px; }
+.liquidity-guide-intro h2 { font-size: 23px; margin: 6px 0; line-height: 1.5; font-weight: 500; }
+.liquidity-guide-intro p { color: #cfdee3; font-size: 13px; line-height: 1.9; }
+.liquidity-allocation { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border-radius: 14px; overflow: hidden; background: #203951; }
+.liquidity-allocation > div { padding: 17px; border-right: 1px solid #ffffff20; min-width: 0; }
+.liquidity-allocation span { display: block; font-size: 11px; color: #cbdde7; }
+.liquidity-allocation strong { font: 600 22px/1.8 var(--number-font); display: block; overflow-wrap: anywhere; }
+.liquidity-allocation .allocation-bills { background: #533c47; }
+.liquidity-allocation .allocation-bills strong { color: #ffc3b7; }
+.liquidity-allocation .allocation-reserve { background: #5a5039; }
+.liquidity-allocation .allocation-reserve strong { color: #ffe09a; }
+.liquidity-allocation .allocation-available { background: #d6eaa0; color: #2c452a; border: 0; }
+.liquidity-allocation .allocation-available span { color: #45603c; }
+.liquidity-shortfall { font-size: 12px; color: #ffe0aa; padding-top: 10px; }
+.liquidity-actions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-top: 16px; }
+.liquidity-action { text-align: left; display: flex; gap: 12px; border: 0; border-radius: 12px; padding: 17px; background: #f9f8f0; color: #243d48; min-width: 0; }
+.liquidity-action .action-colour { width: 39px; height: 39px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center; background: #dbe7fa; color: #345e91; }
+.liquidity-action > span:last-child { min-width: 0; }
+.liquidity-action strong { display: block; font-size: 14px; font-weight: 600; }
+.liquidity-action b { display: block; font-size: 12px; margin: 7px 0; line-height: 1.8; font-weight: 500; }
+.liquidity-action small { color: #5c6c70; display: block; font-size: 11px; line-height: 1.9; }
+.liquidity-action em { display: flex; align-items: center; gap: 5px; margin-top: 12px; color: #2e6964; font-style: normal; font-size: 12px; }
+.liquidity-action.withdraw-action { background: #fff0d2; }
+.liquidity-action.withdraw-action .action-colour { background: #f6d787; color: #70501f; }
+.liquidity-action.save-action { background: #edf2d9; }
+.liquidity-action.save-action .action-colour { background: #d4e8a2; color: #48632b; }
+.liquidity-action:disabled { opacity: .7; cursor: default; }
+.kplus-experience .reserve-settings { padding: 24px; background: #fcf5e5; color: #343f43; --muted: #706957; --line: #e4dac3; }
+.reserve-settings-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.reserve-symbol { flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; background: #f4d47e; color: #715922; display: grid; place-items: center; }
+.reserve-settings h2 { font-size: 18px; font-weight: 500; line-height: 1.6; }
+.kplus-experience .reserve-settings .section-kicker { color: #80672d; font-size: 10px; }
+.reserve-settings > p, .reserve-source p { color: #655f51; font-size: 12px; line-height: 1.9; }
+.reserve-status { display: flex; justify-content: space-between; gap: 14px; align-items: center; margin: 16px 0 10px; padding: 13px 0; border-block: 1px solid #ddcea9; }
+.reserve-status strong { font-size: 12px; font-weight: 500; color: #795c23; }
+.reserve-status span { font: 600 22px/1.6 var(--number-font); color: #5d4c27; overflow-wrap: anywhere; }
+.reserve-status.confirmed strong { color: #35644a; }
+.reserve-source { margin-bottom: 18px; font-size: 12px; }
+.reserve-source summary { color: #766132; cursor: pointer; min-height: 30px; }
+.reserve-edit-row { display: flex; gap: 9px; flex-wrap: wrap; }
+.reserve-edit-row .amount-input { flex: 1; min-width: 135px; background: #fffdf8; border-color: #c8b681; }
+.reserve-edit-row .amount-input input { width: 100%; min-width: 0; color: #34444a; font-size: 25px; }
+.reserve-edit-row .secondary-button { min-height: 46px; padding: 10px 14px; display: inline-flex; gap: 7px; align-items: center; }
+.kplus-experience .reserve-settings .secondary-button { color: #5f532d; border-color: #c4af75; }
+.kplus-experience .reserve-settings .text-link { color: #665b39; font-size: 12px; }
+.reserve-settings .small-note { font-size: 10px; }
+.reserve-preview { margin-top: 16px; border-top: 1px solid #dfcfaa; padding-top: 16px; }
+.reserve-preview h3 { font-size: 14px; font-weight: 500; margin-bottom: 12px; }
+.reserve-preview-row, .reserve-preview-labels { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 8px; align-items: center; padding: 9px 0; font-size: 11px; border-bottom: 1px solid #e5dbc4; }
+.reserve-preview-row > :not(:first-child), .reserve-preview-labels > :not(:first-child) { text-align: right; overflow-wrap: anywhere; }
+.reserve-preview-labels { color: #73694f; font-size: 10px; }
+.reserve-preview-row b { font-weight: 400; color: #686457; }
+.reserve-preview-row strong { font-weight: 600; color: #355d47; }
+.reserve-preview p { font-size: 11px; line-height: 1.9; margin: 12px 0; color: #715731; }
+.reserve-preview .primary-button { width: 100%; background: #e8c866; border-color: #e8c866; color: #463c23; padding: 11px 15px; font-size: 12px; }
+.reserve-preview > small { display: block; font-size: 10px; color: #746e5d; margin-top: 9px; line-height: 1.8; }
+.reserve-settings .reserve-error { font-size: 12px; color: #a43d25; margin-top: 10px; }
+#reserve-amount, #daily-budget { scroll-margin-block: 100px; }
+@media(max-width: 900px) {
+  .liquidity-actions { grid-template-columns: 1fr; }
+  .liquidity-action { padding: 16px; }
+}
+@media(max-width: 640px) {
+  .liquidity-guide-intro h2 { font-size: 20px; }
+  .liquidity-allocation { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .liquidity-allocation > div { padding: 14px; }
+  .liquidity-allocation strong { font-size: 20px; }
+  .kplus-experience .reserve-settings { padding: 18px; }
+  .reserve-status { flex-wrap: wrap; gap: 3px; }
+  .reserve-edit-row { flex-direction: column; }
+  .reserve-edit-row .secondary-button { justify-content: center; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }

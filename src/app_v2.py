@@ -1,4 +1,4 @@
-from src.flowsense_engine import demo_now, next_payday, commitments, horizon as calculate_horizon
+from src.flowsense_engine import demo_now, next_payday, commitments, reserve_settings, horizon as calculate_horizon
 from src.transfer_planning import (transfer_impact, plan_fingerprint, bill_for_transfer,
                                    apply_planned_debit, verification_guidance)
 from fastapi import FastAPI, HTTPException, Query, Header, Path, Request
@@ -444,6 +444,10 @@ class LiquidityScenarioRequest(StrictRequest):
 class SavingsPreferenceRequest(StrictRequest):
     account_id: str
     enabled: bool
+
+class ReservePreferenceRequest(StrictRequest):
+    account_id: str
+    amount: float = Field(..., ge=500, le=10_000_000)
 
 class TransferPreferenceRequest(StrictRequest):
     account_id: str
@@ -1117,8 +1121,11 @@ def health_check():
 
 @app.post("/api/v2/flowsense/scenario")
 def set_liquidity_scenario(payload: LiquidityScenarioRequest):
+    saved_reserve = {key: LIVE_ACCOUNT_STATES[payload.account_id][key]
+                     for key in ("reserve_amount", "reserve_confirmed") if key in LIVE_ACCOUNT_STATES[payload.account_id]}
     reset_account_state(payload.account_id)
     state = LIVE_ACCOUNT_STATES[payload.account_id]
+    state.update(saved_reserve)
     prof = BEHAVIORAL_PROFILES_CACHE[payload.account_id]
     salary = float(prof["monthly_salary"])
     state["scenario"] = payload.scenario
@@ -1157,6 +1164,33 @@ def set_savings_preference(payload: SavingsPreferenceRequest):
         LIVE_ACCOUNT_STATES[payload.account_id]["savings_enabled"] = payload.enabled
     audit_log("SAVINGS_PREFERENCE_UPDATED", payload.account_id, {"enabled": payload.enabled})
     return {"account_id": payload.account_id, "savings_enabled": payload.enabled}
+
+
+@app.post("/api/v2/flowsense/reserve-preview")
+def preview_reserve(payload: ReservePreferenceRequest):
+    """Read-only what-if using the same forecast and allocation rules as a saved plan."""
+    with get_account_lock(payload.account_id):
+        state = LIVE_ACCOUNT_STATES[payload.account_id]
+        prof = BEHAVIORAL_PROFILES_CACHE[payload.account_id]
+        points = forecast_cashflow_30d(payload.account_id)["timeline"]
+        projection = {p["date"]: p["projected_balance"] for p in points if not p["is_past"]}
+        before = calculate_horizon(prof, state, projection)
+        draft = {**state, "reserve_amount": payload.amount}
+        after = calculate_horizon(prof, draft, projection)
+        fields = ("daily_safe_limit", "remaining_today", "savings_capacity", "budget_reserve_shortfall", "emergency_buffer")
+        return {"account_id": payload.account_id, "amount": payload.amount,
+                "before": {key: before[key] for key in fields},
+                "after": {key: after[key] for key in fields}}
+
+
+@app.post("/api/v2/flowsense/reserve-preference")
+def set_reserve_preference(payload: ReservePreferenceRequest):
+    with get_account_lock(payload.account_id):
+        state = LIVE_ACCOUNT_STATES[payload.account_id]
+        state["reserve_amount"] = payload.amount
+        state["reserve_confirmed"] = True
+    audit_log("RESERVE_PREFERENCE_UPDATED", payload.account_id, {"amount": payload.amount})
+    return reserve_settings(state, BEHAVIORAL_PROFILES_CACHE[payload.account_id])
 
 
 @app.get("/api/v2/demo/insights")

@@ -13,6 +13,8 @@ An independent interactive UX prototype demonstrating two next-generation financ
 
 Built with a responsive mobile/desktop interface and isolated visitor sessions. Financial data and transfers are synthetic; this is not a production banking service.
 
+Users can preview and confirm their own planning reserve, with consistent effects on daily spending, savings capacity and transfer review. The liquidity guide explains reducing future spending, withdrawing existing savings and saving only surplus. See [reserve behavior and liquidity UX](docs/liquidity-reserve.md) for rules, limitations and verification.
+
 ---
 
 ##  Live Demo & Endpoints

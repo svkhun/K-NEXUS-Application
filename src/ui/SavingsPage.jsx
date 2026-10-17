@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowDownLeft, ArrowRight, ChevronDown, CircleAlert, RotateCcw, Sparkles, Wallet } from 'lucide-react';
+import ReserveSettings from './ReserveSettings';
 const money = (v, digits = 2) => Number(v || 0).toLocaleString('th-TH', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 
 export function ScenarioPicker({ horizon, busy, onScenario }) {
@@ -8,7 +9,7 @@ export function ScenarioPicker({ horizon, busy, onScenario }) {
   return <details className="surface scenario-lab"><summary><span>เปลี่ยนสถานการณ์ทดลอง<small>กำลังใช้: {selected}</small></span><ChevronDown size={18} /></summary><div className="scenario-content"><p>เปรียบเทียบผลเมื่อยอดเงินเปลี่ยน ทุกสถานการณ์ใช้วันที่ปัจจุบันตามเวลาไทย</p><div className="scenario-pills">{scenarios.map(([id, label]) => <button key={id} aria-pressed={horizon.scenario === id} disabled={busy} onClick={() => onScenario(id)}>{label}</button>)}</div></div></details>;
 }
 
-export default function SavingsPage({ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, onScenario, openTab }) {
+export default function SavingsPage({ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, onScenario, openTab, onReservePreview, onReserveSave }) {
   const [withdrawAmount, setWithdrawAmount] = useState('200');
   const [withdrawAll, setWithdrawAll] = useState(false);
   const enabled = profile.savings_enabled;
@@ -21,6 +22,7 @@ export default function SavingsPage({ profile, horizon, busy, sweepAmount, setSw
   const validWithdrawal = validMoney(withdrawal) && withdrawal <= profile.vault_balance;
   return <div className="savings-page">
     <div className="savings-budget-link"><Wallet size={23} /><div><strong>วันนี้ใช้เพิ่มได้อีก ฿{money(horizon.remaining_today)}</strong><p>ตรวจงบใช้จ่ายก่อนตัดสินใจออม</p></div><button onClick={() => openTab('plan')}>ดูแผนใช้เงิน <ArrowRight size={16} /></button></div>
+    <p className="savings-purpose">เงินตึงให้เก็บไว้ใช้ก่อน · การแยกออมช่วยจัดเงินเป็นส่วน ไม่ได้เพิ่มยอดเงินรวม หากต้องใช้ คุณถอนกลับเข้าบัญชีหลักได้</p>
     <ScenarioPicker horizon={horizon} busy={busy} onScenario={onScenario} />
     <div className="feature-layout">
       <section className="surface feature-primary">
@@ -54,7 +56,7 @@ export default function SavingsPage({ profile, horizon, busy, sweepAmount, setSw
             <button className="primary-button" disabled={busy || !validWithdrawal}>ถอนเงินออมเข้าบัญชีหลัก <ArrowRight size={16} /></button>
           </form><p className="small-note">เป็นการย้ายยอดจำลองระหว่างบัญชีของคุณ ไม่มีการโอนเงินจริงหรือคำนวณดอกเบี้ย</p>
         </section>
-        <section className="surface aside-card"><h3>{horizon.horizon_badge_th}</h3><p>{horizon.nudge_message}</p><div className="aside-metric"><span>เงินสำรองที่กันไว้</span><strong>฿{money(horizon.emergency_buffer)}</strong></div><div className="aside-metric"><span>ใช้ได้ต่อวันโดยประมาณ</span><strong>฿{money(horizon.daily_safe_limit)}</strong></div></section>
+        <ReserveSettings {...{horizon, busy, onReservePreview, onReserveSave}}/>
         <button className="reset-button" disabled={busy} onClick={doReset}><RotateCcw size={15} /> กลับข้อมูลเริ่มต้น</button>
       </aside>
     </div>

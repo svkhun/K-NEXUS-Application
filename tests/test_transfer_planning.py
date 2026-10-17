@@ -132,6 +132,19 @@ class TransferPlanningTests(unittest.TestCase):
         self.assertTrue(pending['plan_changed'])
         self.assertEqual(self.state['main_balance'], 15000)
 
+    def test_changed_reserve_invalidates_review_and_fresh_review_uses_it(self):
+        payload = self.payload(350)
+        review = self.evaluate(payload)
+        proof = self.confirmation(payload, review)
+        self.assertEqual(self.post('/flowsense/reserve-preference', dict(account_id=SOURCE, amount=2500)).status_code, 200)
+        stale = self.post('/trustgraph/confirm-transfer', proof)
+        self.assertEqual(stale.status_code, 409)
+        self.assertEqual(stale.json()['code'], 'PLAN_CHANGED')
+        self.assertEqual(self.state['main_balance'], 15000)
+        fresh = self.evaluate(payload)
+        self.assertEqual(fresh['liquidity_impact']['emergency_buffer'], 2500)
+        self.assertLess(fresh['liquidity_impact']['after']['average_per_day'], review['liquidity_impact']['after']['average_per_day'])
+
     def test_matching_a_bill_or_changing_context_does_not_lower_recipient_risk(self):
         for purpose in ('general', 'job', 'unlock', 'changed_account'):
             review = self.evaluate(self.payload(1000, 'ACC_0001', matched_bill_id='rent:2026-10-26', transfer_purpose=purpose))
