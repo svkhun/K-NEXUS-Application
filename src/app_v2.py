@@ -1,4 +1,6 @@
-from src.flowsense_engine import demo_now, next_payday, horizon as calculate_horizon
+from src.flowsense_engine import demo_now, next_payday, commitments, horizon as calculate_horizon
+from src.transfer_planning import (transfer_impact, plan_fingerprint, bill_for_transfer,
+                                   apply_planned_debit, verification_guidance)
 from fastapi import FastAPI, HTTPException, Query, Header, Path, Request
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from src.demo_security import (PRODUCTION, SECRET, ALLOWED_HOSTS, DEMO_ACCOUNTS, DEMO_RECIPIENTS, SEED_ACCOUNTS, SessionMapping, current_session, DemoSessionMiddleware, BodyLimitMiddleware, SecurityHeadersMiddleware)
@@ -72,12 +74,13 @@ def audit_log(event_type: str, actor: str, details: Dict[str, Any]):
     }
     print(f"[AUDIT-SIEM] {json.dumps(record, ensure_ascii=False)}")
 
-def generate_signed_micro_auth_token(source_acc: str, target_acc: str, amount: float) -> str:
+def generate_signed_micro_auth_token(source_acc: str, target_acc: str, amount: float, purpose="micro_auth") -> str:
     """Generates an HMAC-SHA256 tamper-proof clearance token with 120s TTL."""
     payload = {
         "src": source_acc,
         "dst": target_acc,
         "amt": round(amount, 2),
+        "purpose": purpose,
         "iat": int(time.time()),
         "exp": int(time.time()) + 120,
         "nonce": PENDING_STEP_UP[step_up_key(source_acc, target_acc, amount)]["nonce"],
@@ -88,7 +91,7 @@ def generate_signed_micro_auth_token(source_acc: str, target_acc: str, amount: f
     signature = hmac.new(HMAC_SECRET.encode(), b64_payload.encode(), hashlib.sha256).hexdigest()
     return f"TG.{b64_payload}.{signature}"
 
-def verify_signed_micro_auth_token(token: str, source_acc: str, target_acc: str, amount: float) -> bool:
+def verify_signed_micro_auth_token(token: str, source_acc: str, target_acc: str, amount: float, purpose="micro_auth") -> bool:
     """Verifies HMAC signature, expiration TTL, and account/amount binding."""
     if not token or not token.startswith("TG."):
         return False
@@ -101,6 +104,8 @@ def verify_signed_micro_auth_token(token: str, source_acc: str, target_acc: str,
         if not hmac.compare_digest(sig, expected_sig):
             return False
         payload = json.loads(base64.urlsafe_b64decode(b64_payload.encode()).decode())
+        if payload.get("purpose") != purpose:
+            return False
         if time.time() > payload.get("exp", 0):
             return False
         pending = PENDING_STEP_UP.get(step_up_key(source_acc, target_acc, amount), {})
@@ -311,8 +316,33 @@ def remember_step_up(source_acc: str, target_acc: str, amount: float, risky=Fals
 
 def retain_transfer_review(result, payload):
     pending = PENDING_STEP_UP[step_up_key(payload.source_account_id, payload.target_account_id, payload.amount)]
+    state = LIVE_ACCOUNT_STATES[payload.source_account_id]
+    prof = BEHAVIORAL_PROFILES_CACHE[payload.source_account_id]
+    result.update(planning_details(payload, state, prof))
+    pending["plan_fingerprint"] = plan_fingerprint(state, prof)
+    pending["matched_bill_id"] = payload.matched_bill_id
+    pending["transfer_purpose"] = payload.transfer_purpose
+    pending["requires_auth"] = result["status"] == "MICRO_AUTH_REQUIRED"
     pending["evaluation"] = result
-    return {**result, **cooldown_status(pending)}
+    response = {**result, **cooldown_status(pending)}
+    if not pending["requires_auth"]:
+        response["review_token"] = generate_signed_micro_auth_token(payload.source_account_id, payload.target_account_id, payload.amount, "review")
+    return response
+
+
+def planning_details(payload, state, prof):
+    try:
+        impact = transfer_impact(state, prof, payload.amount, payload.matched_bill_id)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error))
+    today = demo_now(state).strftime("%Y-%m-%d")
+    previous = state.get("transfer_totals", {}).get(f"{today}:{payload.target_account_id}", {})
+    return {"liquidity_impact": impact, "transfer_purpose": payload.transfer_purpose,
+            "matched_bill_id": payload.matched_bill_id,
+            "verification_guidance": verification_guidance(payload.transfer_purpose),
+            "transfer_sequence": {"count_today": previous.get("count", 0),
+                                  "sent_today": previous.get("amount", 0),
+                                  "total_if_confirmed": round(previous.get("amount", 0)+payload.amount, 2)}}
 
 
 def require_cooldown_complete(source_acc, target_acc, amount):
@@ -387,6 +417,8 @@ class TransferEvaluationRequest(StrictRequest):
     ratio_to_daily_avg: float = Field(12.5, gt=0, le=1000)
     auth_factor_used: Literal["pin", "face_scan", "none"] = "pin"
     scenario_mode: Literal["auto", "suspicious", "blocked"] = "auto"
+    matched_bill_id: Optional[str] = Field(None, max_length=40)
+    transfer_purpose: Literal["general", "job", "unlock", "changed_account"] = "general"
 
 class MicroAuthRequest(StrictRequest):
     source_account_id: str
@@ -399,6 +431,7 @@ class TransferConfirmRequest(StrictRequest):
     amount: float = Field(..., gt=0, le=100_000)
     decision: Literal["PROCEED", "CANCEL"]
     auth_token: Optional[str] = Field(None, max_length=1024)
+    review_token: Optional[str] = Field(None, max_length=1024)
 
 class MicroSweepRequest(StrictRequest):
     account_id: str
@@ -425,22 +458,12 @@ class VaultWithdrawalRequest(StrictRequest):
 # ==============================================================================
 @app.post("/api/v2/trustgraph/evaluate-transfer")
 def evaluate_transfer_v2(payload: TransferEvaluationRequest):
-    """
-    TrustGraph Targeted Anti-Scam Verification:
-    - Zero-Delay Baseline: Routine transfers to known or low-risk accounts execute immediately with zero added steps (<80ms SLA).
-    - Risky transfers: optional server-timed 15-minute review, enabled by default.
-    - Micro-Auth for Critical Anomaly: simulated verification after review readiness.
-      Triggers a 5-second face liveness check and displays a single confirmation prompt.
-    - Direct Risk Reasoning: Tells the user plainly why a recipient looks suspicious
-      (e.g., 'Recipient account opened 48 hours ago with rapid pass-through fund patterns')
-      and leaves the final transfer decision to the user.
-    - Demo high-value gate: Transfers >= 50,000 THB request simulated step-up verification.
-    - Hard Interdiction: Transfers to confirmed criminal mule rings (risk >= 0.90) are blocked under Royal Decree B.E. 2566.
-    """
+    """Preview only. Every debit requires a separate, bound final confirmation."""
     if payload.source_account_id not in LIVE_ACCOUNT_STATES:
         raise HTTPException(status_code=404, detail="Unknown demo source")
     if LIVE_ACCOUNT_STATES[payload.source_account_id]["main_balance"] < payload.amount:
         raise HTTPException(status_code=400, detail="ยอดเงินในบัญชีหลักไม่เพียงพอ")
+    details = planning_details(payload, LIVE_ACCOUNT_STATES[payload.source_account_id], BEHAVIORAL_PROFILES_CACHE[payload.source_account_id])
     t_start = time.perf_counter()
 
     # 1. Feature Store Lookup (Tier 1 Redis Simulation)
@@ -490,6 +513,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
         audit_log("TRANSFER_BLOCKED", payload.source_account_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount, "latency_ms": round(latency_ms, 2)})
         return {
             "status": "BLOCKED_MULE_INTERDICTION",
+            **details,
             "risk_tier": "CONFIRMED_MULE_RING",
             "current_risk_score": round(current_risk, 4),
             "risk_score": round(current_risk, 4),
@@ -553,49 +577,18 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
     # Applied strictly to confirmed blacklisted criminal accounts (e.g. ACC_0000 or scenario_mode == "blocked")
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
-    # ZERO-DELAY BASELINE: Routine / Low-Risk Transfers Execute Immediately
+    # ROUTINE TRANSFERS: Preview first, without simulated auth or a timed pause
     # --------------------------------------------------------------------------
     if current_risk < 0.45:
-        clear_account_reviews(payload.source_account_id)
-        src_id = payload.source_account_id
-        res_main_balance = None
-        with get_account_lock(src_id):
-            if src_id in LIVE_ACCOUNT_STATES:
-                src_state = LIVE_ACCOUNT_STATES[src_id]
-                demo_now(src_state)
-                if src_state["main_balance"] < payload.amount:
-                    raise HTTPException(status_code=400, detail=f"ยอดเงินในบัญชีหลักไม่เพียงพอ (มี ฿ {src_state['main_balance']:,.2f})")
-                src_state["main_balance"] = round(src_state["main_balance"] - payload.amount, 2)
-                src_state["daily_spent_today"] = round(src_state.get("daily_spent_today", 0.0) + payload.amount, 2)
-                res_main_balance = src_state["main_balance"]
-                audit_log("TRANSFER_EXECUTED_ZERO_DELAY", src_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount, "remaining": res_main_balance})
-
-        return {
-            "status": "APPROVED",
-            "receipt_id": "DEMO-" + secrets.token_hex(6).upper(),
-            "executed_at": datetime.now(ZoneInfo("Asia/Bangkok")).isoformat(),
-            "amount": payload.amount,
-            "risk_tier": "LOW_RISK",
-            "risk_score": round(current_risk, 4),
-            "current_risk_score": round(current_risk, 4),
-            "action": "ALLOW",
-            "zero_delay_baseline": True,
-            "step_up_required": False,
-            "added_steps_count": 0,
-            "direct_risk_reasoning": "Zero-Delay Baseline: บัญชีปลายทางและพฤติกรรมการโอนอยู่ในเกณฑ์ปกติ ดำเนินการโอนทันทีโดยไม่มีขั้นตอนเพิ่ม",
-            "counterfactual_message": "Zero-Delay Baseline: บัญชีปลายทางและพฤติกรรมการโอนอยู่ในเกณฑ์ปกติ ดำเนินการโอนทันทีโดยไม่มีขั้นตอนเพิ่ม",
-            "reason_summary": "Zero-Delay Baseline verified",
-            "actionable_warning": "Zero-Delay Baseline verified. Instant transfer executed.",
-            "new_main_balance": res_main_balance,
-            "amount": payload.amount,
-            "target_meta": {
-                "account_id": payload.target_account_id,
-                "account_age_days": account_age_days,
-                "kyc_level": kyc_level,
-                "velocity_sec": inflow_velocity
-            },
-            "latency_ms": round(latency_ms, 2)
+        remember_step_up(payload.source_account_id, payload.target_account_id, payload.amount)
+        result = {
+            "status": "TRANSFER_REVIEW", "risk_tier": "LOW_RISK",
+            "risk_score": round(current_risk, 4), "current_risk_score": round(current_risk, 4),
+            "step_up_required": False, "zero_delay_baseline": False,
+            "primary_reason_th": "ยังไม่พบสัญญาณผิดปกติจากข้อมูลจำลองที่มี กรุณาดูผลต่อแผนเงินก่อนยืนยัน",
+            "direct_risk_reasons_list": [], "latency_ms": round(latency_ms, 2),
         }
+        return retain_transfer_review(result, payload)
 
     # --------------------------------------------------------------------------
     # Risky transfers use the optional server-timed review period before Micro-Auth.
@@ -657,8 +650,10 @@ def verify_micro_auth(payload: MicroAuthRequest):
     """
     if not has_pending_step_up(payload.source_account_id, payload.target_account_id, payload.amount):
         raise HTTPException(status_code=400, detail="กรุณาตรวจสอบความเสี่ยงของรายการโอนก่อนยืนยันตัวตน")
-    require_cooldown_complete(payload.source_account_id, payload.target_account_id, payload.amount)
     pending = PENDING_STEP_UP[step_up_key(payload.source_account_id, payload.target_account_id, payload.amount)]
+    if not pending.get("requires_auth", True):
+        raise HTTPException(status_code=400, detail="รายการนี้ยืนยันจากหน้าสรุปได้โดยไม่ต้องยืนยันตัวตนจำลอง")
+    require_cooldown_complete(payload.source_account_id, payload.target_account_id, payload.amount)
     pending["expires"] = max(pending["expires"], int(time.time()) + 120)
 
     # Generate tamper-proof HMAC-SHA256 clearance token bound to accounts & amount
@@ -680,9 +675,9 @@ def verify_micro_auth(payload: MicroAuthRequest):
 @app.post("/api/v2/trustgraph/confirm-transfer")
 def confirm_transfer(payload: TransferConfirmRequest, x_idempotency_key: Optional[str] = Header(None)):
     """
-    Direct Risk Reasoning Final Decision:
-    User retains full autonomy to proceed or cancel after the 5-second Micro-Auth check.
-    Guarded with account mutex lock for thread safety and balance consistency.
+    Execute a reviewed transaction only with the appropriate bound token.
+    Risky transactions additionally enforce the server cooldown and simulated auth.
+    Recheck the financial snapshot before atomically settling money and any bill.
     """
 
     src_id = payload.source_account_id
@@ -705,22 +700,37 @@ def confirm_transfer(payload: TransferConfirmRequest, x_idempotency_key: Optiona
 
         return res
 
-    valid_token = verify_signed_micro_auth_token(payload.auth_token, src_id, payload.target_account_id, payload.amount)
-    if valid_token:
-        require_cooldown_complete(src_id, payload.target_account_id, payload.amount)
-    if not valid_token or not consume_step_up(src_id, payload.target_account_id, payload.amount):
-        audit_log("TRANSFER_REJECTED_INVALID_TOKEN", src_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount})
-        raise HTTPException(status_code=401, detail="กรุณาตรวจความเสี่ยงและยืนยันตัวตนจำลองก่อนโอนต่อ")
-
-    # Concurrency Lock Guard to prevent double spending
     with get_account_lock(src_id):
-        state = LIVE_ACCOUNT_STATES.get(src_id, {"main_balance": 24500.0, "vault_balance": 15000.0})
+        pending = PENDING_STEP_UP.get(step_up_key(src_id, payload.target_account_id, payload.amount), {})
+        requires_auth = pending.get("requires_auth", True)
+        token = payload.auth_token if requires_auth else payload.review_token
+        purpose = "micro_auth" if requires_auth else "review"
+        valid_token = verify_signed_micro_auth_token(token, src_id, payload.target_account_id, payload.amount, purpose)
+        if not valid_token or not has_pending_step_up(src_id, payload.target_account_id, payload.amount):
+            raise HTTPException(status_code=401, detail="กรุณาตรวจรายการและยืนยันตามขั้นตอนก่อนโอนต่อ")
+        require_cooldown_complete(src_id, payload.target_account_id, payload.amount)
+        state = LIVE_ACCOUNT_STATES[src_id]
+        prof = BEHAVIORAL_PROFILES_CACHE[src_id]
         demo_now(state)
+        if pending.get("plan_fingerprint") != plan_fingerprint(state, prof):
+            return JSONResponse({"code": "PLAN_CHANGED", "detail": "ยอดเงินหรือแผนเปลี่ยนแล้ว กรุณาตรวจผลกระทบล่าสุดก่อนยืนยันอีกครั้ง ยังไม่มีการหักเงิน"}, status_code=409)
         if state["main_balance"] < payload.amount:
             raise HTTPException(status_code=400, detail=f"ยอดเงินในบัญชีหลักไม่เพียงพอ (มี ฿ {state['main_balance']:,.2f})")
-
-        state["main_balance"] = round(state["main_balance"] - payload.amount, 2)
-        state["daily_spent_today"] = round(state.get("daily_spent_today", 0.0) + payload.amount, 2)
+        try:
+            bill = bill_for_transfer(state, prof, pending.get("matched_bill_id"), payload.amount)
+        except ValueError as error:
+            raise HTTPException(status_code=409, detail=str(error))
+        if not consume_step_up(src_id, payload.target_account_id, payload.amount):
+            raise HTTPException(status_code=401, detail="รายการหมดอายุ กรุณาตรวจรายการใหม่")
+        apply_planned_debit(state, payload.amount, bill)
+        today = demo_now(state).strftime("%Y-%m-%d")
+        totals = state.setdefault("transfer_totals", {})
+        for key in list(totals):
+            if not key.startswith(today+":"):
+                del totals[key]
+        total = totals.setdefault(f"{today}:{payload.target_account_id}", {"count": 0, "amount": 0})
+        total["count"] += 1
+        total["amount"] = round(total["amount"]+payload.amount, 2)
         remaining = round(state["main_balance"], 2)
 
     res = {
@@ -730,9 +740,10 @@ def confirm_transfer(payload: TransferConfirmRequest, x_idempotency_key: Optiona
         "decision": "PROCEED",
         "amount": payload.amount,
         "remaining_balance": remaining,
+        "matched_bill": bill,
         "message": f"โอนเงิน ฿ {payload.amount:,.2f} ไปยังบัญชี {mask_account_id(payload.target_account_id)} สำเร็จแล้วตามความประสงค์ของคุณ"
     }
-    audit_log("TRANSFER_EXECUTED", src_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount, "remaining": remaining})
+    audit_log("TRANSFER_EXECUTED", src_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount, "remaining": remaining, "matched_bill_id": bill["id"] if bill else None})
 
     return res
 
@@ -756,9 +767,13 @@ def pending_transfer(account_id: str):
     if not rows:
         return {"pending": None}
     pending = max(rows, key=lambda row: row["created_at"])
-    return {"pending": {**pending["evaluation"], **cooldown_status(pending),
+    response = {**pending["evaluation"], **cooldown_status(pending),
                         "source_account_id": account_id, "target_account_id": pending["target_account_id"],
-                        "amount": pending["amount"]}}
+                        "amount": pending["amount"],
+                        "plan_changed": pending.get("plan_fingerprint") != plan_fingerprint(LIVE_ACCOUNT_STATES[account_id], BEHAVIORAL_PROFILES_CACHE[account_id])}
+    if not pending.get("requires_auth", True):
+        response["review_token"] = generate_signed_micro_auth_token(account_id, pending["target_account_id"], pending["amount"], "review")
+    return {"pending": response}
 
 
 @app.get("/api/v2/flowsense/profile/{account_id}")
@@ -906,6 +921,7 @@ def forecast_cashflow_30d(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
     fixed_rent = float(prof.get("fixed_rent", round(salary * 0.25, 2)))
     fixed_debt_emi = float(prof.get("fixed_debt", round(salary * 0.12, 2)))
     fixed_utilities = float(prof.get("fixed_utilities", round(salary * 0.05, 2)))
+    due_today = sum(row["amount"] for row in commitments(prof, now, state) if row["due_days"] == 0)
 
     for f_step in range(1, 31):
         target_date = now + timedelta(days=f_step)
@@ -920,13 +936,13 @@ def forecast_cashflow_30d(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
         pred_spend = max(150.0, pred_spend)
 
         # Accurately reflect recurring commitments on due days
-        fixed_due_deduction = 0.0
-        if target_date.day == 22: # Debt EMI due
-            fixed_due_deduction += fixed_debt_emi
-        elif target_date.day == 26: # Rent due
-            fixed_due_deduction += fixed_rent
-        elif target_date.day == 27: # Utilities due
-            fixed_due_deduction += fixed_utilities
+        # Remaining amounts share the same bill IDs as the transfer planner.
+        # An unpaid bill due today is conservatively carried into tomorrow.
+        fixed_due_deduction = due_today if f_step == 1 else 0.0
+        for kind, day, value in (("debt", 22, fixed_debt_emi), ("rent", 26, fixed_rent), ("utilities", 27, fixed_utilities)):
+            if target_date.day == day:
+                paid = state.get("paid_commitments", {}).get(f"{kind}:{target_date:%Y-%m-%d}", 0)
+                fixed_due_deduction += max(0, value-paid)
 
         inflow = salary if target_date.day == 28 else 0.0
         cum_bal = cum_bal - pred_spend - fixed_due_deduction + inflow

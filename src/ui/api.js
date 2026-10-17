@@ -26,7 +26,9 @@ async function request(path, options = {}) {
   if (!response.ok) {
     if (body.code === 'SESSION_EXPIRED') sessionPromise = undefined;
     const detail = body.detail ?? body.message;
-    throw new Error(typeof detail === 'string' ? detail : 'ไม่สามารถเชื่อมต่อกับระบบทดลองได้');
+    const error = new Error(typeof detail === 'string' ? detail : 'ไม่สามารถเชื่อมต่อกับระบบทดลองได้');
+    error.code = body.code;
+    throw error;
   }
   return body;
 }

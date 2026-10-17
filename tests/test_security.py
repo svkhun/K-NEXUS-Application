@@ -127,8 +127,15 @@ class SecurityTests(unittest.TestCase):
         key = secrets.token_hex(16)
         body = self.transfer("ACC_0101", 350)
         first = self.post("/trustgraph/evaluate-transfer", body, key)
-        self.assertEqual(first.json()["status"], "APPROVED")
+        self.assertEqual(first.json()["status"], "TRANSFER_REVIEW")
         self.assertEqual(self.post("/trustgraph/evaluate-transfer", body, key).json(), first.json())
+        self.assertEqual(self.balance(), before)
+        proof = {field: body[field] for field in ("source_account_id", "target_account_id", "amount")}
+        confirmation = {**proof, "decision": "PROCEED", "review_token": first.json()["review_token"]}
+        confirm_key = secrets.token_hex(16)
+        done = self.post("/trustgraph/confirm-transfer", confirmation, confirm_key)
+        self.assertEqual(done.status_code, 200)
+        self.assertEqual(self.post("/trustgraph/confirm-transfer", confirmation, confirm_key).json(), done.json())
         self.assertEqual(self.balance(), before - 350)
         self.assertEqual(self.post("/trustgraph/evaluate-transfer", {**body, "amount": 500}, key).status_code, 409)
 

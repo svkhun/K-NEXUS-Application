@@ -94,7 +94,7 @@ class TransferCooldownTests(unittest.TestCase):
         self.assertEqual(self.post('/trustgraph/verify-micro-auth', self.proof()).status_code, 200)
         self.assertEqual(self.evaluate('ACC_0000')['status'], 'BLOCKED_MULE_INTERDICTION')
         self.assertEqual(self.post('/trustgraph/verify-micro-auth', self.proof('ACC_0000')).status_code, 400)
-        self.assertEqual(self.evaluate('ACC_0101', 350)['status'], 'APPROVED')
+        self.assertEqual(self.evaluate('ACC_0101', 350)['status'], 'TRANSFER_REVIEW')
 
     def test_setting_change_does_not_rewrite_an_active_transaction(self):
         before = self.profile()['main_balance']

@@ -14,7 +14,7 @@ Reviewed the original `README.md`, `src/app_v2.py`, `frontend/js/app.js`, genera
 | Surplus-only Micro-Sweep | FlowSense | The backend uses the forecast's minimum balance before payday, obligations, emergency buffer and minimum main balance; recommendation and manual amount share the same guard |
 | Optional savings | ออมเงิน → เปิดการแยกเงินออม | Disabled by default; explicit per-persona/session consent; no balance change on enabling; reserve living costs, all profile bills, minimum THB 500 buffer and forecast minimum; at most THB 500 per action |
 | Standard savings withdrawal | ออมเงิน → ถอนเงินออม | Explicit positive amount or full balance selected before submission; works with savings disabled; no Undo or implicit all-balance withdrawal |
-| Routine transfers with no added steps | Transfer / known recipient | Real ONNX evaluation; debit once; visible receipt and measured server inference latency |
+| Routine transfer preview and confirmation | Transfer / known recipient | ONNX evaluation without debit; show budget impact, then explicit confirmation; no cooldown or simulated authentication |
 | Critical anomaly / direct reasoning | Transfer / inspect recipient | Full Thai reasons, recipient age, velocity and KYC metadata; model signals are synthetic; no funds moved while waiting |
 | Risk-only cooldown / Micro-Auth | Visible transfer settings and review popup | Optional 15-minute server-enforced pause, enabled by default, then five-second simulated verification and explicit proceed/cancel; signed clearance still binds source, target, amount, visitor and evaluation nonce, expires after 120 seconds and is single-use |
 | High-value step-up | Transfer / “ลองรายการมูลค่าสูง ฿50,000” | Resets and funds that visitor's simulated account to 60,000 so the 50,000 demo gate can actually be tried |
@@ -43,4 +43,9 @@ Session state and the bounded event history remain in memory. They survive a pag
 
 ## Risk-only cooldown update — 16 October 2026
 
-See [the cooldown policy](transfer-cooldown.md). Default-on 15-minute review is restricted to risky transfers; ordinary payments remain immediate and the blocked destination remains blocked. Settings apply to new transactions; cancellation clears that transaction's timer. Review results use a modal. The current suite contains 44 backend and 13 frontend tests.
+See [the cooldown policy](transfer-cooldown.md). Default-on 15-minute review is restricted to risky transfers; ordinary payments have no timed pause but now require explicit confirmation after the plan preview and the blocked destination remains blocked. Settings apply to new transactions; cancellation clears that transaction's timer. Review results use a modal. The current suite contains 44 backend and 13 frontend tests.
+
+
+## Transfer planning update — 17 October 2026
+
+See [transfer planning](transfer-planning.md) for the preview-only API, before/after allocation, bill settlement shared across planning/savings/forecast, contextual guidance, cumulative same-recipient totals and stale-plan enforcement. Verification: 56 Python regressions, 13 frontend logic tests and the production build pass. Browser checks cover successful bill payment, new spending impact, sequence totals, cancellation, reload restoration, risk-only waiting and 320/390 px layouts without horizontal overflow. These are functional checks on synthetic data, not a user study or fraud-effectiveness evaluation.

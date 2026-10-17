@@ -21,19 +21,24 @@ def next_payday(now):
     return candidate
 
 
-def commitments(prof, now):
+def commitments(prof, now, state=None):
     salary = float(prof["monthly_salary"])
     rows = [
-        (str(prof.get("debt_type", "บิลผ่อนชำระ / บัตรเครดิต")), float(prof.get("fixed_debt", salary * .12)), 22),
-        (str(prof.get("living_type", "ค่าเช่าห้อง/คอนโด")), float(prof.get("fixed_rent", salary * .25)), 26),
-        ("ค่าน้ำ-ไฟ-อินเทอร์เน็ต", float(prof.get("fixed_utilities", salary * .05)), 27),
+        ("debt", str(prof.get("debt_type", "บิลผ่อนชำระ / บัตรเครดิต")), float(prof.get("fixed_debt", salary * .12)), 22),
+        ("rent", str(prof.get("living_type", "ค่าเช่าห้อง/คอนโด")), float(prof.get("fixed_rent", salary * .25)), 26),
+        ("utilities", "ค่าน้ำ-ไฟ-อินเทอร์เน็ต", float(prof.get("fixed_utilities", salary * .05)), 27),
     ]
     result = []
-    for name, amount, day in rows:
+    for kind, name, amount, day in rows:
         due = now.replace(day=day)
-        if due.date() <= now.date():
+        if due.date() < now.date():
             due = due.replace(year=now.year + (now.month == 12), month=now.month % 12 + 1)
-        result.append(dict(name=name, amount=round(amount, 2), due_date=due.strftime("%Y-%m-%d"), due_days=(due.date()-now.date()).days))
+        due_date = due.strftime("%Y-%m-%d")
+        bill_id = f"{kind}:{due_date}"
+        paid = float((state or {}).get("paid_commitments", {}).get(bill_id, 0))
+        result.append(dict(id=bill_id, kind=kind, name=name, original_amount=round(amount, 2),
+                           paid_amount=round(paid, 2), amount=round(max(0, amount-paid), 2),
+                           due_date=due_date, due_days=(due.date()-now.date()).days))
     return sorted(result, key=lambda row: row["due_days"])
 
 
@@ -43,8 +48,7 @@ def get_savings_capacity(state, prof, now=None):
     payday = next_payday(now)
     days = max(1, (payday.date() - now.date()).days)
     salary = float(prof["monthly_salary"])
-    fixed = sum(float(prof.get(key, salary * rate)) for key, rate in (
-        ("fixed_rent", .25), ("fixed_debt", .12), ("fixed_utilities", .05)))
+    fixed = sum(row["amount"] for row in commitments(prof, now, state))
     buffer = max(500.0, float(prof.get("emergency_buffer", salary * .12)))
     daily = max(0.0, float(prof.get("avg_daily_spend", 600)), float(state["daily_spent_today"]))
     living = round(daily * days, 2)
@@ -65,14 +69,15 @@ def horizon(prof, state, projection=None):
     balance = float(state["main_balance"])
     spent = float(state["daily_spent_today"])
     burn = spent * .5 + float(prof.get("avg_daily_spend", 600)) * .5
-    rows = commitments(prof, now)
+    rows = commitments(prof, now, state)
     upcoming = [row for row in rows if row["due_days"] < days]
     deductions = 0
     for row in rows:
         # Alert only on a debit before the next salary, not a normal balance dip.
         if row["due_days"] < days:
             deductions += row["amount"]
-            row["projected_after_payment"] = round((projection or {}).get(row["due_date"], balance - burn * row["due_days"] - deductions), 2)
+            estimate = balance - burn * row["due_days"] - deductions
+            row["projected_after_payment"] = round(estimate if row["due_days"] == 0 else (projection or {}).get(row["due_date"], estimate), 2)
             row["is_at_risk"] = row["amount"] > 0 and row["projected_after_payment"] < 0
         else:
             row["projected_after_payment"] = None

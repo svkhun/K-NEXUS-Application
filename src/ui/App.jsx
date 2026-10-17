@@ -28,6 +28,7 @@ const recipientTemplates = [
   { id: 'ACC_0000', name: 'บัญชีที่ถูกระงับ', meta: 'ทดลองกรณีหยุดรายการ', icon: LockKeyhole, tone: 'red', amount: 1200 },
 ];
 const money = (value, digits = 0) => new Intl.NumberFormat('th-TH', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(Number(value ?? 0));
+const isPendingTransfer = (result) => ['MICRO_AUTH_REQUIRED', 'TRANSFER_REVIEW', 'REVIEW_CHANGED'].includes(result?.status);
 const navItems = [
   { id: 'home', label: 'หน้าหลัก', icon: Home },
   { id: 'plan', label: 'แผนใช้เงิน', icon: Target },
@@ -56,6 +57,8 @@ function App() {
   const [sweepAmount, setSweepAmount] = useState('200');
   const [recipient, setRecipient] = useState(recipientTemplates[0]);
   const [amount, setAmount] = useState('350');
+  const [matchedBillId, setMatchedBillId] = useState('');
+  const [transferPurpose, setTransferPurpose] = useState('general');
   const [transferResult, setTransferResult] = useState(null);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [focusSettings, setFocusSettings] = useState(false);
@@ -92,6 +95,7 @@ function App() {
           const pending = review.pending;
           const target = recipientTemplates.find((item) => item.id === pending.target_account_id) || { ...recipientTemplates[0], id: pending.target_account_id };
           setRecipient(target); setAmount(String(pending.amount)); setClearanceToken(null); setTransferResult(pending);
+          setMatchedBillId(pending.matched_bill_id || ''); setTransferPurpose(pending.transfer_purpose || 'general');
         }
       })
       .catch((err) => { if (active) setError(err.message); })
@@ -128,6 +132,7 @@ function App() {
     setAccountId(id); setTransferResult(null); setClearanceToken(null); setReviewOpen(false);
     setRecipient({ ...recipientTemplates[0], id: id === 'ACC_0101' ? 'ACC_0100' : 'ACC_0101' });
     setAmount('350'); setTelemetry({ device: false, first: false, duration: 90, ratio: 1.1, auth: 'pin' });
+    setMatchedBillId(''); setTransferPurpose('general');
     setError(''); setNotice('');
   };
   const doSweep = () => run(async () => {
@@ -150,11 +155,11 @@ function App() {
     await refresh();
     setNotice(`ถอนเงินออม ฿${money(result.withdrawn_amount, 2)} เข้าบัญชีหลักแล้ว`);
   });
-  const onScenario = (scenario) => run(async () => { await api.scenario(accountId, scenario); await refresh(); setTransferResult(null); setClearanceToken(null); setReviewOpen(false); setNotice('เปลี่ยนสถานการณ์จำลองแล้ว ลองดูคำแนะนำและกราฟที่เปลี่ยนไป'); });
+  const onScenario = (scenario) => run(async () => { await api.scenario(accountId, scenario); setMatchedBillId(''); setTransferPurpose('general'); await refresh(); setTransferResult(null); setClearanceToken(null); setReviewOpen(false); setNotice('เปลี่ยนสถานการณ์จำลองแล้ว ลองดูคำแนะนำและกราฟที่เปลี่ยนไป'); });
   const prepareHighValue = () => run(async () => { await api.scenario(accountId, 'high_value'); await refresh(); changeRecipient(recipients[0]); setAmount('50000'); setNotice('เตรียมยอดบัญชีสมมติ ฿60,000 สำหรับทดลองการตรวจรายการมูลค่าสูงแล้ว'); });
   const onSavingsToggle = (enabled) => run(async () => { await api.savingsPreference(accountId, enabled); await refresh(); setNotice(enabled ? 'เปิดการแยกเงินออมแล้ว เลือกจำนวนแล้วกดออมเมื่อพร้อม' : 'ปิดการแยกเงินออมแล้ว ยังถอนเงินออมที่มีอยู่ได้ตามปกติ'); });
   const doReset = () => run(async () => {
-    await api.reset(accountId);
+    await api.reset(accountId); setMatchedBillId(''); setTransferPurpose('general');
     await refresh();
     setTransferResult(null); setClearanceToken(null); setReviewOpen(false);
     setNotice('รีเซ็ตข้อมูลของบัญชีจำลองแล้ว');
@@ -169,6 +174,8 @@ function App() {
     ratio_to_daily_avg: Number(telemetry.ratio),
     auth_factor_used: telemetry.auth,
     scenario_mode: recipient.id === 'ACC_0000' ? 'blocked' : 'auto',
+    matched_bill_id: matchedBillId || null,
+    transfer_purpose: transferPurpose,
   });
   const evaluate = () => run(async () => {
     const value = Number(amount);
@@ -188,7 +195,7 @@ function App() {
   });
   const onTransferPreference = (enabled) => run(async () => {
     await api.transferPreference(accountId, enabled); await refresh();
-    setNotice(enabled ? 'เปิดพักก่อนโอนรายการเสี่ยง 15 นาทีแล้ว' : transferResult?.status === 'MICRO_AUTH_REQUIRED' ? 'ปิดสำหรับรายการใหม่แล้ว หากต้องการใช้ค่านี้ ให้ยกเลิกรายการเดิมแล้วเริ่มใหม่' : 'ปิดเวลาพักเสริมแล้ว รายการเสี่ยงใหม่ยังตรวจความเสี่ยงและยืนยันจำลองตามปกติ');
+    setNotice(enabled ? 'เปิดพักก่อนโอนรายการเสี่ยง 15 นาทีแล้ว' : isPendingTransfer(transferResult) ? 'ปิดสำหรับรายการใหม่แล้ว หากต้องการใช้ค่านี้ ให้ยกเลิกรายการเดิมแล้วเริ่มใหม่' : 'ปิดเวลาพักเสริมแล้ว รายการเสี่ยงใหม่ยังตรวจความเสี่ยงและยืนยันจำลองตามปกติ');
   });
   const checkCooldown = async () => {
     if (inFlight.current) return;
@@ -196,15 +203,22 @@ function App() {
       const { pending } = await api.pendingTransfer(accountId);
       if (activeAccount.current !== accountId) return;
       setTransferResult((current) => {
-        if (current?.status !== 'MICRO_AUTH_REQUIRED') return current;
+        if (!isPendingTransfer(current)) return current;
         if (!pending || pending.target_account_id !== recipient.id || Number(pending.amount) !== Number(amount)) return { status: 'REVIEW_EXPIRED' };
         return { ...current, ...pending };
       });
     } catch (err) { setError(err.message); }
   };
   const decide = (decision) => run(async () => {
-    const result = await api.confirm({ source_account_id: accountId, target_account_id: recipient.id, amount: Number(amount), decision, auth_token: decision === 'PROCEED' ? clearanceToken : undefined });
+    let result;
+    try {
+      result = await api.confirm({ source_account_id: accountId, target_account_id: recipient.id, amount: Number(amount), decision, auth_token: decision === 'PROCEED' ? clearanceToken : undefined, review_token: decision === 'PROCEED' ? transferResult?.review_token : undefined });
+    } catch (err) {
+      if (err.code === 'PLAN_CHANGED') { setClearanceToken(null); setTransferResult((current) => ({ ...current, plan_changed: true })); }
+      throw err;
+    }
     setTransferResult(result); setClearanceToken(null); setReviewOpen(true);
+    if (result.status === 'TRANSFER_EXECUTED') setMatchedBillId('');
     await refresh();
     if (decision === 'CANCEL') setNotice('ยกเลิกรายการและเวลาพักเดิมแล้ว รายการใหม่จะใช้ค่าตั้งค่าปัจจุบัน');
   });
@@ -214,6 +228,7 @@ function App() {
   const changeRecipient = (item) => {
     setTelemetry({ device: false, first: item.tone !== 'green', duration: item.tone === 'green' ? 90 : 8, ratio: item.tone === 'green' ? 1.1 : 8, auth: 'pin' });
     setRecipient(item); setAmount(String(item.amount)); setTransferResult(null); setClearanceToken(null); setReviewOpen(false); setError(''); setNotice('');
+    setMatchedBillId(''); setTransferPurpose('general');
   };
   const openTab = (id) => {
     setTab(id); setError(''); setNotice(''); setSearch(''); setShowAlerts(false); setSearchOpen(false);
@@ -257,27 +272,27 @@ function App() {
           </div>
         </header>
         <main className="main-content">
-          <div className="page-intro"><div><h1>{title}</h1><p>{tab === 'home' ? 'ภาพรวมเงินของคุณวันนี้' : tab === 'plan' ? 'ลองตั้งงบ ให้เงินพอถึงวันเงินเดือน' : tab === 'accounts' ? 'ยอดเงิน ภาระ และแนวโน้มวันข้างหน้า' : tab === 'savings' ? 'ออมเมื่อพร้อม ถอนเงินได้ตามปกติ' : 'ดูความเสี่ยงก่อนตัดสินใจ'}</p></div><details className="demo-context"><summary>บัญชีทดลอง · {persona.name}<ChevronDown size={15} /></summary><div className="demo-context-panel"><label htmlFor="persona">ลองเปลี่ยนโปรไฟล์</label><select id="persona" value={accountId} disabled={busy} onChange={(event) => changePersona(event.target.value)}>{personas.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.role}</option>)}</select><p>แอปต้นแบบอิสระ ใช้ข้อมูลสมมติ ไม่ใช่แอปทางการของ KBank</p><button className="text-link" disabled={busy || !profile} onClick={doReset}><RotateCcw size={15} /> รีเซ็ตบัญชีทดลอง</button></div></details></div>
+          <div className="page-intro"><div><h1>{title}</h1><p>{tab === 'home' ? 'ภาพรวมเงินของคุณวันนี้' : tab === 'plan' ? 'ลองตั้งงบ ให้เงินพอถึงวันเงินเดือน' : tab === 'accounts' ? 'ยอดเงิน ภาระ และแนวโน้มวันข้างหน้า' : tab === 'savings' ? 'ออมเมื่อพร้อม ถอนเงินได้ตามปกติ' : 'เห็นผลต่อแผนเงินและตรวจผู้รับก่อนโอน'}</p></div><details className="demo-context"><summary>บัญชีทดลอง · {persona.name}<ChevronDown size={15} /></summary><div className="demo-context-panel"><label htmlFor="persona">ลองเปลี่ยนโปรไฟล์</label><select id="persona" value={accountId} disabled={busy} onChange={(event) => changePersona(event.target.value)}>{personas.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.role}</option>)}</select><p>แอปต้นแบบอิสระ ใช้ข้อมูลสมมติ ไม่ใช่แอปทางการของ KBank</p><button className="text-link" disabled={busy || !profile} onClick={doReset}><RotateCcw size={15} /> รีเซ็ตบัญชีทดลอง</button></div></details></div>
 
           <div className="demo-disclaimer"><ShieldCheck size={14} /><span>แอปต้นแบบ · ข้อมูลสมมติ · ไม่มีการโอนเงินจริง</span></div>
           {error && !hidden && <div className="message error" role="alert"><CircleAlert size={18} /><span>{error}</span><button aria-label="ปิดข้อความ" onClick={() => setError('')}><X size={16} /></button></div>}
           {notice && !hidden && <div className="message success" role="status"><Check size={18} /><span>{notice}</span><button aria-label="ปิดข้อความ" onClick={() => setNotice('')}><X size={16} /></button></div>}
 
           {hidden ? <section className="surface privacy-cover"><EyeOff size={32} /><h2>ซ่อนข้อมูลการเงินแล้ว</h2><p>ยอดเงิน กราฟ และรายการต่าง ๆ จะกลับมาเมื่อคุณเลือกแสดงข้อมูล</p><button className="primary-button" onClick={() => setHidden(false)}>แสดงข้อมูลการเงิน <Eye size={17} /></button></section> : loading ? <div className="loading-card"><div className="spinner" /> กำลังโหลดข้อมูลจำลอง...</div> : profile && horizon ? <>
-            {tab !== 'transfer' && transferResult?.status === 'MICRO_AUTH_REQUIRED' && <div className="pending-transfer-banner"><ShieldAlert size={19} /><span>มีรายการรอตรวจสอบก่อนโอน · ยังไม่ได้หักเงิน</span><button className="text-link" onClick={showTransferReview}>กลับไปดูรายการ <ArrowRight size={16} /></button></div>}
+            {tab !== 'transfer' && isPendingTransfer(transferResult) && <div className="pending-transfer-banner"><ShieldAlert size={19} /><span>มีรายการรอตรวจสอบก่อนโอน · ยังไม่ได้หักเงิน</span><button className="text-link" onClick={showTransferReview}>กลับไปดูรายการ <ArrowRight size={16} /></button></div>}
             {tab === 'home' && <Dashboard profile={profile} horizon={horizon} activities={(profile.events || []).slice(0, 5).map(describeEvent)} hidden={hidden} setHidden={setHidden} openTab={openTab} tryScenario={tryScenario} />}
             {tab === 'plan' && <DailyPlan key={`${accountId}-${horizon.scenario}`} {...{ horizon, forecast, busy, onScenario, openTab }} />}
             {tab === 'accounts' && <AccountsPage profile={profile} horizon={horizon} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} openTab={openTab} hidden={hidden} doReset={doReset} busy={busy} onScenario={onScenario} refresh={() => run(() => refresh())} />}
 
             {tab === 'savings' && <SavingsPage key={accountId} {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, onScenario, openTab }} />}
 
-            {tab === 'transfer' && <TransferProtectionSettings key={accountId} profile={profile} busy={busy} hasPending={transferResult?.status === 'MICRO_AUTH_REQUIRED'} onChange={onTransferPreference} />}
+            {tab === 'transfer' && <TransferProtectionSettings key={accountId} profile={profile} busy={busy} hasPending={isPendingTransfer(transferResult)} onChange={onTransferPreference} />}
             {tab === 'transfer' && <>
-              {transferResult?.status === 'MICRO_AUTH_REQUIRED' && <div className="transfer-active-review"><div><strong>มีรายการที่กำลังตรวจสอบ</strong><p>฿{money(amount, 2)} · {recipient.name} · ยังไม่ได้หักเงิน</p></div><div><button id="transfer-review-open" className="primary-button" disabled={busy} onClick={showTransferReview}>ดูรายการที่รอ <ArrowRight size={16} /></button><button className="text-link" disabled={busy} onClick={() => decide('CANCEL')}>ยกเลิกรายการเดิม</button></div></div>}
-              {transferResult && transferResult.status !== 'MICRO_AUTH_REQUIRED' && <button className="transfer-last-result text-link" onClick={() => setReviewOpen(true)}>ดูผลรายการล่าสุด <ArrowRight size={16} /></button>}
-              <div className="transfer-workspace"><TransferForm profile={profile} persona={persona} recipients={recipients} recipient={recipient} amount={amount} setAmount={setAmount} changeRecipient={changeRecipient} clearResult={clearTransferResult} busy={busy} evaluate={evaluate} prepareHighValue={prepareHighValue} telemetry={telemetry} setTelemetry={(value) => { setTelemetry(value); clearTransferResult(); }} /><div className="transfer-flow-note"><ShieldCheck size={19} /><p>ผลการตรวจสอบจะแสดงในหน้าต่าง Pop-up · เมื่อยกเลิก รายการและเวลาพักนั้นจะสิ้นสุด รายการใหม่ใช้ค่าตั้งค่าปัจจุบัน</p></div></div>
+              {isPendingTransfer(transferResult) && <div className="transfer-active-review"><div><strong>มีรายการที่กำลังตรวจสอบ</strong><p>฿{money(amount, 2)} · {recipient.name} · ยังไม่ได้หักเงิน</p></div><div><button id="transfer-review-open" className="primary-button" disabled={busy} onClick={showTransferReview}>ดูรายการที่รอ <ArrowRight size={16} /></button><button className="text-link" disabled={busy} onClick={() => decide('CANCEL')}>ยกเลิกรายการเดิม</button></div></div>}
+              {transferResult && !isPendingTransfer(transferResult) && <button className="transfer-last-result text-link" onClick={() => setReviewOpen(true)}>ดูผลรายการล่าสุด <ArrowRight size={16} /></button>}
+              <div className="transfer-workspace"><TransferForm profile={profile} persona={persona} recipients={recipients} recipient={recipient} amount={amount} setAmount={setAmount} changeRecipient={changeRecipient} clearResult={clearTransferResult} busy={busy} evaluate={evaluate} prepareHighValue={prepareHighValue} bills={(horizon.recurring_commitments || []).filter((bill) => bill.due_days < horizon.days_to_payday && bill.amount > 0)} matchedBillId={matchedBillId} setMatchedBillId={setMatchedBillId} transferPurpose={transferPurpose} setTransferPurpose={setTransferPurpose} telemetry={telemetry} setTelemetry={(value) => { setTelemetry(value); clearTransferResult(); }} /><div className="transfer-flow-note"><ShieldCheck size={19} /><p>ผลการตรวจสอบจะแสดงในหน้าต่าง Pop-up · เมื่อยกเลิก รายการและเวลาพักนั้นจะสิ้นสุด รายการใหม่ใช้ค่าตั้งค่าปัจจุบัน</p></div></div>
             </>}
-            {reviewOpen && transferResult && <TransferReviewDialog busy={busy} pending={transferResult.status === 'MICRO_AUTH_REQUIRED'} canContactBank={transferResult.status === 'BLOCKED_MULE_INTERDICTION' || (transferResult.status === 'MICRO_AUTH_REQUIRED' && transferResult.risk_tier !== 'HIGH_VALUE_DEMO_CHECK')} error={error} onClose={() => setReviewOpen(false)} onSettings={editTransferSettings} onCancelTransfer={() => decide('CANCEL')}><TransferResult result={transferResult} {...{ amount, recipient, busy, clearanceToken, verify, decide, scanning, checkCooldown }} cancelInFooter clear={clearTransferResult} /></TransferReviewDialog>}
+            {reviewOpen && transferResult && <TransferReviewDialog busy={busy} pending={isPendingTransfer(transferResult)} canContactBank={transferResult.status === 'BLOCKED_MULE_INTERDICTION' || (transferResult.status === 'MICRO_AUTH_REQUIRED' && transferResult.risk_tier !== 'HIGH_VALUE_DEMO_CHECK')} error={error} onClose={() => setReviewOpen(false)} onSettings={editTransferSettings} onCancelTransfer={() => decide('CANCEL')}><TransferResult result={transferResult} {...{ amount, recipient, busy, clearanceToken, verify, decide, scanning, checkCooldown, evaluate }} cancelInFooter clear={clearTransferResult} /></TransferReviewDialog>}
 
           </> : null}
           <footer className="page-footer"><span>FlowSense × TrustGraph · Prototype experience</span><span>Inspired by everyday banking · ไม่ใช่ผลิตภัณฑ์ทางการของ KBank</span></footer>
