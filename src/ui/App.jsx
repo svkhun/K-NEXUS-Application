@@ -17,6 +17,7 @@ import DailyPlan from './DailyPlan';
 import TransferProtectionSettings from './TransferProtectionSettings';
 import TransferReviewDialog from './TransferReviewDialog';
 import { BankWordmark, TransactionsHub, ProfilePage, FinancialTabs } from './KBankSurfaces';
+import TrialGuide, { trials } from './TrialGuide';
 
 const personas = [
   { id: 'ACC_0100', name: 'เมย์', role: 'วัยเริ่มทำงาน', initials: 'ม', color: 'mint' },
@@ -56,6 +57,9 @@ function App() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [trial, setTrial] = useState(null);
+  const [completedTrials, setCompletedTrials] = useState([]);
+  const completeTrial = useCallback((id) => setCompletedTrials((current) => current.includes(id) ? current : [...current, id]), []);
   const [sweepAmount, setSweepAmount] = useState('200');
   const [recipient, setRecipient] = useState(recipientTemplates[0]);
   const [amount, setAmount] = useState('350');
@@ -65,6 +69,15 @@ function App() {
   const [reviewOpen, setReviewOpen] = useState(false);
   const [focusSettings, setFocusSettings] = useState(false);
   const [clearanceToken, setClearanceToken] = useState(null);
+  useEffect(() => {
+    if (trial?.id === 'transfer' && reviewOpen && ['TRANSFER_REVIEW', 'MICRO_AUTH_REQUIRED', 'BLOCKED_MULE_INTERDICTION'].includes(transferResult?.status)) completeTrial('transfer');
+  }, [trial?.id, reviewOpen, transferResult?.status, completeTrial]);
+  useEffect(() => {
+    if (!trial || reviewOpen) return;
+    const guide = document.getElementById(`trial-guide-${trial.id}`);
+    guide?.focus({ preventScroll: true });
+    guide?.scrollIntoView({ block: 'center', behavior: 'auto' });
+  }, [trial, reviewOpen]);
   const inFlight = useRef(false);
   const activeAccount = useRef(accountId);
   useEffect(() => {
@@ -130,6 +143,7 @@ function App() {
     finally { inFlight.current = false; setBusy(false); }
   };
   const changePersona = (id) => {
+    setTrial(null); setCompletedTrials([]);
     activeAccount.current = id;
     setAccountId(id); setTransferResult(null); setClearanceToken(null); setReviewOpen(false);
     setRecipient({ ...recipientTemplates[0], id: id === 'ACC_0101' ? 'ACC_0100' : 'ACC_0101' });
@@ -168,6 +182,7 @@ function App() {
   });
   const doReset = () => run(async () => {
     await api.reset(accountId); setMatchedBillId(''); setTransferPurpose('general');
+    setTrial(null); setCompletedTrials([]);
     await refresh();
     setTransferResult(null); setClearanceToken(null); setReviewOpen(false);
     setNotice('รีเซ็ตข้อมูลของบัญชีจำลองแล้ว');
@@ -255,6 +270,25 @@ function App() {
     return search.trim() && terms[item.id].includes(search.trim().toLowerCase());
   });
   const tryScenario = (index) => { changeRecipient(recipients[index]); openTab('transfer'); };
+  const startTrial = (id) => {
+    if (busy) return;
+    setCompletedTrials((current) => current.filter((item) => item !== id));
+    setTrial({ id });
+    if (id === 'transfer') {
+      if (isPendingTransfer(transferResult)) { showTransferReview(); return; }
+      if (Number(profile.main_balance) <= 0) { setTrial(null); onWithdraw(); setNotice('บัญชีหลักยังไม่มีเงินสำหรับตรวจรายการ ทดลองเลือกถอนเงินออมก่อน หรือกลับไปลองงบรายวันและเงินสำรองได้'); return; }
+      changeRecipient(recipients[1]);
+      setAmount(String(Math.min(1200, Number(profile.main_balance))));
+      openTab('transfer');
+    } else openTab('plan');
+  };
+  const guideFor = (id) => {
+    if (trial?.id !== id) return null;
+    const next = trials.find((item) => item.id !== id && !completedTrials.includes(item.id));
+    return { done: completedTrials.includes(id), onComplete: () => completeTrial(id), onExit: () => setTrial(null),
+      nextLabel: next ? `ต่อไป: ${next.title}` : 'กลับไปดูสิ่งที่ลองแล้ว',
+      onNext: () => { if (next) startTrial(next.id); else { setTrial(null); openTab('home'); } } };
+  };
   const navSection = ({ accounts: 'plan', transfer: 'transactions' })[tab] || tab;
   const title = { home: `สวัสดี, คุณ${persona.name}`, plan: 'แผนใช้เงินของฉัน', accounts: 'การเงินของฉัน', savings: 'ออมเงิน', transfer: 'โอนเงิน', transactions: 'ธุรกรรม', profile: 'โปรไฟล์' }[tab];
   const description = { home: 'ภาพรวมเงินของคุณวันนี้', plan: 'ลองตั้งงบ ให้เงินพอถึงวันเงินเดือน', accounts: 'ยอดเงิน ภาระ และแนวโน้มวันข้างหน้า', savings: 'ออมเมื่อพร้อม ถอนเงินได้ตามปกติ', transfer: 'เห็นผลต่อแผนเงินและตรวจผู้รับก่อนโอน', transactions: 'บัญชีและบริการที่ใช้บ่อย', profile: 'ดูแลการเงินและตั้งค่าในแบบของคุณ' }[tab];
@@ -299,15 +333,16 @@ function App() {
 
           {hidden ? <section className="surface privacy-cover"><EyeOff size={32} /><h2>ซ่อนข้อมูลการเงินแล้ว</h2><p>ยอดเงิน กราฟ และรายการต่าง ๆ จะกลับมาเมื่อคุณเลือกแสดงข้อมูล</p><button className="primary-button" onClick={() => setHidden(false)}>แสดงข้อมูลการเงิน <Eye size={17} /></button></section> : loading ? <div className="loading-card"><div className="spinner" /> กำลังโหลดข้อมูลจำลอง...</div> : profile && horizon ? <>
             {tab !== 'transfer' && isPendingTransfer(transferResult) && <div className="pending-transfer-banner"><ShieldAlert size={19} /><span>มีรายการรอตรวจสอบก่อนโอน · ยังไม่ได้หักเงิน</span><button className="text-link" onClick={showTransferReview}>กลับไปดูรายการ <ArrowRight size={16} /></button></div>}
-            {tab === 'home' && <Dashboard profile={profile} horizon={horizon} activities={(profile.events || []).slice(0, 5).map(describeEvent)} hidden={hidden} setHidden={setHidden} openTab={openTab} tryScenario={tryScenario} {...{onPayBill, onWithdraw, onTransferSettings}} />}
+            {tab === 'home' && <Dashboard profile={profile} horizon={horizon} activities={(profile.events || []).slice(0, 5).map(describeEvent)} hidden={hidden} setHidden={setHidden} openTab={openTab} tryScenario={tryScenario} {...{onPayBill, onWithdraw, onTransferSettings, completedTrials, startTrial, busy}} />}
             {tab === 'transactions' && <TransactionsHub {...{profile, horizon, openTab, onPayBill, onWithdraw, onTransferSettings}}/>}
             {tab === 'profile' && <ProfilePage {...{persona, profile, openTab, onTransferSettings, doReset, busy, setHidden}}/>}
             {['plan', 'accounts'].includes(tab) && <FinancialTabs active={tab} openTab={openTab}/>}
-            {tab === 'plan' && <DailyPlan key={`${accountId}-${horizon.scenario}`} {...{ profile, horizon, forecast, busy, onScenario, openTab, onWithdraw, onReservePreview, onReserveSave }} />}
+            {tab === 'plan' && <DailyPlan key={`${accountId}-${horizon.scenario}`} {...{ profile, horizon, forecast, busy, onScenario, openTab, onWithdraw, onReservePreview, onReserveSave }} budgetGuide={guideFor('budget')} reserveGuide={guideFor('reserve')}/>}
             {tab === 'accounts' && <AccountsPage profile={profile} horizon={horizon} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} openTab={openTab} hidden={hidden} doReset={doReset} busy={busy} onScenario={onScenario} refresh={() => run(() => refresh())} />}
 
-            {tab === 'savings' && <SavingsPage key={accountId} {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, onScenario, openTab, onReservePreview, onReserveSave }} />}
+            {tab === 'savings' && <SavingsPage key={accountId} {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, onScenario, openTab, onReservePreview, onReserveSave }} reserveGuide={guideFor('reserve')}/>}
 
+            {tab === 'transfer' && <TrialGuide id="transfer" guide={guideFor('transfer')} busy={busy || Number(amount) <= 0} onAction={isPendingTransfer(transferResult) ? showTransferReview : evaluate} actionLabel={isPendingTransfer(transferResult) ? 'เปิดผลตรวจรายการที่รอ' : 'ดูผลตรวจตัวอย่างนี้'}><p>เตรียมผู้รับสมมติและยอดไว้ให้แล้ว กดดูผล แล้วอ่าน <b>เหตุผลที่ควรตรวจเพิ่ม</b> และ <b>งบก่อน–หลังโอน</b> ในหน้าต่างผลตรวจ</p><p>ดูตัวอย่างได้โดยไม่ต้องรอครบเวลาพักหรือยืนยันโอน ปิดหน้าต่างเพื่อกลับมาลองเรื่องถัดไปได้</p></TrialGuide>}
             {tab === 'transfer' && <TransferProtectionSettings key={accountId} profile={profile} busy={busy} hasPending={isPendingTransfer(transferResult)} onChange={onTransferPreference} />}
             {tab === 'transfer' && <>
               {isPendingTransfer(transferResult) && <div className="transfer-active-review"><div><strong>มีรายการที่กำลังตรวจสอบ</strong><p>฿{money(amount, 2)} · {recipient.name} · ยังไม่ได้หักเงิน</p></div><div><button id="transfer-review-open" className="primary-button" disabled={busy} onClick={showTransferReview}>ดูรายการที่รอ <ArrowRight size={16} /></button><button className="text-link" disabled={busy} onClick={() => decide('CANCEL')}>ยกเลิกรายการเดิม</button></div></div>}

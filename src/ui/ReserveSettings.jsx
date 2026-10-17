@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ShieldCheck, SlidersHorizontal } from 'lucide-react';
+import TrialGuide from './TrialGuide';
 
 const money = (value) => Number(value || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-export default function ReserveSettings({ horizon, busy, onReservePreview, onReserveSave }) {
+export default function ReserveSettings({ horizon, busy, onReservePreview, onReserveSave, trialGuide }) {
   const settings = horizon.reserve_settings;
   const [amount, setAmount] = useState(String(settings.amount));
   const [preview, setPreview] = useState(null);
@@ -15,16 +16,21 @@ export default function ReserveSettings({ horizon, busy, onReservePreview, onRes
   useEffect(() => () => { request.current += 1; }, []);
   const changeAmount = (value) => { request.current += 1; setAmount(value); setPreview(null); setChecking(false); setError(''); };
   const valid = amount.trim() !== '' && Number.isFinite(Number(amount)) && Number(amount) >= settings.minimum && Number(amount) <= settings.maximum && Math.abs(Number(amount) * 100 - Math.round(Number(amount) * 100)) < 1e-7;
-  const check = async (event) => {
-    event.preventDefault();
-    if (!valid || busy || checking) return;
+  const previewAmount = async (value) => {
+    if (!Number.isFinite(value) || value < settings.minimum || value > settings.maximum || busy || checking) return;
     const id = ++request.current;
     setChecking(true); setError(''); setPreview(null);
-    try { const result = await onReservePreview(Number(amount)); if (id === request.current) setPreview(result); }
+    try { const result = await onReservePreview(value); if (id === request.current) { setPreview(result); trialGuide?.onComplete(); } }
     catch (err) { if (id === request.current) setError(err.message); }
     finally { if (id === request.current) setChecking(false); }
   };
+  const check = (event) => { event.preventDefault(); if (valid) previewAmount(Number(amount)); };
+  const exampleReserve = settings.amount <= settings.maximum - 1000 ? settings.amount + 1000 : settings.amount - 1000;
   return <section className="surface reserve-settings" aria-labelledby="reserve-settings-title">
+    <TrialGuide id="reserve" guide={trialGuide} busy={busy || checking} onAction={() => { changeAmount(String(exampleReserve)); previewAmount(exampleReserve); }} actionLabel={`ลองเทียบกับสำรอง ฿${money(exampleReserve)}`}>
+      {trialGuide?.done && preview ? <div className="trial-outcome" aria-live="polite"><span>ถ้าเผื่อสำรอง ฿{money(preview.amount)} วันนี้ใช้เพิ่มได้อีก</span><strong>฿{money(preview.before.remaining_today)} → ฿{money(preview.after.remaining_today)}</strong><small>ส่วนที่พร้อมออม ฿{money(preview.before.savings_capacity)} → ฿{money(preview.after.savings_capacity)}</small></div> : <p>กดตัวอย่างเพื่อเปรียบเทียบ <b>วันนี้ใช้เพิ่มได้อีก</b> และ <b>ส่วนที่พร้อมออม</b> ในตารางก่อน–หลังด้านล่าง</p>}
+      <p>ดูผลได้โดยไม่ต้องกดยืนยัน ยอดเงินสำรองที่ใช้อยู่จะยังไม่เปลี่ยน</p>
+    </TrialGuide>
     <div className="reserve-settings-heading"><span className="reserve-symbol"><ShieldCheck size={25}/></span><div><span className="section-kicker">คุณเลือกเงินเผื่อฉุกเฉินได้</span><h2 id="reserve-settings-title">อยากเหลือเงินสำรองไว้เท่าไร?</h2></div></div>
     <p>เผื่อไว้สำหรับเรื่องไม่คาดคิด เงินยังอยู่ในบัญชีหลักและใช้ได้ตามปกติ ระบบเพียงเว้นยอดนี้ออกจากงบใช้จ่ายและคำแนะนำออม</p>
     <div className={`reserve-status ${settings.confirmed ? 'confirmed' : ''}`}><strong>{settings.confirmed ? 'คุณยืนยันยอดในแผนแล้ว' : 'ยังไม่ได้ตั้งเอง · ใช้ยอดเริ่มต้นชั่วคราว'}</strong><span>฿{money(settings.amount)}</span></div>

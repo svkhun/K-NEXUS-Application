@@ -1,8 +1,9 @@
 import React from 'react';
 import InsightsLab from './InsightsLab';
-import { BankCardArt, MoneyJourneyArt, QuickActions } from './KBankSurfaces';
+import { BankCardArt, QuickActions } from './KBankSurfaces';
 import { ScenarioPicker } from './SavingsPage';
 import { DailySummary } from './DailyPlan';
+import { TrialStart } from './TrialGuide';
 import {
   ArrowDownLeft, ArrowRight,
   Bell, ChevronRight, Clock3, CreditCard, Eye, EyeOff,
@@ -67,11 +68,9 @@ export function ForecastPanel({ horizon, chart }) {
   );
 }
 
-export default function Dashboard({ profile, horizon, activities, hidden, setHidden, openTab, tryScenario, onPayBill, onWithdraw, onTransferSettings }) {
+export default function Dashboard({ profile, horizon, activities, hidden, setHidden, openTab, tryScenario, onPayBill, onWithdraw, onTransferSettings, completedTrials, startTrial, busy }) {
   return <div className="bank-dashboard kplus-home">
-    <section className="home-introduction" aria-label="แนะนำตัวช่วยดูแลเงิน">
-      <div><span>FlowSense × TrustGraph</span><h2>จัดเงินให้พอใช้<br/>ถึงวันเงินเดือน</h2><p>เห็นเงินหลังหักบิล ลองลดรายจ่าย หรือเลือกถอนเงินออมเมื่อจำเป็น</p><button onClick={() => openTab('plan')}>ดูวิธีให้เงินพอใช้ <ArrowRight size={16}/></button></div><MoneyJourneyArt/>
-    </section>
+    <TrialStart completed={completedTrials} onStart={startTrial} busy={busy}/>
     <div className="home-important"><div className="home-section-heading"><h2>เรื่องสำคัญวันนี้</h2><span>ใหม่ · แผนใช้เงิน</span></div><DailySummary {...{horizon, openTab}}/></div>
     <section className="home-transactions" aria-label="ธุรกรรมด่วน"><div className="home-section-heading"><h2>ธุรกรรมด่วน</h2><button onClick={() => openTab('transactions')}>ดูทั้งหมด <ChevronRight size={16}/></button></div><QuickActions {...{openTab, onPayBill, onWithdraw, onTransferSettings}}/></section>
     <button className="home-account-strip" onClick={() => openTab('transactions')}><span className="account-strip-icon"><CreditCard size={22}/></span><span>บัญชีหลัก<small>{profile.masked_account_id}</small></span><strong>฿{money(profile.main_balance, 2)}</strong><ChevronRight size={18}/></button>
