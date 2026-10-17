@@ -15,7 +15,7 @@ export function DailySummary({ horizon, openTab }) {
     <div className="today-budget-amount"><div><h2>วันนี้ใช้เพิ่มได้อีก</h2><strong>฿{money(horizon.remaining_today, 2)}</strong></div><button className="round-link" onClick={() => openTab('plan')} aria-label="ไปตั้งงบรายวัน"><ArrowRight size={21} /></button></div>
     <div className="today-budget-stats"><span>ใช้แล้ว <b>฿{money(horizon.spent_today, 2)}</b></span><span>จากงบ <b>฿{money(horizon.daily_safe_limit, 2)}</b></span></div>
     <div className="daily-progress" role="progressbar" aria-label="สัดส่วนงบวันนี้ที่ใช้ไป" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(used)}><i style={{ width: `${used}%` }} /></div>
-    <div className="today-budget-footer"><p>{reserveShort ? `บิลและเงินสำรองยังขาด ฿${money(horizon.budget_reserve_shortfall, 2)}` : horizon.remaining_today <= 0 ? 'ใช้ถึงงบวันนี้แล้ว ลองปรับแผนก่อนใช้เพิ่ม' : `เผื่อบิลและเงินสำรองแล้ว · อีก ${horizon.days_to_payday} วันถึงเงินเดือน`}</p><button className="text-link" onClick={() => openTab('plan')}>ลองตั้งงบ <ArrowRight size={15} /></button></div>
+    <div className="today-budget-footer"><p>{reserveShort ? `บิลและเงินสำรองยังขาด ฿${money(horizon.budget_reserve_shortfall, 2)}` : horizon.remaining_today <= 0 ? 'ใช้ถึงงบวันนี้แล้ว ลองปรับแผนก่อนใช้เพิ่ม' : `กันบิลและเงินสำรองแล้ว · อีก ${horizon.days_to_payday} วันถึงเงินเดือน`}</p><button className="text-link" onClick={() => openTab('plan')}>ดูแผนเงินของฉัน <ArrowRight size={15} /></button></div>
   </section>;
 }
 

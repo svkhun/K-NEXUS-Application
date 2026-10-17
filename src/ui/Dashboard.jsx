@@ -1,6 +1,6 @@
 import React from 'react';
 import InsightsLab from './InsightsLab';
-import { AccountGarden } from './FinanceDecor';
+import { BankCardArt, MoneyJourneyArt, QuickActions } from './KBankSurfaces';
 import { ScenarioPicker } from './SavingsPage';
 import { DailySummary } from './DailyPlan';
 import {
@@ -17,19 +17,16 @@ const money = (value, digits = 0) => new Intl.NumberFormat('th-TH', {
 export function AccountTiles({ profile, openTab, hidden = false }) {
   const value = (amount) => hidden ? '••••••' : `฿ ${money(amount, 2)}`;
   return (
-    <div className="account-tiles">
+    <div className="account-tiles" aria-label="บัญชีของฉัน เลื่อนเพื่อดูบัญชีเงินออม">
       <button className="account-tile main-account" onClick={() => openTab('accounts')}>
         <div className="account-tile-top"><span className="account-emblem"><Wallet size={16} /></span><div><strong>บัญชีออมทรัพย์</strong><small>{profile.masked_account_id} · บัญชีหลัก</small></div><ChevronRight size={16} /></div>
-        <AccountGarden /><b>{value(profile.main_balance)}</b><span className="account-caption">พร้อมใช้สำหรับทุกวัน</span>
+        <BankCardArt /><b>{value(profile.main_balance)}</b><span className="account-caption">พร้อมใช้สำหรับทุกวัน</span>
       </button>
       <button className="account-tile savings-account" onClick={() => openTab('savings')}>
-        <div className="account-tile-top"><span className="account-emblem"><Sparkles size={16} /></span><div><strong>บัญชีเงินออม</strong><small>FlowSense · Flexible Savings</small></div><ChevronRight size={16} /></div>
-        <AccountGarden /><b>{value(profile.vault_balance)}</b><span className="account-caption">เลือกออมเอง ถอนเงินได้ตามปกติ</span>
+        <div className="account-tile-top"><span className="account-emblem"><Sparkles size={16} /></span><div><strong>บัญชีเงินออม</strong><small>เลือกออมเอง ถอนเมื่อจำเป็น</small></div><ChevronRight size={16} /></div>
+        <BankCardArt /><b>{value(profile.vault_balance)}</b><span className="account-caption">เลือกออมเอง ถอนเงินได้ตามปกติ</span>
       </button>
-      <div className="account-tile protection-account">
-        <div className="account-tile-top"><span className="account-emblem"><ShieldCheck size={16} /></span><div><strong>ตรวจความเสี่ยงก่อนโอน</strong><small>TrustGraph · สถานการณ์จำลอง</small></div><span className="protection-dot" /></div>
-        <AccountGarden /><b>ดูความเสี่ยงของผู้รับ</b><button className="protection-link" onClick={() => openTab('transfer')}>ตรวจสอบก่อนโอน <ArrowRight size={14} /></button>
-      </div>
+
     </div>
   );
 }
@@ -70,29 +67,20 @@ export function ForecastPanel({ horizon, chart }) {
   );
 }
 
-export default function Dashboard({ profile, horizon, activities, hidden, setHidden, openTab, tryScenario }) {
-  const total = Number(profile.main_balance) + Number(profile.vault_balance);
-  return (
-    <div className="bank-dashboard">
-      <section className="home-wallet surface" aria-label="ภาพรวมบัญชี">
-          <div className="total-balance-top"><div><span>เงินรวมของคุณ</span><div className="total-amount">{hidden ? '••••••••' : `฿${money(total, 2)}`}<button className="icon-button balance-eye" aria-label={hidden ? 'แสดงยอดเงิน' : 'ซ่อนยอดเงิน'} onClick={() => setHidden(!hidden)}>{hidden ? <EyeOff size={17} /> : <Eye size={17} />}</button></div></div><button className="text-link" onClick={() => openTab('accounts')}>ดูบัญชี <ChevronRight size={14} /></button></div>
-          <div className="home-pockets"><button onClick={() => openTab('accounts')}><span>บัญชีหลัก</span><strong>฿{money(profile.main_balance, 2)}</strong></button><button onClick={() => openTab('savings')}><span>เงินออม</span><strong>฿{money(profile.vault_balance, 2)}</strong></button></div>
-          <div className="bank-quick-actions">
-            <button onClick={() => openTab('transfer')}><span className="bank-action-icon action-primary"><Send size={21} /></span><strong>โอนเงิน</strong></button>
-            <button onClick={() => openTab('savings')}><span className="bank-action-icon"><ArrowDownLeft size={21} /></span><strong>ออมเงิน</strong></button>
-            <button onClick={() => openTab('savings')}><span className="bank-action-icon"><RotateCcw size={21} /></span><strong>ถอนเงินออม</strong></button>
-            <button onClick={() => openTab('plan')}><span className="bank-action-icon"><Target size={21} /></span><strong>แผนใช้เงิน</strong></button>
-          </div>
-      </section>
-      <DailySummary {...{ horizon, openTab }} />
-      <section className="home-services" aria-label="ตัวช่วยดูแลเงิน">
-        <button className="home-service trend-service" onClick={() => openTab('accounts')}><span className="section-icon sky"><TrendingUp size={21} /></span><div><h2>แนวโน้มเงินเข้า–ออก</h2><p>ดูกราฟเงินเหลือและบิล<br />ล่วงหน้าสูงสุด 30 วัน</p></div><ChevronRight size={17} /></button>
-        <button className="home-service saving-service" onClick={() => openTab('savings')}><span className="section-icon mint"><Wallet size={21} /></span><div><h2>เงินส่วนที่พร้อมออม</h2><strong>฿{money(horizon.recommended_sweep_amount, 2)}</strong><p>{horizon.recommended_sweep_amount > 0 ? 'ยอดแนะนำสำหรับรอบนี้' : 'รอบนี้พักการออมเพิ่มไว้ก่อน'}</p></div><ChevronRight size={17} /></button>
-        <button className="home-service trust-service" onClick={() => tryScenario(1)}><span className="section-icon lilac"><ShieldCheck size={21} /></span><div><h2>ตรวจความเสี่ยงก่อนโอน</h2><p>ลองดูคำเตือนและเหตุผล<br />ก่อนตัดสินใจทำรายการ</p></div><ChevronRight size={17} /></button>
-      </section>
-      <div className="dashboard-activity"><ActivityList activities={activities} openTab={openTab} /></div>
-    </div>
-  );
+export default function Dashboard({ profile, horizon, activities, hidden, setHidden, openTab, tryScenario, onPayBill, onWithdraw, onTransferSettings }) {
+  return <div className="bank-dashboard kplus-home">
+    <section className="home-introduction" aria-label="แนะนำตัวช่วยดูแลเงิน">
+      <div><span>FlowSense × TrustGraph</span><h2>รู้เงินที่ใช้ได้<br/>มั่นใจก่อนใช้ ก่อนโอน</h2><p>วางแผนถึงเงินเดือน พร้อมดูแลก่อนเงินออก</p><button onClick={() => openTab('plan')}>เริ่มดูแผนเงิน <ArrowRight size={16}/></button></div><MoneyJourneyArt/>
+    </section>
+    <div className="home-important"><div className="home-section-heading"><h2>เรื่องสำคัญวันนี้</h2><span>ใหม่ · แผนใช้เงิน</span></div><DailySummary {...{horizon, openTab}}/></div>
+    <section className="home-transactions" aria-label="ธุรกรรมด่วน"><div className="home-section-heading"><h2>ธุรกรรมด่วน</h2><button onClick={() => openTab('transactions')}>ดูทั้งหมด <ChevronRight size={16}/></button></div><QuickActions {...{openTab, onPayBill, onWithdraw, onTransferSettings}}/></section>
+    <button className="home-account-strip" onClick={() => openTab('transactions')}><span className="account-strip-icon"><CreditCard size={22}/></span><span>บัญชีหลัก<small>{profile.masked_account_id}</small></span><strong>฿{money(profile.main_balance, 2)}</strong><ChevronRight size={18}/></button>
+    <section className="home-services" aria-label="ตัวช่วยดูแลเงิน"><div className="home-section-heading"><h2>ให้เงินพร้อมสำหรับทุกวัน</h2></div>
+      <button className="home-service saving-service" onClick={() => openTab('savings')}><span className="section-icon mint"><Wallet size={25}/></span><div><small>ออมส่วนที่พร้อม</small><h2>{horizon.recommended_sweep_amount > 0 ? `ออมได้ ฿${money(horizon.recommended_sweep_amount, 2)}` : 'รอบนี้พักการออมเพิ่ม'}</h2><p>{horizon.recommended_sweep_amount > 0 ? 'กันเงินใช้ชีวิตแล้ว คุณเลือกออมเอง' : 'ดูแลบิลและเงินใช้ชีวิตให้พร้อมก่อน'}</p></div><ChevronRight size={19}/></button>
+      <button className="home-service trust-service" onClick={() => tryScenario(1)}><span className="section-icon lilac"><ShieldCheck size={25}/></span><div><small>ดูแลก่อนโอน</small><h2>รู้ความเสี่ยง เห็นเงินที่เหลือ</h2><p>ตรวจผู้รับ พร้อมเห็นผลต่อแผนเงิน</p></div><ChevronRight size={19}/></button>
+    </section>
+    <div className="dashboard-activity"><ActivityList activities={activities} openTab={openTab}/></div>
+  </div>;
 }
 
 export function AccountsPage({ profile, horizon, chart, openTab, hidden, doReset, busy, onScenario, refresh }) {

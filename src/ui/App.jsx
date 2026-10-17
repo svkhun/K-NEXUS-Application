@@ -3,7 +3,7 @@ import {
   Activity, ArrowDownLeft, ArrowRight, ArrowUpRight, BadgeCheck,
   Bell, Check, ChevronDown, CircleAlert, CreditCard, Fingerprint,
   Home, LockKeyhole, RotateCcw, Send, ShieldAlert, ShieldCheck,
-  Sparkles, Wallet, X, Search, ChevronRight, Target, Eye, EyeOff,
+  Sparkles, Wallet, X, Search, ChevronRight, Target, Eye, EyeOff, UserRound, BarChart3,
 } from 'lucide-react';
 import { api } from './api';
 import Dashboard, { AccountsPage } from './Dashboard';
@@ -16,6 +16,7 @@ import { bangkokDate } from './forecastModel.mjs';
 import DailyPlan from './DailyPlan';
 import TransferProtectionSettings from './TransferProtectionSettings';
 import TransferReviewDialog from './TransferReviewDialog';
+import { BankWordmark, TransactionsHub, ProfilePage, FinancialTabs } from './KBankSurfaces';
 
 const personas = [
   { id: 'ACC_0100', name: 'เมย์', role: 'วัยเริ่มทำงาน', initials: 'ม', color: 'mint' },
@@ -31,11 +32,12 @@ const money = (value, digits = 0) => new Intl.NumberFormat('th-TH', { minimumFra
 const isPendingTransfer = (result) => ['MICRO_AUTH_REQUIRED', 'TRANSFER_REVIEW', 'REVIEW_CHANGED'].includes(result?.status);
 const navItems = [
   { id: 'home', label: 'หน้าหลัก', icon: Home },
-  { id: 'plan', label: 'แผนใช้เงิน', icon: Target },
-  { id: 'accounts', label: 'บัญชี', icon: CreditCard },
-  { id: 'transfer', label: 'โอน / จ่าย', icon: Send },
+  { id: 'plan', label: 'การเงิน', icon: BarChart3 },
+  { id: 'transactions', label: 'ธุรกรรม', icon: CreditCard },
   { id: 'savings', label: 'ออมเงิน', icon: Wallet },
+  { id: 'profile', label: 'โปรไฟล์', icon: UserRound },
 ];
+const serviceItems = [...navItems, { id: 'accounts', label: 'บัญชีและแนวโน้มเงิน', icon: CreditCard }, { id: 'transfer', label: 'โอน / จ่าย', icon: Send }];
 
 function App() {
   const [tab, setTab] = useState('home');
@@ -234,12 +236,22 @@ function App() {
     setTab(id); setError(''); setNotice(''); setSearch(''); setShowAlerts(false); setSearchOpen(false);
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
-  const searchItems = navItems.filter((item) => {
-    const terms = { home: 'หน้าหลัก ภาพรวม ยอดเงิน', plan: 'แผนใช้เงิน งบ วันนี้ รายวัน วันละ ใช้ได้ ควรใช้ คาดการณ์รายจ่าย flowsense สภาพคล่อง', accounts: 'บัญชี สภาพคล่อง คาดการณ์ กราฟ ภาระ', transfer: 'โอน จ่าย trustgraph ความเสี่ยง', savings: 'flowsense การออมเงิน ออมเงิน เงินออม ถอน ถอนเงิน ดึงคืน' };
+  const onPayBill = () => {
+    const bill = horizon?.recurring_commitments?.find((row) => row.amount > 0 && row.due_days < horizon.days_to_payday);
+    changeRecipient(recipients[0]);
+    if (bill) { setMatchedBillId(bill.id); setAmount(String(bill.amount)); }
+    openTab(bill ? 'transfer' : 'accounts');
+  };
+  const onWithdraw = () => { openTab('savings'); requestAnimationFrame(() => document.getElementById('withdraw-amount')?.focus()); };
+  const onTransferSettings = () => { openTab('transfer'); setReviewOpen(false); setFocusSettings(true); };
+  const searchItems = serviceItems.filter((item) => {
+    const terms = { home: 'หน้าหลัก ภาพรวม ยอดเงิน', plan: 'แผนใช้เงิน การเงิน งบ วันนี้ รายวัน วันละ ใช้ได้ ควรใช้ คาดการณ์รายจ่าย flowsense สภาพคล่อง', accounts: 'บัญชี สภาพคล่อง คาดการณ์ กราฟ ภาระ', transfer: 'โอน จ่าย trustgraph ความเสี่ยง', savings: 'flowsense การออมเงิน ออมเงิน เงินออม ถอน ถอนเงิน ดึงคืน', transactions: 'ธุรกรรม บริการ', profile: 'โปรไฟล์ ตั้งค่า ซ่อน ข้อมูล' };
     return search.trim() && terms[item.id].includes(search.trim().toLowerCase());
   });
   const tryScenario = (index) => { changeRecipient(recipients[index]); openTab('transfer'); };
-  const title = { home: `สวัสดี, คุณ${persona.name}`, plan: 'แผนใช้เงิน', accounts: 'บัญชีของฉัน', savings: 'ออมเงิน', transfer: 'โอนเงิน' }[tab];
+  const navSection = ({ accounts: 'plan', transfer: 'transactions' })[tab] || tab;
+  const title = { home: `สวัสดี, คุณ${persona.name}`, plan: 'แผนใช้เงินของฉัน', accounts: 'การเงินของฉัน', savings: 'ออมเงิน', transfer: 'โอนเงิน', transactions: 'ธุรกรรม', profile: 'โปรไฟล์' }[tab];
+  const description = { home: 'ภาพรวมเงินของคุณวันนี้', plan: 'ลองตั้งงบ ให้เงินพอถึงวันเงินเดือน', accounts: 'ยอดเงิน ภาระ และแนวโน้มวันข้างหน้า', savings: 'ออมเมื่อพร้อม ถอนเงินได้ตามปกติ', transfer: 'เห็นผลต่อแผนเงินและตรวจผู้รับก่อนโอน', transactions: 'บัญชีและบริการที่ใช้บ่อย', profile: 'ดูแลการเงินและตั้งค่าในแบบของคุณ' }[tab];
 
   useEffect(() => {
     if (transferResult && window.innerWidth <= 640) {
@@ -249,11 +261,11 @@ function App() {
   }, [transferResult]);
 
   return (
-    <div className={`app-shell page-${tab}`}>
+    <div className={`app-shell kplus-experience page-${tab}`}>
       <aside className="sidebar">
-        <div className="bank-brand" aria-label="K แอปต้นแบบ"><span className="k-mark">K</span><small>CONCEPT EXPERIENCE</small></div>
+        <div className="bank-brand"><BankWordmark/><small>ต้นแบบฟีเจอร์ · ข้อมูลสมมติ</small></div>
         <nav className="side-nav" aria-label="เมนูหลัก">
-          {navItems.map(({ id, label, icon: Icon }) => <button key={id} className={tab === id ? 'active' : ''} aria-label={label} title={label} aria-current={tab === id ? 'page' : undefined} onClick={() => openTab(id)}><Icon size={19} strokeWidth={1.6} /><span>{label}</span>{tab === id && <ChevronRight className="side-chevron" size={14} />}</button>)}
+          {navItems.map(({ id, label, icon: Icon }) => <button key={id} className={navSection === id ? 'active' : ''} aria-label={label} title={label} aria-current={navSection === id ? 'page' : undefined} onClick={() => openTab(id)}><Icon size={19} strokeWidth={1.6} /><span>{label}</span>{navSection === id && <ChevronRight className="side-chevron" size={14} />}</button>)}
         </nav>
         <div className="sidebar-spacer" />
         <div className="sidebar-feature"><strong>FlowSense × TrustGraph</strong><p>ข้อมูลสมมติสำหรับทดลองใช้งาน</p></div>
@@ -262,8 +274,9 @@ function App() {
 
       <div className="app-content">
         <header className="topbar">
-          <div className="mobile-brand"><span className="mobile-bank-logo" aria-label="K แอปต้นแบบ">K</span></div>
-          <div className="header-product">FlowSense <span>×</span> TrustGraph <span className="concept-badge">DEMO</span></div>
+          <button className="header-avatar" aria-label="เปิดโปรไฟล์ของฉัน" onClick={() => openTab('profile')}><UserRound size={23}/></button>
+          <div className="mobile-brand"><BankWordmark/><small>ต้นแบบฟีเจอร์</small></div>
+          <div className="header-product">FlowSense <span>×</span> TrustGraph</div>
           <div className="topbar-right">
             <button className="icon-button mobile-search-toggle" aria-label="เปิดช่องค้นหา" aria-expanded={searchOpen} onClick={() => setSearchOpen(!searchOpen)}><Search size={18} /></button><div className={`service-search ${searchOpen ? 'search-open' : ''}`}><Search size={16} /><input aria-label="ค้นหาบริการหรือเมนู" placeholder="ค้นหาบริการหรือเมนู" value={search} onChange={(event) => setSearch(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && searchItems.length) openTab(searchItems[0].id); if (event.key === 'Escape') setSearch(''); }} />
               {search.trim() && <div className="search-results">{searchItems.length ? searchItems.map(({ id, label, icon: Icon }) => <button key={id} onClick={() => openTab(id)}><Icon size={16} />{label}<ChevronRight size={14} /></button>) : <p>ไม่พบบริการ ลองค้นหา “ออม” หรือ “โอน”</p>}</div>}
@@ -272,7 +285,7 @@ function App() {
           </div>
         </header>
         <main className="main-content">
-          <div className="page-intro"><div><h1>{title}</h1><p>{tab === 'home' ? 'ภาพรวมเงินของคุณวันนี้' : tab === 'plan' ? 'ลองตั้งงบ ให้เงินพอถึงวันเงินเดือน' : tab === 'accounts' ? 'ยอดเงิน ภาระ และแนวโน้มวันข้างหน้า' : tab === 'savings' ? 'ออมเมื่อพร้อม ถอนเงินได้ตามปกติ' : 'เห็นผลต่อแผนเงินและตรวจผู้รับก่อนโอน'}</p></div><details className="demo-context"><summary>บัญชีทดลอง · {persona.name}<ChevronDown size={15} /></summary><div className="demo-context-panel"><label htmlFor="persona">ลองเปลี่ยนโปรไฟล์</label><select id="persona" value={accountId} disabled={busy} onChange={(event) => changePersona(event.target.value)}>{personas.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.role}</option>)}</select><p>แอปต้นแบบอิสระ ใช้ข้อมูลสมมติ ไม่ใช่แอปทางการของ KBank</p><button className="text-link" disabled={busy || !profile} onClick={doReset}><RotateCcw size={15} /> รีเซ็ตบัญชีทดลอง</button></div></details></div>
+          <div className="page-intro"><div><h1>{title}</h1><p>{description}</p></div><details className="demo-context"><summary>บัญชีทดลอง · {persona.name}<ChevronDown size={15} /></summary><div className="demo-context-panel"><label htmlFor="persona">ลองเปลี่ยนโปรไฟล์</label><select id="persona" value={accountId} disabled={busy} onChange={(event) => changePersona(event.target.value)}>{personas.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.role}</option>)}</select><p>แอปต้นแบบอิสระ ใช้ข้อมูลสมมติ ไม่ใช่แอปทางการของ KBank</p><button className="text-link" disabled={busy || !profile} onClick={doReset}><RotateCcw size={15} /> รีเซ็ตบัญชีทดลอง</button></div></details></div>
 
           <div className="demo-disclaimer"><ShieldCheck size={14} /><span>แอปต้นแบบ · ข้อมูลสมมติ · ไม่มีการโอนเงินจริง</span></div>
           {error && !hidden && <div className="message error" role="alert"><CircleAlert size={18} /><span>{error}</span><button aria-label="ปิดข้อความ" onClick={() => setError('')}><X size={16} /></button></div>}
@@ -280,7 +293,10 @@ function App() {
 
           {hidden ? <section className="surface privacy-cover"><EyeOff size={32} /><h2>ซ่อนข้อมูลการเงินแล้ว</h2><p>ยอดเงิน กราฟ และรายการต่าง ๆ จะกลับมาเมื่อคุณเลือกแสดงข้อมูล</p><button className="primary-button" onClick={() => setHidden(false)}>แสดงข้อมูลการเงิน <Eye size={17} /></button></section> : loading ? <div className="loading-card"><div className="spinner" /> กำลังโหลดข้อมูลจำลอง...</div> : profile && horizon ? <>
             {tab !== 'transfer' && isPendingTransfer(transferResult) && <div className="pending-transfer-banner"><ShieldAlert size={19} /><span>มีรายการรอตรวจสอบก่อนโอน · ยังไม่ได้หักเงิน</span><button className="text-link" onClick={showTransferReview}>กลับไปดูรายการ <ArrowRight size={16} /></button></div>}
-            {tab === 'home' && <Dashboard profile={profile} horizon={horizon} activities={(profile.events || []).slice(0, 5).map(describeEvent)} hidden={hidden} setHidden={setHidden} openTab={openTab} tryScenario={tryScenario} />}
+            {tab === 'home' && <Dashboard profile={profile} horizon={horizon} activities={(profile.events || []).slice(0, 5).map(describeEvent)} hidden={hidden} setHidden={setHidden} openTab={openTab} tryScenario={tryScenario} {...{onPayBill, onWithdraw, onTransferSettings}} />}
+            {tab === 'transactions' && <TransactionsHub {...{profile, horizon, openTab, onPayBill, onWithdraw, onTransferSettings}}/>}
+            {tab === 'profile' && <ProfilePage {...{persona, profile, openTab, onTransferSettings, doReset, busy, setHidden}}/>}
+            {['plan', 'accounts'].includes(tab) && <FinancialTabs active={tab} openTab={openTab}/>}
             {tab === 'plan' && <DailyPlan key={`${accountId}-${horizon.scenario}`} {...{ horizon, forecast, busy, onScenario, openTab }} />}
             {tab === 'accounts' && <AccountsPage profile={profile} horizon={horizon} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} openTab={openTab} hidden={hidden} doReset={doReset} busy={busy} onScenario={onScenario} refresh={() => run(() => refresh())} />}
 
@@ -297,7 +313,7 @@ function App() {
           </> : null}
           <footer className="page-footer"><span>FlowSense × TrustGraph · Prototype experience</span><span>Inspired by everyday banking · ไม่ใช่ผลิตภัณฑ์ทางการของ KBank</span></footer>
         </main>
-        <nav className="mobile-nav" aria-label="เมนูหลักบนมือถือ">{navItems.map(({ id, label, icon: Icon }) => <button key={id} className={tab === id ? 'active' : ''} aria-label={label} aria-current={tab === id ? 'page' : undefined} onClick={() => openTab(id)}><Icon size={21} strokeWidth={2} /><span>{label}</span></button>)}</nav>
+        <nav className="mobile-nav" aria-label="เมนูหลักบนมือถือ">{navItems.map(({ id, label, icon: Icon }) => <button key={id} data-tab={id} className={navSection === id ? 'active' : ''} aria-label={label} aria-current={navSection === id ? 'page' : undefined} onClick={() => openTab(id)}><span className="nav-icon">{id === 'transactions' ? <b aria-hidden="true">฿</b> : <Icon size={21} strokeWidth={1.7}/>}</span><span>{label}</span></button>)}</nav>
       </div>
     </div>
   );

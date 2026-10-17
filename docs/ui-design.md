@@ -1,4 +1,11 @@
-# K: mobile banking experience
+# K+: mobile banking concept experience
+
+## Current revision — 17 October 2026
+
+The current visual reference is the set of ten redacted K+ screenshots supplied by the user. The teal overview, circular transaction grid, account geometry and light task surfaces are implemented in `src/ui/kplus.css` and `KBankSurfaces.jsx`. Home highlights the daily plan under important items; Transactions and Profile provide permanent financial entry points; the existing transfer review carries the cashflow impact. See [the Thai feature-placement plan](KPLUS_FEATURE_PLACEMENT_TH.md) for image analysis, current navigation, proposed integration into the real K+ structure and a discovery-study plan. Source screenshots are not bundled.
+
+The sections below record the 16 October layout foundation; its pastel visual palette is superseded by the current scoped skin. Core allocation and transfer policies are unchanged.
+
 
 The 16 October 2026 revision separates the home overview from the daily budget editor and starts the layout at phone widths. The previous large summary was rendered on both pages, obscuring their different purposes. The previous typography pass also enlarged small roles indiscriminately across five cascading stylesheets. The replacement assigns sizes by role in one stylesheet.
 
@@ -11,7 +18,7 @@ The 16 October 2026 revision separates the home overview from the daily budget e
 ## Shared visual language
 
 - Deep green anchors the K brand and primary actions. Mint identifies cash flow and saving; sky blue identifies history; peach identifies outgoing funds/payday; lavender identifies protection and flexible reserves.
-- `src/ui/banking.css` supplies the only imported stylesheet, including palette, layout, components, mobile navigation, risk states and breakpoints. The five superseded stylesheets were removed. `FinanceDecor.jsx` supplies decorative SVG artwork; no bank artwork is bundled.
+- `src/ui/banking.css` supplies the layout and form foundation; `src/ui/kplus.css` supplies the current scoped visual skin. The older five superseded stylesheets remain removed. `KBankSurfaces.jsx` supplies the active original SVG artwork; no user screenshots or bank artwork are bundled.
 - Decorative artwork is hidden from accessibility APIs. Text, controls, focus rings and semantic risk states remain distinct from pastel backgrounds.
 - Home: total balance, account allocation, quick actions, today's remaining allowance, forecast/saving/risk entry points and real session activity. It does not render a model forecast panel or budget editor.
 - Plan: the budget input, slider, presets and reserve result appear first. Model spending estimates follow, and the formula/bills are under an expandable detail. There is no copy of the home allowance card.

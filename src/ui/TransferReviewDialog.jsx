@@ -58,7 +58,7 @@ export default function TransferReviewDialog({ children, busy, pending, canConta
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   };
   return createPortal(<dialog ref={dialog} className="transfer-review-dialog" aria-labelledby="transfer-review-title" onKeyDown={keepFocus} onCancel={(event) => { event.preventDefault(); if (!busy) close.current(); }}>
-    <header className="review-dialog-header"><div><span>TRUSTGRAPH · รายการทดลอง</span><h2 id="transfer-review-title">ตรวจสอบรายการโอน</h2></div><button className="icon-button" aria-label="ปิดหน้าต่างตรวจสอบ" disabled={busy} onClick={onClose}><X size={21} /></button></header>
+    <header className="review-dialog-header"><div><span>FlowSense × TrustGraph · รายการทดลอง</span><h2 id="transfer-review-title">ตรวจสอบข้อมูลก่อนโอน</h2></div><button className="icon-button" aria-label="ปิดหน้าต่างตรวจสอบ" disabled={busy} onClick={onClose}><X size={21} /></button></header>
     <div className="review-dialog-toolbar"><span>{pending ? 'ยังไม่หักเงิน · ปิดหน้าต่างได้โดยยังไม่ยกเลิก' : 'ผลการตรวจสอบรายการของคุณ'}</span><button className="text-link" disabled={busy} onClick={onSettings}><Settings2 size={17} /> ตั้งค่าเวลาพัก</button></div>
     {error && <div className="message error" role="alert">{error}</div>}
     <div className="review-dialog-body" ref={body}>

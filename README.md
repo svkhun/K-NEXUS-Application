@@ -27,6 +27,8 @@ Built with a responsive mobile/desktop interface and isolated visitor sessions. 
 
 ##  Key Capabilities
 
+The current interface follows the user-supplied K+ visual reference: a teal home/transaction/profile shell, circular actions, geometric account cards and light task sheets. The daily plan is promoted in home important items and linked from Transactions and Profile; [the Thai placement plan](docs/KPLUS_FEATURE_PLACEMENT_TH.md) separates this working prototype from a proposed real K+ integration. All balances remain synthetic.
+
 ### 1. FlowSense — Liquidity Forecasting & Smart Micro-Sweep
 - **30-Day Liquidity Forecast:** High-resolution balance and cash flow projection across 30 future days, today, and 7 synthetic historical days powered by ONNX inference (`flowsense.onnx`).
 - **Daily Spending Plan:** The home screen highlights how much more can be spent today, the total daily allowance, and spending already posted. The allowance reserves known bills and an emergency buffer until payday. It is a transparent calculation, separate from model-predicted spending.
