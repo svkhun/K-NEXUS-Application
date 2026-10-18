@@ -5,7 +5,7 @@ This repository contains a Docker Web Service Blueprint. It builds React in a No
 ## Render setup
 
 1. In Render, choose **New → Blueprint** and connect `svkhun/K-NEXUS-Web` on `main`.
-2. Review `render.yaml`. It requests **Starter compute in Singapore** for continuous operation. Render will charge for the compute plan only when you create the service; importing this repository does not create a service by itself. Check the current [Render pricing](https://render.com/pricing) before confirming.
+2. Review `render.yaml`. It requests **Free compute in Singapore**. Free instances can spin down when idle, so allow for startup time before a live demonstration. Check the current [Render pricing](https://render.com/pricing) before changing plans.
 3. Apply the Blueprint. Render generates `DEMO_SESSION_SECRET` and supplies `RENDER_EXTERNAL_URL`; no secret belongs in Git.
 4. Wait for the repository's **Verify prototype** workflow and the deployment to succeed. `autoDeployTrigger: checksPass` gates later deployments on CI.
 5. Open `https://k-nexus-app.onrender.com` and check `/api/v2/health`. Enable savings, save a chosen amount, withdraw savings and the three TrustGraph scenarios. In another browser or private window, confirm balances are independent.
