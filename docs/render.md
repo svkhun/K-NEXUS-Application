@@ -4,11 +4,11 @@ This repository contains a Docker Web Service Blueprint. It builds React in a No
 
 ## Render setup
 
-1. In Render, choose **New → Blueprint** and connect `svkhun/k-web-application` on `main`.
+1. In Render, choose **New → Blueprint** and connect `svkhun/K-NEXUS-Web` on `main`.
 2. Review `render.yaml`. It requests **Starter compute in Singapore** for continuous operation. Render will charge for the compute plan only when you create the service; importing this repository does not create a service by itself. Check the current [Render pricing](https://render.com/pricing) before confirming.
 3. Apply the Blueprint. Render generates `DEMO_SESSION_SECRET` and supplies `RENDER_EXTERNAL_URL`; no secret belongs in Git.
 4. Wait for the repository's **Verify prototype** workflow and the deployment to succeed. `autoDeployTrigger: checksPass` gates later deployments on CI.
-5. Open the URL shown in Render, and check `/api/v2/health`. Enable savings, save a chosen amount, withdraw savings and the three TrustGraph scenarios. In another browser or private window, confirm balances are independent.
+5. Open `https://k-nexus-app.onrender.com` and check `/api/v2/health`. Enable savings, save a chosen amount, withdraw savings and the three TrustGraph scenarios. In another browser or private window, confirm balances are independent.
 
 For manual Web Service setup, choose **Docker**, repository root, `Dockerfile`, health path `/api/v2/health`, `ENVIRONMENT=production`, `HOST=0.0.0.0`, and a randomly generated `DEMO_SESSION_SECRET` of at least 32 characters. `run.py` binds to Render's `PORT`. Keep exactly one instance and one worker.
 
@@ -29,8 +29,8 @@ Do not increase worker or instance counts while state is in process memory. Mult
 ## Container verification
 
 ```sh
-docker build -t k-flow-lab .
-docker run --rm -p 8000:10000 k-flow-lab
+docker build -t k-nexus-web .
+docker run --rm -p 8000:10000 k-nexus-web
 ```
 
 For the local container example, the production environment is deliberately omitted so HTTP cookies work on localhost. Production validation happens in CI with the production environment enabled. CI also audits dependencies and runs the HTTP security tests.

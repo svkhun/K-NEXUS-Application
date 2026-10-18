@@ -4,9 +4,9 @@ import { formatCooldown, remainingCooldown } from './transferCooldown.mjs';
 import TransferPlanning from './TransferPlanning';
 const money = (v) => Number(v || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 function saveReceipt(result, amount, recipient) {
-  const content = `K · FlowSense × TrustGraph\nใบรายการทดลอง — ไม่มีการโอนเงินจริง\n${result.receipt_id || 'DEMO'}\n${result.executed_at || new Date().toISOString()}\nยอดโอน ${money(amount)} บาท\nไปยัง ${recipient.name} (${recipient.id})\n${result.message || 'ดำเนินการในบัญชีจำลองสำเร็จ'}\nไม่ใช่หลักฐานการชำระเงินจริงหรือผลิตภัณฑ์ทางการของ KBank`;
+  const content = `K-NEXUS · FlowSense × TrustGraph\nใบรายการทดลอง — ไม่มีการโอนเงินจริง\n${result.receipt_id || 'DEMO'}\n${result.executed_at || new Date().toISOString()}\nยอดโอน ${money(amount)} บาท\nไปยัง ${recipient.name} (${recipient.id})\n${result.message || 'ดำเนินการในบัญชีจำลองสำเร็จ'}\nไม่ใช่หลักฐานการชำระเงินจริงหรือผลิตภัณฑ์ทางการของ KBank`;
   const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
-  const a = document.createElement('a'); a.href = url; a.download = 'K-demo-receipt.txt'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  const a = document.createElement('a'); a.href = url; a.download = 'K-NEXUS-demo-receipt.txt'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 export default function TransferResult({ result, amount, recipient, busy, clearanceToken, verify, decide, clear, scanning, checkCooldown, evaluate, cancelInFooter = false }) {
   const [, tick] = useState(0);

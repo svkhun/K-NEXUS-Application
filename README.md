@@ -1,6 +1,6 @@
-# K · FlowSense × TrustGraph — Interactive Web Prototype
+# K-NEXUS — FlowSense × TrustGraph Interactive Web Prototype
 
-[![Live Demo](https://img.shields.io/badge/Render-Live_Demo-00C7B7?style=for-the-badge&logo=render&logoColor=white)](https://k-web-application.onrender.com)
+[![Live Demo](https://img.shields.io/badge/Render-Live_Demo-00C7B7?style=for-the-badge&logo=render&logoColor=white)](https://k-nexus-app.onrender.com)
 [![FastAPI](https://img.shields.io/badge/FastAPI-4.0.0-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![ONNX Runtime](https://img.shields.io/badge/ONNX_Runtime-1.30-005CED?style=for-the-badge&logo=onnx&logoColor=white)](https://onnxruntime.ai)
@@ -21,8 +21,8 @@ The home screen keeps its illustrated hero and offers an eight-step spotlight tu
 
 ##  Live Demo & Endpoints
 
-- **Live Web Application:** [https://k-web-application.onrender.com](https://k-web-application.onrender.com)
-- **API Health Check:** [https://k-web-application.onrender.com/api/v2/health](https://k-web-application.onrender.com/api/v2/health)
+- **Live Web Application:** [https://k-nexus-app.onrender.com](https://k-nexus-app.onrender.com)
+- **API Health Check:** [https://k-nexus-app.onrender.com/api/v2/health](https://k-nexus-app.onrender.com/api/v2/health)
 
 > [!TIP]
 > Availability and startup time depend on the hosting plan and service state. The health endpoint reports current readiness; this project does not guarantee continuous uptime or a fixed load time.
@@ -67,7 +67,7 @@ The current interface follows the user-supplied K+ visual reference: a teal home
 ##  System Architecture & Tech Stack
 
 ```
-k-web-application/
+K-NEXUS-Web/
 ├── frontend/             # Production static SPA bundle
 │   └── dist/             # Built React assets (HTML/CSS/JS)
 ├── src/

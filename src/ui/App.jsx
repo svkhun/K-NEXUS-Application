@@ -313,7 +313,7 @@ function App() {
           {navItems.map(({ id, label, icon: Icon }) => <button key={id} className={navSection === id ? 'active' : ''} aria-label={label} title={label} aria-current={navSection === id ? 'page' : undefined} onClick={() => openTab(id)}><Icon size={19} strokeWidth={1.6} /><span>{label}</span>{navSection === id && <ChevronRight className="side-chevron" size={14} />}</button>)}
         </nav>
         <div className="sidebar-spacer" />
-        <div className="sidebar-feature"><strong>FlowSense × TrustGraph</strong><p>ข้อมูลสมมติสำหรับทดลองใช้งาน</p></div>
+        <div className="sidebar-feature"><strong>K-NEXUS</strong><p>FlowSense × TrustGraph · ข้อมูลสมมติ</p></div>
         <div className="sidebar-profile"><div className={`avatar ${persona.color}`}>{persona.initials}</div><div><strong>คุณ{persona.name}</strong><small>บัญชีทดลอง</small></div></div>
       </aside>
 
@@ -321,7 +321,7 @@ function App() {
         <header className="topbar">
           <button className="header-avatar" aria-label="เปิดโปรไฟล์ของฉัน" onClick={() => openTab('profile')}><UserRound size={23}/></button>
           <div className="mobile-brand"><BankWordmark/><small>ต้นแบบฟีเจอร์</small></div>
-          <div className="header-product">FlowSense <span>×</span> TrustGraph</div>
+          <div className="header-product">K-NEXUS</div>
           <div className="topbar-right">
             <button className="icon-button mobile-search-toggle" aria-label="เปิดช่องค้นหา" aria-expanded={searchOpen} onClick={() => setSearchOpen(!searchOpen)}><Search size={18} /></button><div className={`service-search ${searchOpen ? 'search-open' : ''}`}><Search size={16} /><input aria-label="ค้นหาบริการหรือเมนู" placeholder="ค้นหาบริการหรือเมนู" value={search} onChange={(event) => setSearch(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && searchItems.length) openTab(searchItems[0].id); if (event.key === 'Escape') setSearch(''); }} />
               {search.trim() && <div className="search-results">{searchItems.length ? searchItems.map(({ id, label, icon: Icon }) => <button key={id} onClick={() => openTab(id)}><Icon size={16} />{label}<ChevronRight size={14} /></button>) : <p>ไม่พบบริการ ลองค้นหา “ออม” หรือ “โอน”</p>}</div>}
@@ -356,7 +356,7 @@ function App() {
             {reviewOpen && transferResult && <TransferReviewDialog busy={busy} pending={isPendingTransfer(transferResult)} canContactBank={transferResult.status === 'BLOCKED_MULE_INTERDICTION' || (transferResult.status === 'MICRO_AUTH_REQUIRED' && transferResult.risk_tier !== 'HIGH_VALUE_DEMO_CHECK')} error={error} onClose={() => setReviewOpen(false)} onSettings={editTransferSettings} onCancelTransfer={() => decide('CANCEL')}><TransferResult result={transferResult} {...{ amount, recipient, busy, clearanceToken, verify, decide, scanning, checkCooldown, evaluate }} cancelInFooter clear={clearTransferResult} /></TransferReviewDialog>}
 
           </> : null}
-          <footer className="page-footer"><span>FlowSense × TrustGraph · Prototype experience</span><span>Inspired by everyday banking · ไม่ใช่ผลิตภัณฑ์ทางการของ KBank</span></footer>
+          <footer className="page-footer"><span>K-NEXUS · FlowSense × TrustGraph</span><span>Inspired by everyday banking · ไม่ใช่ผลิตภัณฑ์ทางการของ KBank</span></footer>
         </main>
         <nav className="mobile-nav" aria-label="เมนูหลักบนมือถือ">{navItems.map(({ id, label, icon: Icon }) => <button key={id} data-tab={id} className={navSection === id ? 'active' : ''} aria-label={label} aria-current={navSection === id ? 'page' : undefined} onClick={() => openTab(id)}><span className="nav-icon">{id === 'transactions' ? <b aria-hidden="true">฿</b> : <Icon size={21} strokeWidth={1.7}/>}</span><span>{label}</span></button>)}</nav>
       </div>

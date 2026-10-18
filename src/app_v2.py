@@ -29,7 +29,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 
 app = FastAPI(
-    title="FlowSense & TrustGraph — Interactive Prototype",
+    title="K-NEXUS — FlowSense & TrustGraph Prototype",
     description="Synthetic-data API for exploring liquidity, flexible saving, and transfer-risk interactions. No real bank connection or biometric verification.",
     version="4.0.0", docs_url=None, redoc_url=None, openapi_url=None
 )
@@ -67,7 +67,7 @@ def audit_log(event_type: str, actor: str, details: Dict[str, Any]):
         del events[50:]
     record = {
         "audit_timestamp": datetime.now(ZoneInfo("Asia/Bangkok")).isoformat(),
-        "service": "k-flowsense-trustgraph",
+        "service": "k-nexus-web",
         "event_type": event_type,
         "actor_masked": mask_account_id(actor),
         "details": details
