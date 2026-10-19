@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64" role="img" aria-labelledby="title">
+  <title id="title">K NEXUS</title>
+  <rect width="220" height="64" rx="12" fill="#0e303e"/>
+  <g transform="translate(12 8)">
+    <path d="M9 8v32M12 25 29 8M12 25l17 15" fill="none" stroke="#f5fbfa" stroke-width="6" stroke-linecap="square"/>
+    <path d="m28 19 10-9v28L28 28" fill="none" stroke="#8bd885" stroke-width="4" stroke-linejoin="round"/>
+  </g>
+  <text x="65" y="41" fill="#f5fbfa" font-family="Arial, sans-serif" font-size="27" font-weight="800" letter-spacing="2">NEXUS</text>
+</svg>

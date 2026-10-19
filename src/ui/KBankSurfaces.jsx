@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { ArrowDownLeft, ArrowLeftRight, ArrowRight, BarChart3, ChevronRight, CircleUserRound, CreditCard, EyeOff, Landmark, PiggyBank, Settings2, ShieldCheck, Target, Wallet } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowDownLeft, ArrowLeftRight, ArrowRight, BarChart3, ChevronLeft, ChevronRight, CircleUserRound, CreditCard, EyeOff, Landmark, PiggyBank, Settings2, ShieldCheck, Target, Wallet } from 'lucide-react';
 
 const money = (value) => Number(value ?? 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 export function BankWordmark() {
-  return <span className="bank-wordmark" aria-label="K Plus ต้นแบบ"><span>K</span><b>+</b></span>;
+  return <span className="bank-wordmark" role="img" aria-label="K NEXUS"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M9 8v32M12 25 29 8M12 25l17 15" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="square"/><path d="m28 19 10-9v28L28 28" fill="none" stroke="#8bd885" strokeWidth="4" strokeLinejoin="round"/></svg><span>NEXUS</span></span>;
 }
 
 export function FinancialTabs({ active, openTab }) {
@@ -32,11 +32,38 @@ export function QuickActions({ openTab, onPayBill, onWithdraw, onTransferSetting
 }
 
 export function TransactionsHub({ profile, horizon, openTab, onPayBill, onWithdraw, onTransferSettings }) {
-  const [savings, setSavings] = useState(false);
+  const [accountIndex, setAccountIndex] = useState(0);
+  const track = useRef(null);
+  const selectedIndex = useRef(0);
+  const selectAccount = (index) => {
+    const next = Math.max(0, Math.min(1, index));
+    track.current?.scrollTo({ left: next * track.current.clientWidth, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  };
+  useEffect(() => {
+    const element = track.current;
+    const observer = new ResizeObserver(() => element.scrollTo({ left: selectedIndex.current * element.clientWidth, behavior: 'instant' }));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
   return <div className="transactions-hub">
-    <div className="account-category-tabs" aria-label="เลือกบัญชี"><button aria-pressed={!savings} onClick={() => setSavings(false)}>บัญชีหลัก</button><button aria-pressed={savings} onClick={() => setSavings(true)}>บัญชีเงินออม</button><button onClick={() => openTab('plan')}>แผนใช้เงิน</button></div>
-    <button className="kplus-account-card" onClick={() => openTab(savings ? 'savings' : 'accounts')} aria-label={savings ? 'ดูบัญชีเงินออม' : 'ดูบัญชีหลัก'}><BankCardArt/><div className="kplus-account-name"><span>{savings ? 'บัญชีเงินออม' : 'ออมทรัพย์ · บัญชีหลัก'}<small>{savings ? 'ออมส่วนที่พร้อมใช้' : profile.masked_account_id}</small></span><CreditCard size={22}/></div><div className="kplus-account-balance"><span>{savings ? 'ยอดเงินออม' : 'ยอดเงินที่ใช้ได้'}</span><strong>฿{money(savings ? profile.vault_balance : profile.main_balance)}</strong><span className="account-card-link">ดูรายการและจัดการบัญชี <ChevronRight size={17}/></span></div></button>
-    <div className="account-pager" aria-hidden="true"><i className={!savings ? 'active' : ''}/><i className={savings ? 'active' : ''}/></div>
+    <div className="account-category-tabs" role="group" aria-label="เลือกบัญชี"><button aria-pressed={accountIndex === 0} aria-controls="transaction-accounts" onClick={() => selectAccount(0)}>บัญชีหลัก</button><button aria-pressed={accountIndex === 1} aria-controls="transaction-accounts" onClick={() => selectAccount(1)}>บัญชีเงินออม</button></div>
+    <section className="account-carousel" aria-label="บัญชีของฉัน" aria-roledescription="แถบเลื่อนบัญชี">
+      <div id="transaction-accounts" className="account-carousel-track" ref={track} tabIndex={0} aria-label="ปัดซ้ายหรือขวาเพื่อเปลี่ยนบัญชี หรือใช้ปุ่มลูกศรบนแป้นพิมพ์" onScroll={(event) => {
+        const element = event.currentTarget;
+        const next = Math.max(0, Math.min(1, Math.round(element.scrollLeft / element.clientWidth)));
+        selectedIndex.current = next;
+        setAccountIndex(next);
+      }} onKeyDown={(event) => {
+        if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+          event.preventDefault();
+          selectAccount(event.key === 'Home' ? 0 : event.key === 'End' ? 1 : accountIndex + (event.key === 'ArrowRight' ? 1 : -1));
+        }
+      }}>
+        {[false, true].map((savings, index) => <div key={index} className="account-slide" role="group" aria-label={`${index + 1} จาก 2 · ${savings ? 'บัญชีเงินออม' : 'บัญชีหลัก'}`}><button className={`kplus-account-card ${savings ? 'vault-card' : ''}`} tabIndex={accountIndex === index ? 0 : -1} onClick={() => openTab(savings ? 'savings' : 'accounts')} aria-label={savings ? 'ดูบัญชีเงินออม' : 'ดูบัญชีหลัก'}><BankCardArt/><div className="kplus-account-name"><span>{savings ? 'บัญชีเงินออม' : 'ออมทรัพย์ · บัญชีหลัก'}<small>{savings ? 'เลือกออมเอง ถอนเมื่อจำเป็น' : profile.masked_account_id}</small></span><CreditCard size={22}/></div><div className="kplus-account-balance"><span>{savings ? 'ยอดเงินออม' : 'ยอดเงินที่ใช้ได้'}</span><strong>฿{money(savings ? profile.vault_balance : profile.main_balance)}</strong><span className="account-card-link">ดูรายการและจัดการบัญชี <ChevronRight size={17}/></span></div></button></div>)}
+      </div>
+      <div className="account-carousel-controls"><button className="icon-button" aria-label="บัญชีก่อนหน้า" disabled={accountIndex === 0} onClick={() => selectAccount(0)}><ChevronLeft size={19}/></button><div className="account-pager" role="group" aria-label="หน้าบัญชี">{['บัญชีหลัก', 'บัญชีเงินออม'].map((label, index) => <button key={label} aria-label={`แสดง${label}`} aria-pressed={accountIndex === index} onClick={() => selectAccount(index)}><i/></button>)}</div><button className="icon-button" aria-label="บัญชีถัดไป" disabled={accountIndex === 1} onClick={() => selectAccount(1)}><ChevronRight size={19}/></button></div>
+      <p className="account-swipe-hint" aria-live="polite">{accountIndex === 0 ? 'บัญชีหลัก' : 'บัญชีเงินออม'} · {accountIndex + 1}/2 <span>ปัดซ้าย–ขวาเพื่อดูอีกบัญชี</span></p>
+    </section>
     <QuickActions {...{openTab, onPayBill, onWithdraw, onTransferSettings}} expanded/>
     <button className="inline-discovery" onClick={() => openTab('plan')}><span className="discovery-icon"><Target size={25}/></span><span><small>การเงินของฉัน · FlowSense</small><strong>ดูเงินที่ใช้ได้จริง ถึงวันเงินเดือนออก</strong><em>วันนี้ใช้เพิ่มได้อีก ฿{money(horizon.remaining_today)}</em></span><ChevronRight size={20}/></button>
     <div className="bank-service-links"><button onClick={() => openTab('transfer')}><ShieldCheck size={22}/><span>ดูแลก่อนโอน<small>ตรวจผู้รับ พร้อมเห็นเงินที่เหลือ</small></span><ChevronRight size={18}/></button><button onClick={() => openTab('profile')}><CircleUserRound size={22}/><span>โปรไฟล์และการตั้งค่า<small>จัดการข้อมูลทดลองของคุณ</small></span><ChevronRight size={18}/></button></div>

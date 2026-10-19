@@ -22,7 +22,7 @@ export default function SavingsPage({ profile, horizon, busy, sweepAmount, setSw
   const validWithdrawal = validMoney(withdrawal) && withdrawal <= profile.vault_balance;
   return <div className="savings-page">
     <div className="savings-budget-link"><Wallet size={23} /><div><strong>วันนี้ใช้เพิ่มได้อีก ฿{money(horizon.remaining_today)}</strong><p>ตรวจงบใช้จ่ายก่อนตัดสินใจออม</p></div><button onClick={() => openTab('plan')}>ดูแผนใช้เงิน <ArrowRight size={16} /></button></div>
-    <p className="savings-purpose">เงินตึงให้เก็บไว้ใช้ก่อน · การแยกออมช่วยจัดเงินเป็นส่วน ไม่ได้เพิ่มยอดเงินรวม หากต้องใช้ คุณถอนกลับเข้าบัญชีหลักได้</p>
+    <p className="savings-purpose"><strong>กันเงินใช้ให้พอก่อนออม</strong><span>แยกเงินจากบัญชีหลักไปเก็บในบัญชีเงินออม ยอดเงินรวมยังเท่าเดิม และถอนกลับมาใช้ได้ตามปกติ</span></p>
     <ScenarioPicker horizon={horizon} busy={busy} onScenario={onScenario} />
     <div className="feature-layout">
       <section className="surface feature-primary">
