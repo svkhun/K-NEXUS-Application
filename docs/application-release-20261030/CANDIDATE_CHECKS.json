@@ -8,7 +8,7 @@
     "errors": 0,
     "skipped": 0,
     "not_run": [],
-    "seconds": 3.92
+    "seconds": 3.46
   },
   "test_daily_budget.py": {
     "status": "PASS",
@@ -19,7 +19,7 @@
     "errors": 0,
     "skipped": 0,
     "not_run": [],
-    "seconds": 0.62
+    "seconds": 0.63
   },
   "test_features.py": {
     "status": "PASS",
@@ -30,7 +30,7 @@
     "errors": 0,
     "skipped": 0,
     "not_run": [],
-    "seconds": 3.75
+    "seconds": 3.51
   },
   "test_flowsense_vnext.py": {
     "status": "PASS",
@@ -41,18 +41,18 @@
     "errors": 0,
     "skipped": 0,
     "not_run": [],
-    "seconds": 1.22
+    "seconds": 1.19
   },
   "test_flowsense_vnext_proposed3.py": {
-    "status": "FAIL",
-    "exit_code": 1,
+    "status": "PASS",
+    "exit_code": 0,
     "tests": 12,
-    "passed": 11,
+    "passed": 12,
     "failed": 0,
-    "errors": 1,
+    "errors": 0,
     "skipped": 0,
     "not_run": [],
-    "seconds": 1.99
+    "seconds": 2.1
   },
   "test_flowsense_vnext_proposed4.py": {
     "status": "PASS",
@@ -63,7 +63,7 @@
     "errors": 0,
     "skipped": 0,
     "not_run": [],
-    "seconds": 2.95
+    "seconds": 2.71
   },
   "test_handoff_integration.py": {
     "status": "PASS",
@@ -90,7 +90,7 @@
         "reason": "Full research package/parity/legacy inference outside runtime distribution; runtime integrity checked separately"
       }
     ],
-    "seconds": 3.89
+    "seconds": 3.36
   },
   "test_release_runtime.py": {
     "status": "PASS",
@@ -101,7 +101,7 @@
     "errors": 0,
     "skipped": 0,
     "not_run": [],
-    "seconds": 3.05
+    "seconds": 2.8
   },
   "test_reserve_preference.py": {
     "status": "PASS",
@@ -112,7 +112,7 @@
     "errors": 0,
     "skipped": 0,
     "not_run": [],
-    "seconds": 3.39
+    "seconds": 2.92
   },
   "test_savings_flow.py": {
     "status": "PASS",
@@ -123,7 +123,7 @@
     "errors": 0,
     "skipped": 0,
     "not_run": [],
-    "seconds": 3.63
+    "seconds": 3.04
   },
   "test_security.py": {
     "status": "PASS",
@@ -134,7 +134,7 @@
     "errors": 0,
     "skipped": 0,
     "not_run": [],
-    "seconds": 5.07
+    "seconds": 4.53
   },
   "test_transfer_cooldown.py": {
     "status": "PASS",
@@ -145,7 +145,7 @@
     "errors": 0,
     "skipped": 0,
     "not_run": [],
-    "seconds": 3.48
+    "seconds": 3.17
   },
   "test_transfer_planning.py": {
     "status": "PASS",
@@ -156,6 +156,6 @@
     "errors": 0,
     "skipped": 0,
     "not_run": [],
-    "seconds": 3.49
+    "seconds": 3.25
   }
 }

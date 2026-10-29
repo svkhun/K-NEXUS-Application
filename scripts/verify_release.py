@@ -45,6 +45,8 @@ def run(filename):
         if line.startswith('RELEASE_RESULT '): row.update(json.loads(line[15:]))
     row['seconds']=round(time.monotonic()-start,2)
     print(filename, row, flush=True)
+    if row['status'] != 'PASS':
+        print((OUT/(filename+'.log')).read_text(encoding='utf-8')[-12000:], flush=True)
     return filename,row
 
 
