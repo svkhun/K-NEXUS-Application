@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, ShieldCheck, SlidersHorizontal } from 'lucide-react';
+import { ArrowRight, SlidersHorizontal } from 'lucide-react';
+import { ReserveIcon } from './NexusIcons';
 
-const money = (value) => Number(value || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const money = (value) => (value == null ? '—' : Number(value).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
 export default function ReserveSettings({ horizon, busy, onReservePreview, onReserveSave }) {
   const settings = horizon.reserve_settings;
@@ -25,7 +26,7 @@ export default function ReserveSettings({ horizon, busy, onReservePreview, onRes
   };
   const check = (event) => { event.preventDefault(); if (valid) previewAmount(Number(amount)); };
   return <section className="surface reserve-settings" aria-labelledby="reserve-settings-title">
-    <div className="reserve-settings-heading"><span className="reserve-symbol"><ShieldCheck size={25}/></span><div><span className="section-kicker">คุณเลือกเงินเผื่อฉุกเฉินได้</span><h2 id="reserve-settings-title">อยากเหลือเงินสำรองไว้เท่าไร?</h2></div></div>
+    <div className="reserve-settings-heading"><span className="reserve-symbol"><ReserveIcon size={25}/></span><div><span className="section-kicker">คุณเลือกเงินเผื่อฉุกเฉินได้</span><h2 id="reserve-settings-title">อยากเหลือเงินสำรองไว้เท่าไร?</h2></div></div>
     <p>เผื่อไว้สำหรับเรื่องไม่คาดคิด เงินยังอยู่ในบัญชีหลักและใช้ได้ตามปกติ ระบบเพียงเว้นยอดนี้ออกจากงบใช้จ่ายและคำแนะนำออม</p>
     <div className={`reserve-status ${settings.confirmed ? 'confirmed' : ''}`}><strong>{settings.confirmed ? 'คุณยืนยันยอดในแผนแล้ว' : 'ยังไม่ได้ตั้งเอง · ใช้ยอดเริ่มต้นชั่วคราว'}</strong><span>฿{money(settings.amount)}</span></div>
     <details className="reserve-source"><summary>ยอดเริ่มต้นมาจากไหน?</summary><p>฿{money(settings.suggested_amount)} เป็นค่าจากโปรไฟล์สมมติของบัญชีทดลอง ไม่ได้คำนวณจากสถานการณ์จริงของคุณหรือทำนายโดย AI คุณยืนยันยอดนี้หรือปรับให้เหมาะกับตัวเองได้ ต้นแบบกำหนดขั้นต่ำ ฿500 เป็นกติกาทดลอง ไม่ใช่เกณฑ์เงินฉุกเฉินที่เหมาะกับทุกคน</p></details>

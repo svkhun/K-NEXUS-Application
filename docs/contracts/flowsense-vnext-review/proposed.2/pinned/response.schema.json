@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "account_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "contract_version": {
+      "const": "2.0.0-proposed.2"
+    },
+    "feature_row": {
+      "maxItems": 6,
+      "minItems": 6,
+      "prefixItems": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        {
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        {
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      ],
+      "type": "array"
+    },
+    "missing_lag_days": {
+      "items": {
+        "enum": [
+          1,
+          3,
+          7
+        ]
+      },
+      "minItems": 0,
+      "type": "array"
+    },
+    "mode": {
+      "enum": [
+        "FEATURE_ONLY_NO_MODEL"
+      ]
+    },
+    "model_package_version": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "origin": {
+      "format": "date-time",
+      "pattern": "\\+07:00$",
+      "type": "string"
+    },
+    "prediction_thb": {
+      "type": "null"
+    },
+    "request_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "target_date": {
+      "format": "date",
+      "type": "string"
+    }
+  },
+  "required": [
+    "contract_version",
+    "account_id",
+    "origin",
+    "request_sha256",
+    "model_package_version",
+    "mode",
+    "target_date",
+    "feature_row",
+    "missing_lag_days",
+    "prediction_thb"
+  ],
+  "type": "object"
+}

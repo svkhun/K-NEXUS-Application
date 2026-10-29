@@ -37,8 +37,10 @@ class DailyBudgetTests(unittest.TestCase):
     def test_last_day_before_payday_has_one_budget_day(self):
         result = self.calculate(1500, 200, day=27)
         self.assertEqual(result['days_to_payday'], 1)
-        self.assertEqual(result['daily_safe_limit'], 700)
-        self.assertEqual(result['remaining_today'], 500)
+        # Opening current-month rent remains unpaid after its due date.
+        self.assertEqual(result['daily_safe_limit'], 0)
+        self.assertEqual(result['remaining_today'], 0)
+        self.assertEqual(result['budget_reserve_shortfall'], 500)
 
     def test_displayed_budget_and_spending_reconcile_to_the_cent(self):
         result = self.calculate(5000, 306.7155)

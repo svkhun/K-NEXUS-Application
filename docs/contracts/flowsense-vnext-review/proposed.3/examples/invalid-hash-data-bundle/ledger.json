@@ -1,0 +1,2 @@
+[{"account_id":"SYN_ACC","available_at":"2026-10-26T12:00:02+07:00","category":"food_daily","direction":"DR","event_time":"2026-10-26T12:00:00+07:00","posting_time":"2026-10-26T12:00:01+07:00","raw_amount_thb":"-300.00","represented_charge_ids":["food"],"revision":1,"signed_amount_thb":"-300.00","source":"ledger","transaction_id":"food","user_id":"SYN_USER"}]
+ 

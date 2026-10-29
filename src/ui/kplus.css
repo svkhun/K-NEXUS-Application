@@ -76,18 +76,18 @@ body { background: #12313e; }
 .kplus-home .needs-attention .today-budget-amount strong { color: #ffdc9d; }
 .kplus-quick-actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 6px; }
 .kplus-quick-actions button { display: flex; flex-direction: column; align-items: center; gap: 9px; min-width: 0; padding: 0; background: none; border: 0; color: #eff9f6; }
-.kplus-quick-actions button > span { width: 55px; height: 55px; border: 1px solid #6eb8b852; border-radius: 50%; background: #113c47bd; color: #a1ede0; display: grid; place-items: center; }
+.kplus-quick-actions button > span { width: 55px; height: 55px; border: 1px solid #6eb8b852; border-radius: 14px 4px 14px 4px; background: #113c47bd; color: #a1ede0; display: grid; place-items: center; }
 .kplus-quick-actions button:hover > span { background: #265d68; border-color: #a1ede0; }
 .kplus-quick-actions strong { font-size: 12px; font-weight: 500; line-height: 1.5; }
 .home-account-strip { width: 100%; display: flex; align-items: center; gap: 10px; padding: 15px 0; background: none; border: 0; border-block: 1px solid #ffffff22; color: #edf9f6; text-align: left; }
-.account-strip-icon { width: 35px; height: 35px; border-radius: 50%; background: #a1e0c4; color: #296152; display: grid; place-items: center; }
+.account-strip-icon { width: 35px; height: 35px; border-radius: 9px 3px 9px 3px; background: #a1e0c4; color: #296152; display: grid; place-items: center; }
 .home-account-strip > span:not(.account-strip-icon) { font-size: 12px; }
 .home-account-strip small { display: block; color: #b1ccd0; font-size: 10px; }
 .home-account-strip strong { margin-left: auto; font: 500 17px/1.6 var(--number-font); }
 .kplus-home .home-services { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
 .kplus-home .home-services .home-section-heading { margin-bottom: 6px; }
 .kplus-home .home-service { margin-top: 10px; border: 0; background: #153a49; border-radius: 12px; color: #ecf9f6; padding: 17px 15px; }
-.kplus-home .home-service .section-icon { width: 43px; height: 43px; border-radius: 50%; }
+.kplus-home .home-service .section-icon { width: 43px; height: 43px; border-radius: 11px 3px 11px 3px; }
 .kplus-home .home-service h2 { color: #e6f9ef; font-size: 16px; }
 .kplus-home .home-service small { font-size: 10px; color: #a9cfcf; }
 .kplus-home .home-service p { color: #bad0d5; font-size: 11px; }

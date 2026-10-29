@@ -1,0 +1,2502 @@
+[
+  {
+    "path": ".gitattributes",
+    "sha256": "fdc3814a51842e518507ebe78984eb81a342547dfc6e449b5e1e83b6504bec1d",
+    "reason": "Release packaging, dependencies, CI or dated evidence/documentation"
+  },
+  {
+    "path": ".github/workflows/verify.yml",
+    "sha256": "930dc545a6c1e5a3b1d396febc84e11adc2f16663c44cf757d43328e21311f0e",
+    "reason": "Release packaging, dependencies, CI or dated evidence/documentation"
+  },
+  {
+    "path": "APPLICATION_RELEASE_REPORT.md",
+    "sha256": "2b51f34eb8205b37b014aabb3e37dafa7334f24c4b08fa10d511c9c996d190fd",
+    "reason": "Release packaging, dependencies, CI or dated evidence/documentation"
+  },
+  {
+    "path": "BASELINE_INTEGRATION_REPORT.md",
+    "sha256": "18de0d5c02d1621248c04261476bac79175e63d55735f8fd22fb4752bdfdf2cb",
+    "reason": "Release packaging, dependencies, CI or dated evidence/documentation"
+  },
+  {
+    "path": "Dockerfile",
+    "sha256": "aa697413b1a21ea2d6e32798adc58c70e2a21c7a1624afc5cc943953e17d075c",
+    "reason": "Release packaging, dependencies, CI or dated evidence/documentation"
+  },
+  {
+    "path": "README.md",
+    "sha256": "11c4d4776eb8d548261d0835558ecfe67cdb20d591f3a7792b09e74a65f597b3",
+    "reason": "Release packaging, dependencies, CI or dated evidence/documentation"
+  },
+  {
+    "path": "SHOWCASE_HANDOFF.md",
+    "sha256": "eb049c41171f3a412c93e646b4d61906844ab7390f09a26f814efb43b413fd99",
+    "reason": "Release packaging, dependencies, CI or dated evidence/documentation"
+  },
+  {
+    "path": "config/baseline-personas.v1.json",
+    "sha256": "bd2c09c81d4f8e9705c03f2015ddd969ae99d1be90e5b2279209b792cbdbd2cf",
+    "reason": "Versioned explicit synthetic persona assumptions"
+  },
+  {
+    "path": "docs/application-release-20261030/CANDIDATE_CHECKS.json",
+    "sha256": "63bebf8b7b2d8d90395228b7b4789f3f78d0e79184a3cb437735b39bd9ff422b",
+    "reason": "Release packaging, dependencies, CI or dated evidence/documentation"
+  },
+  {
+    "path": "docs/application-release-20261030/PACKAGE_INTEGRITY.json",
+    "sha256": "6ffe02a8ed4fb3966def6ffb3944e28ae46e09d51602d6e98d6d16c399c35f56",
+    "reason": "Release packaging, dependencies, CI or dated evidence/documentation"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/contract.json",
+    "sha256": "a3ebbe36a3225b9d8c9af5a6c644aecec39dd43503b07c34addea1c93e77e62f",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/contract.schema.json",
+    "sha256": "da1c2bf3c13ce9d07fb11874fe64c5b8369e0a71fb85fcd7e4de9bfdd871a1c6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixture-source-manifest.json",
+    "sha256": "0620111d119767f409b863118158f1fd4dcb25da5c714799ce9d85613d360118",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures.json",
+    "sha256": "8c1551784ce1e25e9783cbe847290840367ea796978ae3d374442f9d72c2fa2a",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/builder-corrections/inputs/config.json",
+    "sha256": "3dadb00ebdbac1e13b24da1146c6326df509da7fd912a8a6ecb12e4c44e2e071",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/builder-corrections/inputs/model-eligibility.json",
+    "sha256": "28fbffe00d71b232271b0d2f22b771aaa32368ab84531130fca5d1c1b6f1ca62",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/builder-corrections/observed/ACC_SYNV2_NORMAL_01.json",
+    "sha256": "e26776f1c0c3cab13cf5f6e24dc560e9c9546d735e35fd0b3859d37d7187789a",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/builder-corrections/observed/source-facts/ACC_SYNV2_NORMAL_01.json",
+    "sha256": "6df0b1a19b16788e3a5325f2c1089bbcda464e90a9f8c7f9a1c0bbf1cb8fdcc4",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/counterfactual/collision.json",
+    "sha256": "206d1861418c4c71c3dda0661b0aecd1145d9e8a9891e6b21803e1a54417445f",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/counterfactual/known-corrections.json",
+    "sha256": "6df0b1a19b16788e3a5325f2c1089bbcda464e90a9f8c7f9a1c0bbf1cb8fdcc4",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/late/inputs/config.json",
+    "sha256": "3dadb00ebdbac1e13b24da1146c6326df509da7fd912a8a6ecb12e4c44e2e071",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/late/inputs/model-eligibility.json",
+    "sha256": "28fbffe00d71b232271b0d2f22b771aaa32368ab84531130fca5d1c1b6f1ca62",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/late/observed/ACC_SYNV2_NORMAL_01.json",
+    "sha256": "e476cb29f2a22b954e75603f0f1e796573b920de4a2a929625c5cadbed302e51",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/late/observed/source-facts/ACC_SYNV2_NORMAL_01.json",
+    "sha256": "6fef1d46e505153aaf0240ab3487c0449c5c78fda09d12686281044969417c48",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/0044508dc671.facts.json",
+    "sha256": "a79e2fa6d1e60e70df462e743d6603df412af33c2a86abc3a2c58874dcd84600",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/0044508dc671.json",
+    "sha256": "50b2ad50bf067bcdead714e1009fab3ab455a2aa9e0f36a8762cdfa70316feb0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/01d3071c1394.facts.json",
+    "sha256": "986ea28452b9f24c950e21e38a34d2119d652902d85cd0ad8a0205adfcf96b49",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/01d3071c1394.json",
+    "sha256": "75b833b3213be24f7a1efa892690b35eacf1068140b6d74310cbc8d22c3ee882",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/032001c80812.facts.json",
+    "sha256": "a51b516e01f2ac98a93ab1524c0a32964b61b0f8e01d72e2508f7437c2f462f5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/032001c80812.json",
+    "sha256": "0585d64500355b18e7fe86193cef7ff83dc07bf1e99765500575fd945645c947",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/0403515f0024.facts.json",
+    "sha256": "0ef4c2719c9e9793311b662179161ff6b66a48ddad6997050d10b2fc2e0b2357",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/0403515f0024.json",
+    "sha256": "349e532a60ca7621c6452841f4fc1270197b38c134f77cb541dbe781ea46cb31",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/0418f020a09e.facts.json",
+    "sha256": "01bee2a39595ac06597ad80f849f718c0f31023a172900cc57b7902f44dfacd7",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/0418f020a09e.json",
+    "sha256": "2d7007b4f7d9d80ca8bbec95b6063205c0b8c4ba774bfacef3a4d793b27ab477",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/057ca93f4a94.facts.json",
+    "sha256": "98c242b5302cf528c88cb7591895fec590f1f60228006744e7f5839fc4697bfc",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/057ca93f4a94.json",
+    "sha256": "7082b0671aae7545144d28b23afb13abdfcb20ebc588e6f73bd2d3a6b896001e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/0717f0cd82d9.facts.json",
+    "sha256": "c2a1c8905c528eb0d19467dfbd974602d60f26bec1865761e4c987008d9c3a4e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/0717f0cd82d9.json",
+    "sha256": "0c5b57638f93415c6b8b1c4b9b54e4f2d9914d051531feb7260ae95913648f6b",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/09d633b62e45.facts.json",
+    "sha256": "d5aed7c1944bc8be3bcf1f3aafdfee1475a840c81bd27ea7bc04ca1f22a93dd3",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/09d633b62e45.json",
+    "sha256": "a9262e140128cff557606c434d08eb46485b582575887cc080662a4d4379d2bd",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/0e2366f5d7f4.facts.json",
+    "sha256": "6ab9519a2473711082d20a61ad458846fe1433dea5adf8c6bc12cde61e567ccb",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/0e2366f5d7f4.json",
+    "sha256": "319220423fe6bb3bb97413f2e6d5db755140f5b3de63656534ad260bc82c20b4",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/11c23eea1163.facts.json",
+    "sha256": "10498638a293a42c19cc03243a16e72b050a78f9cd403eaa03bbba79cd16fdd3",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/11c23eea1163.json",
+    "sha256": "738379016f640aae8dc6e50b0f854c9ab4ff14b8c7286167aea70f7c9f056ab6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1304a3953f80.facts.json",
+    "sha256": "8fee2a550fedbde6ab38c5c1664fbbaa666641e0c9cba521d9a3fc98e0ccaf2e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1304a3953f80.json",
+    "sha256": "c3ec4fda5726cbdd7aa3583493497651e9c2c23b14f2c42dc1ecb1e0b18e3e85",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/137d2331eccc.facts.json",
+    "sha256": "a40cda046dc4e4a1f97c825cb4c5d839234b5dac20b80b539a2fd090719c9156",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/137d2331eccc.json",
+    "sha256": "445d821bc6a1eab20ad319e3e72691668ccca81d715b882ff8ab1f5435125a6c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/13f49a17753b.facts.json",
+    "sha256": "fa6e994578a33ffe198c3a8eb540be6fa85ff531b475ed83ce0b694a46f846e0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/13f49a17753b.json",
+    "sha256": "94d0138468e125e29ec4770c0a9329dbf21c1af9524b27674fa226f18d312993",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/14e31e42aeb5.facts.json",
+    "sha256": "9f24d2709da9647b2b062c509ece6ed32767d7b77a956ca427a153d7ce57d859",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/14e31e42aeb5.json",
+    "sha256": "2d5e8062356fe0d14d7500c1e3a02403e8a8bb77194d059fb65c1cb041fa2e7c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1a16f189def4.facts.json",
+    "sha256": "caf134e90f742d78cf1ae825b4e2866521bc7ac7f9b000660f43363da91ec65b",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1a16f189def4.json",
+    "sha256": "49d5ac20f796f58a58d0842fca57622dd98f29679acb528ca0257c091982f126",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1a339f056c5d.facts.json",
+    "sha256": "a8c22127aff56f637d1830288af15a287d99a3b6d7d4e3e955f68cbfaa8a02da",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1a339f056c5d.json",
+    "sha256": "42987f1b3ee6d66783a4094285f8959a068cbfc029ea61402519923cd4b1a7a3",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1b57f7fb74c8.facts.json",
+    "sha256": "590fe467e28207d51c22d06fa98edc9cd55c3c652b5ad7ca3696da90885ffcbb",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1b57f7fb74c8.json",
+    "sha256": "059032d4bda36a41bb3a282b27281d9d41478402423a836d91f0824a4451a666",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1c5fe4300c74.facts.json",
+    "sha256": "5ef0d309c97329ca18cf762c912ab11285c6a2238126cc9c812e8ed6f00503ed",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1c5fe4300c74.json",
+    "sha256": "6674d82938e0a411fc37d4cff0340a4bc9b07b56be3154db749c02972c9e3e80",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1c93a1ef1f13.facts.json",
+    "sha256": "9f1d96ef882ef244d022658f0d63c9e3135f5bcea1e99f337c34df05e0fc41ac",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1c93a1ef1f13.json",
+    "sha256": "9d166623e13353a50f036187fbcfae176c28b34ce6099ede8c5c9967d5e85b5a",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1e83e04dbaf3.facts.json",
+    "sha256": "9800785b84558669641d91353f47ab06b12f145d357430e3f79f73844adec789",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1e83e04dbaf3.json",
+    "sha256": "0d5fe44870976f032dcbcb7de4f92080b70373d2b3b49d471640ef0e63965c69",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1ebfe82373da.facts.json",
+    "sha256": "294278899a4ea2a63f7fa88bd41d0c0ebf65b16d00cd6a48e1f07e65ae4c5d1d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/1ebfe82373da.json",
+    "sha256": "a0efd76bd1557bcd586956fb9016be090a47778f4ca1d155bcbfe608078d095d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/26420c3b4359.facts.json",
+    "sha256": "60806955df178cd307f96d2babafe313039dbdf88cf0a8a99533c3c8f32e0246",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/26420c3b4359.json",
+    "sha256": "26c738b17b4caf05825b69f3765ae60181262a4a5b7ff689ec5b319f4446b7a5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/277431537edc.facts.json",
+    "sha256": "5f3e17291099e4caa70df6a2c4bd2eef1ab01d3e1f02f46d24854f421ac57193",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/277431537edc.json",
+    "sha256": "4563511d72f4466a803dfd9827cfd52025936186c6cce97d1372d0b6a4537114",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/29b61dde24b2.facts.json",
+    "sha256": "2dca0b84ea6e86f5387dc6d3ae06e9d72cbcd5be53cea37dc234cfc3261cb26c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/29b61dde24b2.json",
+    "sha256": "f9d976cec333726524fab4397c187691897e8fbcf2bd3533d17de1488d3c15c5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/2b678ee9139d.facts.json",
+    "sha256": "7ae388f54702b374da9eecac373e47e62df0eb4dd854394ea3dec78d9b656e9b",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/2b678ee9139d.json",
+    "sha256": "df3530cdd866166abb4682a8b3aad88f6a463915afb2f67b3bc23c1da936ad75",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/2f1cc9ac18e4.facts.json",
+    "sha256": "33e19523261c4993508751c6a6fe951a82a2b2f46d10ac3c83274122be89735e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/2f1cc9ac18e4.json",
+    "sha256": "942f3325c2e485ed11e07f5d33ffc13a3eb89f46466155ad47ccae60ebed8d41",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/32ce2aa295f8.facts.json",
+    "sha256": "352f84900de575242ea8bf4831806d03f968111e651115abb10f562b52117791",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/32ce2aa295f8.json",
+    "sha256": "a9163ee265738ccb8dffdf53385ff53e1c4e87e648a12ab33fe07b904f2dace8",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/343966f552e0.facts.json",
+    "sha256": "16b265e737416637a9c3698c3324d14e2a1a7deb4c7d298deea9461446e65323",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/343966f552e0.json",
+    "sha256": "0277bbc01633ed2effb3035009ff1a6ba4142689c66235d0d07e578e35c76971",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/37aa37b04d69.facts.json",
+    "sha256": "b975ddaddfa35e2a01777e3034b9b9cb18153c22f0eef9d1d7134171ae3dfddf",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/37aa37b04d69.json",
+    "sha256": "9f4a6032341b82d386bfc4affa2c95ae3e8a0726a7d46773924ec83ad77364d9",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/37f24dfd226a.facts.json",
+    "sha256": "d44475be289e1ccd043a0b4307dfbb14674e0d1dfb1aa79b6beac71c6cb1694a",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/37f24dfd226a.json",
+    "sha256": "bc1ed4fb052c5f3b79b9b269d5f64c5fb91b13d8213b754d092714e0645908df",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/39aa18c563b5.facts.json",
+    "sha256": "7def38596731b9ea1679a2a85bc53104552575747321a67a91faf1591f0266f7",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/39aa18c563b5.json",
+    "sha256": "90bb7b3022577255d1c7e5beccdf5e62fde0fc588c6805b8d5ed9a3eb6cdf27c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/3a86983acf66.facts.json",
+    "sha256": "1866a6aab839bd22fd72d6e16efe90157fd237c4b5aa0ee6deebd2b5aa0ba3b2",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/3a86983acf66.json",
+    "sha256": "f3c6f809f5141741e2e6f3fa54892c5d22ecc4915b8149515c09052a1ccb95bc",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/3b870559bcb6.facts.json",
+    "sha256": "582b8d8a4b451b14bae1ffbb6d3433a9987c2ac248c36e9d4b3eb2b9edbd456d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/3b870559bcb6.json",
+    "sha256": "52c691b7e01dfc59682fe4e91b8b1928d01e699054d6e89bf2eda4a30de2f46c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/3d97ce2485fe.facts.json",
+    "sha256": "9a2de04070ff6d901a5831fff0f246c89a04f4dd9f4c22dde0cdd8073b14fa36",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/3d97ce2485fe.json",
+    "sha256": "9eb574169989cb876f75c4e7b13cbbf4621bd974b917f170586f19ea58e2d1ea",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/464a290fb79f.facts.json",
+    "sha256": "1e2df7941afc347074782fa2e80bbb6bb95f317b5bfce73abb2ddb0ab8f90b5d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/464a290fb79f.json",
+    "sha256": "06a6fb0c6a9b36678d711e306452fe557728bee485efbe6a702a736b45995a68",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/476fccaf1497.facts.json",
+    "sha256": "afcfa33f07a2e38fb44b37be60191b37c24721b50fc39be46adef755d745d7e6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/476fccaf1497.json",
+    "sha256": "4be8fb73ab7a73e70cb4a5d1a4c3330b8a7b88c99f0081463aed8e77521f1b5e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/482af5d7e51f.facts.json",
+    "sha256": "847dd104a4a38adc507e9a98b4cddf1fd0a89ed3d76a4e807f7d71063fe6cf4c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/482af5d7e51f.json",
+    "sha256": "b33beedfd42dc2d0631d79028cbf875b554ccb10cedf8b2bf2750a91940dad2c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/487312917574.facts.json",
+    "sha256": "445e6099e3c88097ddba20b8118ad1b4ceca50f4800dfd65dcb14c8392ffcdb3",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/487312917574.json",
+    "sha256": "55c0642589d83e33735010bd5e302d4bce01e110d821c8e76785db17b9e9ba72",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/4e5a839a3a3f.facts.json",
+    "sha256": "8b67fbb6b440a2433d36f4af670fcd96ae98d6f84cd7f236b6b38885a45b7f3d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/4e5a839a3a3f.json",
+    "sha256": "5b690853922ad7f145c1f7cef39791320aa540d164d6f9cc0220b8c94a8c5649",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/4e9d3e0ff132.facts.json",
+    "sha256": "3fbf07a8517a7c819d8e585874f5cd1428d70fdf9b5d5b6d88da3aa12fc97808",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/4e9d3e0ff132.json",
+    "sha256": "93df39c2c04c8a4288fecef6c30ae257e9f1537af31b84a3a6e69e0ee19d5ae7",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5167fd5dd268.facts.json",
+    "sha256": "49a420cf515e7cf73be770e09d3aafdcd0e6ae0d4989c218333d657a633ba362",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5167fd5dd268.json",
+    "sha256": "623341f7fb4f08d561974880e70c5e29c63d1333cc122b2e2b7587369f9bafb6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/520188357f66.facts.json",
+    "sha256": "492f087a0d72d8d0bdc3835eb4f320bc20cd11dc09e2039ebfd2a8c1e9c1fa01",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/520188357f66.json",
+    "sha256": "6c925dba2de3ab4877a417f89aa62dbac8936a802310674560d386ae4533cf1c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/52e7bf531b00.facts.json",
+    "sha256": "e0dcac1f5fb68a32f77df7c10822adb309fc7dfecfbb1f9cc07045481b2822f5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/52e7bf531b00.json",
+    "sha256": "ccd27942b945e50e1f533422ffc5c7631f5ca8321e4c4a3d32f163fd74f3e7e5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/531330df683d.facts.json",
+    "sha256": "105387c4e35d6e15e3500853d59d873b978f75e2c6d441c5c9da89099a4776d0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/531330df683d.json",
+    "sha256": "32e3eb33f741544ce1856857d8acabb283fca6707146d5fb3ff81d6d2616144e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/53f299591b33.facts.json",
+    "sha256": "e529e83ce02ffda7116789549a3f0f000c1a7191eec2e08db05ab2604ce5fc79",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/53f299591b33.json",
+    "sha256": "bf2bb434cdace69ee06133063b1a4149dd4eaa5052aa2a2a7ab7a19b98413e38",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/548ac05d0ce1.facts.json",
+    "sha256": "087a5802a633987584d04c85f6ecb38daf49dd1375a3d3ebf8c039b75663ebcd",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/548ac05d0ce1.json",
+    "sha256": "2448b72f8f56effeba0862e02c156b0ee2112a510d812aa04c8a654c57da9a89",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/557412ca2b50.facts.json",
+    "sha256": "c412c170e295412c84f343893f66cbccff934e81a59258b16d194bca0269b29b",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/557412ca2b50.json",
+    "sha256": "7129fe7864120cdcd92d73311d2ea61864bdb1bbfb566fd0ed5ef6f996ee6927",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5587c7cc9f4f.facts.json",
+    "sha256": "471106659674b114408d94bf1f60243725feb8e059568a967d05953e50c52704",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5587c7cc9f4f.json",
+    "sha256": "5f73e7c80a81678d69d0cebbfa59efa5240a8828149c203b955f60ff99bdc895",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/56d00dfee80a.facts.json",
+    "sha256": "249c9eafabc1419459488b97b94d4e9d775cf3e03b55432b5c257bd0ad1d111a",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/56d00dfee80a.json",
+    "sha256": "e449c6578cc13380e51886c8f3a2346e0745d5072d9c5955b3542bdadd8bb7c0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/56fe9bc2608d.facts.json",
+    "sha256": "d93578b9c4ae654757102462991fa78b68450c1d925f6a171031d5ff6d1ff0b0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/56fe9bc2608d.json",
+    "sha256": "76bf4f4508bee9a1528fd0755e310b4739a8be785bcaaf566c8b8e915101ba5b",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5925cabbe074.facts.json",
+    "sha256": "b8c170cea6ac0117f5f5b81cab21f47168942ef5e1c1eb5fb3c33409dd377481",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5925cabbe074.json",
+    "sha256": "176af8945c37e2c19961e956dd2093b0f1f26bbeb60329254b8afea43c0b43b2",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5b8f7ba42ee2.facts.json",
+    "sha256": "a9834af09a32c39292791d634d6ec02daf251440ca5ad4d7be45177f6f1ca909",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5b8f7ba42ee2.json",
+    "sha256": "40b7e29770cabb8a436506d49ad8dada76cf11d2100dda8a73ebbfdd47774596",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5bc6e8a589bf.json",
+    "sha256": "8b84866d7e7d97a899b00e048572442b0de00f4e1e20610cd9d3912df3818b1e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5c2a0e31e7e9.facts.json",
+    "sha256": "46f12c00cf209b1d99ad84a915c2155cb4ef496cc42b2635d4df89c1e577ba86",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5c2a0e31e7e9.json",
+    "sha256": "456b0fd743c0a2eb2f57d98eb11983ea603ed0169fdca09f4c79673096543394",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5cb38eaa9531.facts.json",
+    "sha256": "657cc2a1fd651bce213cadd0f042f60387f09a092b9bf054f6f439c50d54bb03",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5cb38eaa9531.json",
+    "sha256": "2bad1dd3b7c4fe20c22b3ee2fab6d577eb9a45760ebc038ac7024207d8edf9a5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5e07880c1e67.facts.json",
+    "sha256": "7f057339087f954878b8632fe3bf068fd47cec3e947387446a41b12eef752545",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/5e07880c1e67.json",
+    "sha256": "26ed72a78f4e02bcf5d0472b8c742ac15c9feb39610ef6f58a48f797fc0b4525",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/60e055a9f3ea.facts.json",
+    "sha256": "b813ef9c733a0fc43bd095a77654a12bc6d541e106b98327b396db70111bfb39",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/60e055a9f3ea.json",
+    "sha256": "8570c1c87d34e7a0758f5f94ae3bf5743561d9143f5a118106e069f269b808e4",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/64ef15a4c881.facts.json",
+    "sha256": "cb63dbb88fade7b2eb91bd9c6a96523ee54831dce1f9ca11e1b3603bcdfab4ca",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/64ef15a4c881.json",
+    "sha256": "fd67d6ca51fdef14f9e0bfd413dbd718112c5ac93ad5eac8a32da44d3a34770c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/6a5b465c5ef7.facts.json",
+    "sha256": "94af404437da057f31cbe7929c0b9b94a8fe67a5afbbca0b5887ad1d43f92881",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/6a5b465c5ef7.json",
+    "sha256": "a43ee51d4fd3df0e95b8d289e20969666fc32f867cb4363316aa87f11c1aa208",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/6b393b9788ee.facts.json",
+    "sha256": "f6385c957edc064347a98a89d079a9934f628482ef3130aedf2ae2acb1870786",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/6b393b9788ee.json",
+    "sha256": "18d67ec03c0f6a0ace28098eff239f18ac62c0f918b7840b6a62d87621a0e850",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/6b88447d5e9c.facts.json",
+    "sha256": "b25213a92b34d6e86f59f78ab236c13d14572c974dfa76b750c0dc68f3b9cd3d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/6b88447d5e9c.json",
+    "sha256": "2fffbc06a5c3855537f6d815cfa0190702ed0a7f6d4371437e98943386d5545a",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/6bdca4ceb709.facts.json",
+    "sha256": "717d4f563171a93638713a1ee7fc35f8fa8ef3c4e1d2b6399d4fcb25d6d94ddf",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/6bdca4ceb709.json",
+    "sha256": "48e6788fb340fea9400a0a859e0bba07b8ea4750742e9851d7299b24c3ca96ee",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/6cdcd0b4c350.facts.json",
+    "sha256": "ff2c95dbef55c6759ae48431b6c117c33ea2ba649ebbd73bd6f6ce37aff0a9e9",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/6cdcd0b4c350.json",
+    "sha256": "6ef9b6042e3031d2f8704c24e0903ec7b6ffb97f099034767057930858cb14c6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/6d9ff19c766c.facts.json",
+    "sha256": "e377bb1c68ff7e6869efbbb976e5c7d57d10dab9c612e09a373c44f656044222",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/6d9ff19c766c.json",
+    "sha256": "9e87373a1d8f7e66edcba56a2e95aa7c5bf56816e76979ed93e563786a77ca5c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/715347f00111.facts.json",
+    "sha256": "5ae5e9f75d3705ac71d112cab964ae3cfc125195ade9be644557e46e7fde9c0c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/715347f00111.json",
+    "sha256": "982e3e225608677f7b03c287b5c01d206d8d94f8934e55c3c0c45444add3c0f3",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/71a218f55f13.facts.json",
+    "sha256": "11a3bfea0c578a0d5db21004ec78d0bc713983c1b8bf8be339ddcea0ff43f06c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/71a218f55f13.json",
+    "sha256": "303bb34ab79dd0a7c1d72d021412827ba404c1da98d28574b9cfcc2b2aeb1d25",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/7333ade8fa43.facts.json",
+    "sha256": "9fc22c08a253ece95ba8752c8f982fb2246e8c90278d8903b1ed0622cda49804",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/7333ade8fa43.json",
+    "sha256": "ecb99429b7a07544b600daee34cd890676f53d0982d10dc6e2f96beb13fefc06",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/737fdf8c2198.facts.json",
+    "sha256": "98c712eaf1e107aab06cb457d20d5dbb1305f04fa162b9e534034a3942e3a194",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/737fdf8c2198.json",
+    "sha256": "09cf5ea06a6bf90fe22c838d6694f7e15bc79e45b9e472de94a7e47fde3e18be",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/73bfde11cc36.facts.json",
+    "sha256": "2c81fc124238c7454696bc226e3d577ccd752021a25e842d6f780bca985e4a10",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/73bfde11cc36.json",
+    "sha256": "eadfcbf6f4985d2dda92e267f01b52248a81568b4c62434cab84df80d2bdf5db",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/73d0beab01c6.facts.json",
+    "sha256": "19def88ebf96fde1b99bccde8b6dc33372a938a576c142a14b18beed809e48d6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/73d0beab01c6.json",
+    "sha256": "c876231e1f7e0e7bae2f7fb2a4fcf1a403a365faac3801a5d4971d7179995426",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/7577c643f368.facts.json",
+    "sha256": "61a3ab1a92a0409bc1e2a7f9ca93a6e0678fb54a8e987aceae874b5d939f62b3",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/7577c643f368.json",
+    "sha256": "4c2d5c34fb8493a8406b6e95b20a2a691c007e3142a0164c4b85d740f97980f2",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/76bed58c98ed.facts.json",
+    "sha256": "0a078bc74ef17512a684ae64c2edc22c547ee09139a4126bbd4f43e45a654360",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/76bed58c98ed.json",
+    "sha256": "e4d658a383bd248aa2d23fdd722becdddacd9d4795cbf2da4ea753013904783d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/778876895c1c.facts.json",
+    "sha256": "a01ca019f29548db75af2bb96373806125944cd759b6fb6b279431974988a9cf",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/778876895c1c.json",
+    "sha256": "3ad27f172be3dc38cb1b9ef0286b0424f713fe51a286da25e3ab770859abd951",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/783924c17175.facts.json",
+    "sha256": "b9591df0bf797e8fdb4ec05344331afe3aad35423aa22bef9b013126fa7afae1",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/783924c17175.json",
+    "sha256": "a38701572f5db6ab0c8850ef39f4b3b1df69bd0b210d7811af82fae5fce7a912",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/784051a3b200.facts.json",
+    "sha256": "5d512138e301c8787e47e9789e64e804ba6b96b0a26746a67fd0f580953b2f35",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/784051a3b200.json",
+    "sha256": "5eb4c97cc1adef8e7c430348adfac277de552a00999922923820cc49533a277e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/79107e8d4378.facts.json",
+    "sha256": "17d91af75de293f04fa21a1921eb241d0924162b87c50d790ca35be38614778e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/79107e8d4378.json",
+    "sha256": "457d72ea541e5fb5e0660b031b65e41b81242e986f354dcc25ef076dee8c0281",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/7be7d6a71fff.facts.json",
+    "sha256": "f9db6c1c5318983293f69958deaf92390560f5fe9626f733880ba2687a86c8c2",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/7be7d6a71fff.json",
+    "sha256": "6c6623970f0add643ca5145fc76437a51c1cbb26c01189814dbf95a3102160cf",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/83a14e9bee5e.facts.json",
+    "sha256": "11de5e9f25648dce712066630b1c38e2051f67a9792096f37478aaa68a156299",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/83a14e9bee5e.json",
+    "sha256": "f14db8415a1b37d6b805d96ebf1877cbdebf52aa62d2a4d1f10d51670c0278d2",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/858aa0ee7635.facts.json",
+    "sha256": "35a1c8b2b2236bb81ceb3069c3db87e19a67447a581e750bb262a160db35984e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/858aa0ee7635.json",
+    "sha256": "683f778ad248efbfc9dc34fbec174c20b2b8f6c890d85fc7c71671f17af9a10e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/878f9a962d11.facts.json",
+    "sha256": "6ee5d4e39b5d0ddd05cec9317bf4b6b5cc9941d61d074c9394c8b9eefe1beed6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/878f9a962d11.json",
+    "sha256": "1dc67104eeba1d8b0bb4048b753240b99aea8daa0cedd5b303612e44a55ac63e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/8ae2bb2b65c8.facts.json",
+    "sha256": "a66e87f982984214e7127e50a2465f384e841de1903619c7f67c12d11f47e005",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/8ae2bb2b65c8.json",
+    "sha256": "4897d942f92c5d793e525d20a4fa848c4cd154e85c61340c1590ae7db60254ad",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/8c8cb8194b67.facts.json",
+    "sha256": "fa533aea2ed963f0c3548eb2ba18786a42f673eec4467776b3fa0b2c44ddb7fd",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/8c8cb8194b67.json",
+    "sha256": "fa3a57bfa92a2f0bc307d3b5db8523ec349decbb1f8fa46610f239c3c69ce706",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/8e9468eb222b.facts.json",
+    "sha256": "0e65a3b17e852d3ef506eac63706d224116d8878a24d84e1e669db075ac413c6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/8e9468eb222b.json",
+    "sha256": "c93dd13c1973a8cbbd5a5fc9506541188a2c54745fc5662d0912ccb1d1dc0576",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/9563bf5af9a3.facts.json",
+    "sha256": "6267ec8a2fab748004f6ce482b5b4e6a7cde0cc6fe2286caf2010ef3104359ba",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/9563bf5af9a3.json",
+    "sha256": "dacb5e3a286a505d5c1a2b684971f4efd4669ea98b48cc31d0b512170642972d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/96ebb4db4f41.facts.json",
+    "sha256": "99300530892cc4af9162c1ef271fbc0f8d86b56269371c8cfadb2b03ce3a7330",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/96ebb4db4f41.json",
+    "sha256": "d18c9e13fb8064f8e9b17560ecca515562368982a0bacaf2011383434c178f3d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/97d0e533fe5b.facts.json",
+    "sha256": "f2209d4bcd8fd802928e92ce51bfe89156736a740a7478bc13bcb9e4939dbae9",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/97d0e533fe5b.json",
+    "sha256": "f46d9984ebb415f2f11d6917a4e2d394029fb5eca5f84b3ded5c1c8441ffe867",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/984e026cae0a.facts.json",
+    "sha256": "a1535e67af1e6348e51f58920e788c1001657c6af582acb6a58d99d277339c6a",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/984e026cae0a.json",
+    "sha256": "454aeec743cea68b3414f33ae55e57c107d2cc96fee1414250cc99c1edbacd4b",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/9b0d79faa1d9.facts.json",
+    "sha256": "f1a7fe8ff6e50e0f228266469ebe48cd8c506f38901d0175341b952a90117545",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/9b0d79faa1d9.json",
+    "sha256": "79238e33d364a3a7ac33afda2f789873cb7359c82643d06e7f40e8fbf2c7bfb5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/a1c950070aa1.facts.json",
+    "sha256": "4bb76a37194052f363bd9f93f5feda73011597e073551602d2bacc857e800dac",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/a1c950070aa1.json",
+    "sha256": "c833a173d545b7ee3106c547fa24b0e8123061b6be13a81a826003f1ada9949e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/a4d8940795fd.facts.json",
+    "sha256": "583e24671c082906f2ddfd51630584e2522245cf75f0d2e862be484c92286ebd",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/a4d8940795fd.json",
+    "sha256": "871740f5069637f882dfe26d70d3cb55b5f69d0c43acd6fcd54e607e094b7746",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/a765bb2bd371.facts.json",
+    "sha256": "fe6ec3ffb8c4db9016a85034308cecec33468c076ab44d6bf74934463d1acfba",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/a765bb2bd371.json",
+    "sha256": "d0626ca40d686f72aeccc0d5934e8293b5f5594feb32adfea15336fc1cd96396",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/a8f723ab145f.facts.json",
+    "sha256": "028291e9852fd91930bc94121fa94bac219ec35f91da9a735afff551b7719627",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/a8f723ab145f.json",
+    "sha256": "c6d263f4699c233be611e94f5d876d06c095d719e54a4889aee7db07bf369c52",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ab41626a5c7a.facts.json",
+    "sha256": "86db293878450260cedb91db7c4d52ac813c54a5dc2fc8ebde83b7f3b6c29763",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ab41626a5c7a.json",
+    "sha256": "d199867e699aa58e39786a64aebb84944aacaef21cbf2745566cf88511540572",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/abf2e8c7e0a0.facts.json",
+    "sha256": "9927d8df73af03a84e914622ac99e78f94e470042ad629a8cd83bac95222c32b",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/abf2e8c7e0a0.json",
+    "sha256": "56b7df39ae94535ca60b85d9c50d8188522a0d3e79524cd00e3bcbf122eb1bb0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/b0726cb40e11.facts.json",
+    "sha256": "28b979d1bb93c0b8e9c5efc75ad5c9e3d6ea36b09ab295fd9a20ff3455634061",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/b0726cb40e11.json",
+    "sha256": "427fe35bf5fc0c5b4a3e8ba1e81c781da178b6bce6cb4f50281a5c034937f9aa",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/b31df44f6f82.facts.json",
+    "sha256": "5f5d9835d98ec015f553fca99aa18a70b557c21af9c24013457b753c0dcda3cc",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/b31df44f6f82.json",
+    "sha256": "c1f1c2fbbcdadd326ed430f24dfc29171538bde80159177e785340ada0f45e86",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/b43701b3ff2a.facts.json",
+    "sha256": "1bf82d462b0b0c56ff16381768aea75410206fa4cc956dd409e4fbba24aed279",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/b43701b3ff2a.json",
+    "sha256": "0409c11df10a83d292e9795a32c842f9a5f75d377ce2b0ef877374edb7a12817",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/b47125db054c.facts.json",
+    "sha256": "1c6e0882168a51fdf0b9847e9fc1141c051055b0e74a12ee5f3d6ab7cadf3da7",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/b47125db054c.json",
+    "sha256": "82921c409a4dcb333fb91993476b8570ed558c04d7a983d70002d9393cdede90",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/b577dbda0080.facts.json",
+    "sha256": "7675a1f7fcf32f59d780145f8bc3dcc8e6c5d12c26300ccd1001fc52af9d8b64",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/b577dbda0080.json",
+    "sha256": "681ccd095930f8f20615ace82d9ceed359af77256cc4cce14995459906e4e68f",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/b8c0659826d0.facts.json",
+    "sha256": "0adb90adb15994b47aa3bb8491fca54c01ac6a9bb6abf15cfac4dde6770329ae",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/b8c0659826d0.json",
+    "sha256": "b205ed7c80ddf22b5d520553883979357244fb378bb03884439e9a53c1ca8ddd",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ba0dbc83509f.facts.json",
+    "sha256": "472db6d4c6fb31dacf7c3d3117f4fcc06d5187d535e8017d7ff1f300d2748bac",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ba0dbc83509f.json",
+    "sha256": "2186ea9397204f9c96c76f37337500a4e9ecddc1329898eb9679ff9433876ffb",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ba243080f8a2.facts.json",
+    "sha256": "87cca3df528c4c855943d9d9f17dc828871c39ebd34d0077b6fb694908204162",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ba243080f8a2.json",
+    "sha256": "31b38b7e3de28e42dda0572a5c2d19ae491b5bee294be6fa51d7d5a84e953a2d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/bab81f8d7e4c.facts.json",
+    "sha256": "ce50bdbcc1094086d1a135c69b78cdf838979f41a01c2507957b53edec3c26a4",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/bab81f8d7e4c.json",
+    "sha256": "83b1b8489efc5248d6ef2a5180a8a4311b93c6bbb3e1f07183338d6daec52e41",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/bba232d60427.facts.json",
+    "sha256": "fd0b46586ef3e5a9cb76849c26b463ff3c7d2bbad5366eea0ad7b94c2437ef0f",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/bba232d60427.json",
+    "sha256": "dc68c7fb8fc9a642f2de0d5ade6562e60a73d00eb5d142639656b32a59bfcec7",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/bbe073b5c3b2.facts.json",
+    "sha256": "d65716fd20f06a221e304ee826516ab34b5aaad773a2bdfeee22fe4043380ed9",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/bbe073b5c3b2.json",
+    "sha256": "4fdc4f63b3cce05632fd5f193b507bae14f70bedadf4051e8870fc9a60aebfd6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/be3133482a57.facts.json",
+    "sha256": "574e2f7ad59230a88555c3fcbdfd77fb67514b5586bfe81368b12132c682553b",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/be3133482a57.json",
+    "sha256": "02d65756d1bd736780b86bb798b61dd324c084dd5913b821b127a69820b276d7",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/bea34510b6b2.facts.json",
+    "sha256": "e45a2ea55ce8191592dbd9ecaa2913ca7c1a86ffbbf3318313514360de61435f",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/bea34510b6b2.json",
+    "sha256": "ee03eb68987679f8abf0b4b6fecf6ac5180bcf07b53dcf0d642484af34afc248",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/beca48b2c415.facts.json",
+    "sha256": "93b5027831ad5a34bc5a912e7addca52dfa1aeb9afcb8b35eb6ec886ebcef371",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/beca48b2c415.json",
+    "sha256": "16c7d6713fd2e90103a638af9008ced11ad37195d89068a6946b4ebadf04c99f",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/bf333633d18f.facts.json",
+    "sha256": "bca019f049c7def0375c80f069d9cbf550be8e37e148ce2e90182f46c95c5fcf",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/bf333633d18f.json",
+    "sha256": "5de390c3c1c00d770e7a43dccdbf6e1e9dc0ae640da9ca8b2877464726e7b3b9",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c0ffb5b9e42a.facts.json",
+    "sha256": "251a349e4515a4f0547a58d5c6d77210a4f19c886018ec9a0870e6c41ed15be8",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c0ffb5b9e42a.json",
+    "sha256": "486afb9c1bd1ae907c8f9a187b1c4a81155f5ccf4766ea9e1322893b63a30481",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c1187ad20678.facts.json",
+    "sha256": "79b9cb1ac0fda595344d1ff497d207c2b2f17d29678221064036c98c6e0d7938",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c1187ad20678.json",
+    "sha256": "9d367cb43aabc069bf71f2164e138aa0e38e199f3c3dd84108af0e2e4c321573",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c3165ccac765.facts.json",
+    "sha256": "9872f7944d65c8b430ff4f386123c8a17276b9f09ae579a4a05b5ef350767df0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c3165ccac765.json",
+    "sha256": "2714c0ece5ed594334bcacc7b112d5680a190e167db1dfac1c8d928e5ce852a0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c4818b7b94e9.facts.json",
+    "sha256": "177bafc494d43ab996cdd71382db63571f99c59ec2ad551a63c68e68f4a1bd1f",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c4818b7b94e9.json",
+    "sha256": "959a1d1c6e520b494bda03b89a92d9af6858cdd7d62ff05a29dfdf73a4e1653f",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c64c64bf3417.facts.json",
+    "sha256": "0f241b4884469dc832f8e72f6212e46406693fd889d7f96d1b74e06d005ded42",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c64c64bf3417.json",
+    "sha256": "0bb1a417e8c6d0dc165aecda9b052df1006faff7e37ad8cfdb2fa933e2ae3760",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c668cf202302.facts.json",
+    "sha256": "493dea34fe5585fda031d43ea9d7825d022b87f35d9430b39c842e36ec0ef083",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c668cf202302.json",
+    "sha256": "9ffb271e298b78a1b56d624e4dcfa4ba9f959025ca27ac2bbf11c6200f9b6b50",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c7ace089e2cb.facts.json",
+    "sha256": "7b43ea34b9157e8a408d0618b32faa2783cdebbad73f5370dd38da8a52cd4939",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/c7ace089e2cb.json",
+    "sha256": "c2e14787cacea69aaaac08b7e919327ca57610e86027c0897d3752e96e6bd4b2",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/cb6acdde7805.facts.json",
+    "sha256": "7d4bda6318cf761ac1fc72d61c96d4adc852f37d62fa6cf5f1196e4bd4811ed9",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/cb6acdde7805.json",
+    "sha256": "39ea26f3e0b8a0da334eaa539caca88e378ed51e15ec137ac4bcaec7660d3074",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/cb72ac622403.facts.json",
+    "sha256": "46e2d5984e41682b95b1df650598a1fbc379dfaf57fc1c6fc13c0d0338ea0183",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/cb72ac622403.json",
+    "sha256": "0d55e17fad6efac308c86808e436f33b166591530dffb076faf1e2a93aa852db",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/cb7d34c631bc.facts.json",
+    "sha256": "cfc06dce40eaebed33397d362d4aad58cbe80c316af954af79fa1cedb41d50b5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/cb7d34c631bc.json",
+    "sha256": "d17a2856233d27ef1cbdae51e3dd876b202734eec788200e6ed539854c0ce6e7",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ce04a7f345a2.facts.json",
+    "sha256": "6162655eee519dd7b686ade2db4022b451953d756ae87bff40b371586cebcd06",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ce04a7f345a2.json",
+    "sha256": "022668d4d04e36bfbd1c1a3eb3660875ea8f379fad4194a8fbf4597d33800b35",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ceac4cb28226.facts.json",
+    "sha256": "eae093285e3830945250f8c2b342e119dd75a160c7be6553d0630a74ce8b3584",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ceac4cb28226.json",
+    "sha256": "72e8ab4eb328a9f1c290a7d8ed082ade29f58be561e58429ac7d07e86916b335",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/cee7488b7f2e.facts.json",
+    "sha256": "fd4072e31ee026e65ff10e38e445642cc4265b7562f325bcb0ac86d377ed4238",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/cee7488b7f2e.json",
+    "sha256": "24e2fe86c2a08045e3641d17fca4c770630232115a104412bb1320ece02c623b",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d2e0924123f0.facts.json",
+    "sha256": "994363a5158d02db3c8f5ccb137e41dfc50f34a80d5a1b28fc7fc985beab8531",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d2e0924123f0.json",
+    "sha256": "3e1519a5767b5132287c412c34a8b059eb2005b87e3a27909c3cd19c1f7f1e6a",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d44bcdd89e70.facts.json",
+    "sha256": "dac8213519fd49a993cfa326525e6c383897c7fb01b6c9d44e0e63876b624ace",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d44bcdd89e70.json",
+    "sha256": "e047ac3e37cf54258f9f293a24a998d15b61eac3390193500038337fccc78270",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d4bcde95daa4.facts.json",
+    "sha256": "0e20d6958b2415bd61ee01046e3d50a33620ab979ed0dcbddfd89e3a6fa39244",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d4bcde95daa4.json",
+    "sha256": "f899538e56c10be4ef343fee8a88e0fbb9168c80b757a802b82c50247f05927f",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d64108b9f99d.facts.json",
+    "sha256": "8a185574ae1405acfac62ed2a5f2efa67788afeae051aeb455cf346909f27e8a",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d64108b9f99d.json",
+    "sha256": "6d866958bb9e6c0b32d996f804f04554db678ebd0625f4fabdafa4882c35179b",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d6d22f714f69.facts.json",
+    "sha256": "2ca508d048d6b1d4b739068fbc756958f9a94d8c2ddd4e94509e1c0fe90d5dd5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d6d22f714f69.json",
+    "sha256": "03438064d186cb4342a4e6a03c58eb661b7848afbcd3f16ff3abf74776136985",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d7f933f58cd1.facts.json",
+    "sha256": "8286c87ea6d69ad6a53670759edfb2bd18437e56c89f46b0554fc8a830ed0b78",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d7f933f58cd1.json",
+    "sha256": "f55a51a9bcbf59beb232e42db27c8a338188e51a7123524b7feadb541832b6af",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d83fd7f45ec1.facts.json",
+    "sha256": "576ca64d2c3ff02837ab0e2e70ec2f99328aebca1e955ca01ec23fe2ea5e230d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d83fd7f45ec1.json",
+    "sha256": "5f3b2f6408371a54223dad6b89ec6ec495fe6c3a843392481dcd0be3147a0dac",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d883b14a08ea.facts.json",
+    "sha256": "8634ebc616ded2b5c6b8e931554dd102be6a78e188b82b7e3959f20fad974173",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/d883b14a08ea.json",
+    "sha256": "47a88fe44c773b378f805b0aa090abd9e8b8959a6122c40a2e2967dee2f164e6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e07f51667251.facts.json",
+    "sha256": "7f5456f27770f144921ffdb8ee9ef9de92a272e8e8d284142225309ce4fb33ba",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e07f51667251.json",
+    "sha256": "c45d196e7b3ff9b230dc343c3afa740ce82ed6859f9ed9f9bc350f2421f8e250",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e1ba93f4cdfb.facts.json",
+    "sha256": "e2eb4817cf552707d1bf7ae2e9fdb9622519db9f26f28066d3ed9cdeba4988ea",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e1ba93f4cdfb.json",
+    "sha256": "7ef766c16d179e24a2d8354213b91de0834831802ea3812b8a2891a39f5ef89b",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e24b601fb85c.facts.json",
+    "sha256": "61126c8ff1578c5197565085175d6bb43fc7469f56055da3583fd8ff81d33f3f",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e24b601fb85c.json",
+    "sha256": "b7e25e6568103bcea1671c30dc8964f296e0556ac60abb2b8f90fc01c2239242",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e288240b7fff.facts.json",
+    "sha256": "d1a2d6677fd3581bf4d9d578851b493f5bf98c2e754ffb0a19ab9a8575fc03ac",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e288240b7fff.json",
+    "sha256": "ebebf8a360d1a0c53cc9da760a25ad75c911c021ef4ece29b39b834666efd35e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e51deb8db67a.facts.json",
+    "sha256": "c0111830000614c3e45e2de1a3452ed911bda52a6911db8d4b3676ed73aa53db",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e51deb8db67a.json",
+    "sha256": "ac0b44c9672eca06f9115eb4ee9a9fc74fc80cb5e49e92f61b8bf95161d04d76",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e8a56c3937a3.facts.json",
+    "sha256": "147f35c58f6e85cf0d4d4c7752384d6728339da67984b290575f37a5c129cb3e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e8a56c3937a3.json",
+    "sha256": "3fa7b0225e594d13766579aaf81f4649e46c883f79b97f1215f7dfd88665d161",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e9355743cc2d.facts.json",
+    "sha256": "fffd9f6bdf2687a5faf13156a7c8f39c6903319ca3987f3ea9381e7e8dd274c2",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e9355743cc2d.json",
+    "sha256": "2c5f0bbd08f0d2e9f3f7f7bb25db68ab8493bf0d79fa625e30b477601cf90b63",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e9e3a2c8cdce.facts.json",
+    "sha256": "e480059cc06e4e139d2880bbe7042675c056d2bed63a73bb00000b091737e0b6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/e9e3a2c8cdce.json",
+    "sha256": "d822675406e51c906492f7d23775dab3424aabf2ecbd856909bb91113c633482",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ed614ab12c70.facts.json",
+    "sha256": "317a7fc51c0dd0f22508bc8101277aacd71a4931b9a267787c4021886d3c6468",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ed614ab12c70.json",
+    "sha256": "c818f3beb82edc99b7df6029168d341e7009e4e6c5dd7a84c158088aa7760995",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ed68d5ea3d4b.facts.json",
+    "sha256": "ed6e772d101ae7644f0136fe8d58e3c730f537926ea7e5eaf4d9f2ce4d6dca8b",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/ed68d5ea3d4b.json",
+    "sha256": "4ab6a9d9dde1121934795af4cf723a4b3e26c329f18c32318653240f06f33d56",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/f0acdfa7c657.facts.json",
+    "sha256": "9a359f0c696fc33652151408354a1decfd7d29f49d761186c403f8e23c36aee7",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/f0acdfa7c657.json",
+    "sha256": "11d3fec4bbad8faa5bb6e1fad52289fdabf1b4f72baf6b1a7165220520d89fd2",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/f69c0a57ff30.facts.json",
+    "sha256": "2063b855bd83ff9fd545bb6835915bd4e4e25bc79d741e2028b17b04803d6531",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/f69c0a57ff30.json",
+    "sha256": "9f85bc87ef849c9e2e98071011d7fc7d1f59de46f5523bfbba62e0ab8f90ba1a",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/f7e6c7ccc389.facts.json",
+    "sha256": "f96984ab5d176c77f2465ac50e3ce42cf9900525688297a8cd9a9d9f8b76d8e6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/f7e6c7ccc389.json",
+    "sha256": "5b7f7c93d608c67246386f8ea4efbf255e41337b5673b85987418de7e553338b",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/fa800186bd2a.facts.json",
+    "sha256": "5bc76b21fb20e4d5bbd0292a71f1831d5c21091734a74c489c19e2184957b918",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/fa800186bd2a.json",
+    "sha256": "5d1b37f4b7e46121e9f76fed6d72b3749c9d3fd08af0f67958a3261e2ed20a8c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/fbf66f762622.facts.json",
+    "sha256": "20d852224f66b08a7f15800b1fbe0af31fad3c4d042cef0840622c5e3cb394ab",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/fbf66f762622.json",
+    "sha256": "8c96882423376b913c61fcabadf92496e904c7a8abf20ea8d3364f453230f962",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/fc6c2ef91b25.facts.json",
+    "sha256": "09d1cb5aa313b11eae9ef6abf6d9b1147d03bbeea9dd4e98c05ae3c7bc5543d5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/fc6c2ef91b25.json",
+    "sha256": "3143a829810b733b098e43f8b7d5c3be36a292c2e36a5b3ae5549e0d91ecd12d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/fc913b9ddfaf.facts.json",
+    "sha256": "c19cd2efc6aae8d627afd9e5c2aad595ceed02a61a8b3007a5293c08b1cf1277",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/fc913b9ddfaf.json",
+    "sha256": "2b62b40def8e0e65e382845bd998c41bbc0d0b9e802a4262b2da034ccc4a54ea",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/fe7652b0834d.facts.json",
+    "sha256": "8bdcc4f7eb5e4e95b9bd7d23219bda9cde5f7dc5c9eb6d2c883a73c09a0a001e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/migration/fe7652b0834d.json",
+    "sha256": "fc81e623c9c269baf555d47c7b36f3b5d5b26daf60880558f8a957463d2f7f82",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/original/inputs/config.json",
+    "sha256": "3dadb00ebdbac1e13b24da1146c6326df509da7fd912a8a6ecb12e4c44e2e071",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/original/inputs/model-eligibility.json",
+    "sha256": "28fbffe00d71b232271b0d2f22b771aaa32368ab84531130fca5d1c1b6f1ca62",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/original/observed/ACC_SYNV2_NORMAL_01.json",
+    "sha256": "c0187c813bf16f66fca3877e16c07574a9556e225fb403151ae1276243d9c2ca",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/fixtures/source/original/observed/source-facts/ACC_SYNV2_NORMAL_01.json",
+    "sha256": "f48b5bce4f922722954984effb1d8a629b2efed41d429234dbdce070dfc44326",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/forecast.request.schema.json",
+    "sha256": "70fcfe80a65f73f9120a2812ffdd72d23d5ebe03614a49d5664b63478220dce2",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/forecast.response.schema.json",
+    "sha256": "190570789553a6ce43f8d2e6035a0b9ec062821f77482bb477b81ff2f78cef38",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/historical-fixtures.json",
+    "sha256": "f8b840fb8bd6728781a983507d67957dfe372feaf9fc7015d07cfb913944e78a",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/request.schema.json",
+    "sha256": "ed7828ce1fac43bd4456d0a4ed7a3c5bcfe2cfd3bdaa403455cda3a37dafc25c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/response.schema.json",
+    "sha256": "d4a294aab1c99c8842e4e162498d677e7260566e1e2042d063d917dbbd9f9ad1",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/revision-manifest.json",
+    "sha256": "6aed7f78d0120e429f2615764738becac314c780dcd1e792ad165a72e854f8f6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/source-facts.schema.json",
+    "sha256": "672bd20a7c839f33961c6f457cacb0ab6062486ed6344960af799ad0ce0f9695",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-data-review/proposed.4-v2.1.1/pinned/targeted-fixtures.json",
+    "sha256": "cd63edad498ff08d61dbacb6ec51f7323579b76cfadbb1b918e7529eb14c3822",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/conflict-C01-request.json",
+    "sha256": "f6aeb4b882377318e2b18d66cabcca992fc69a11730606f721dfbf03ac3b09ef",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/aggregate-provenance.json",
+    "sha256": "b672670306dd42b3160623f31b552c341d167d64124dff85108ca262af4ce3bf",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/bill-calendar.json",
+    "sha256": "62f52572a953917f27caf57f59599579f53aaa6d839548e310200832d15503b0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/bills.json",
+    "sha256": "06ff7867f672e189114b763b2c40486075be5b1c43f48a45df9f5491a361cc91",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/bundle-manifest.json",
+    "sha256": "c877c5e138846557ca1cfff4f6b1c1b8a6eb29eced9e7ff99c3b6c461ddc5d9a",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/coverage.json",
+    "sha256": "2a71d94eeab9fd069b9e8157da78571abf72a7985c197c4bab284c9f46d662de",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/ledger.json",
+    "sha256": "78aac6a9f568e40949e22ecf34432780479ecd1473fc29413232cbe8fd30554e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/mapping.json",
+    "sha256": "b8534fe1ccae2bd4b857951bead88eb71d71426798d18a5b408f16f4b4a60718",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/model-eligibility.json",
+    "sha256": "3de9756205b2227081e5a1874091d272b4752ce3ca681e4216d5fdd2d527d2f5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/opening-balance.json",
+    "sha256": "18eb9a0f76063077aab34b25c6d094189b0ae61e34f56f1f907252f954eb9f7d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/opening-snapshot.json",
+    "sha256": "2975b3d4f9eb0f86cc15a528dd0dca3313e523c3a4d7a2c4e4833d0e27350aa9",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/request-core.json",
+    "sha256": "96e49cf583a60028a87b641687770650f587515d517dc5db35c482d04d7cef6c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/salary.json",
+    "sha256": "802d2b8aaa6b12fc1a91bc2c1fbca18c39d3ebc50d9b7f3c460709d9252b6528",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/scenario.json",
+    "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/examples/valid-data-bundle/source-registry.json",
+    "sha256": "3088f6c7db9783a7894ce038c62d475bda5e008f89511502f9059d197cdef7a1",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/pinned/contract.json",
+    "sha256": "47854eb2d09df6d018c86aa3087e6c27ee6846f54e912f9bec8757627003953c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/pinned/contract.schema.json",
+    "sha256": "08fd18db8f86bc158c21cf483d7f0e32c262c9d4baa4f2c513614bc26965adb3",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/pinned/fixtures.json",
+    "sha256": "b3e0e66c35328d163d5fcb5785f50cfb7ca1594e585c64a6150e85d810d4996a",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/pinned/forecast.request.schema.json",
+    "sha256": "0591315a4ff7d444d48d42f825ac2442f7775b348b18783b7c899e1849be62ed",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/pinned/forecast.response.schema.json",
+    "sha256": "62888cb559b346a56f773e38c3a3e43138c4d02d0dee109466d74bc92f43b6c2",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/pinned/request.schema.json",
+    "sha256": "5c6e8f302ec26b2b476a293af870fd3e47f2b9198e5522133a6cbb4e157a05c2",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/pinned/response.schema.json",
+    "sha256": "792844cd1a0f7dc1f58771c107660865340ce809087827a7ffa2d4283944a64d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.2/pinned/revision-manifest.json",
+    "sha256": "0b973748962ffb649f381a018853281a7808761a6c51ef1073470fc3b2e439ea",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/aggregate-provenance.json",
+    "sha256": "b672670306dd42b3160623f31b552c341d167d64124dff85108ca262af4ce3bf",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/bill-calendar.json",
+    "sha256": "62f52572a953917f27caf57f59599579f53aaa6d839548e310200832d15503b0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/bills.json",
+    "sha256": "06ff7867f672e189114b763b2c40486075be5b1c43f48a45df9f5491a361cc91",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/bundle-manifest.json",
+    "sha256": "2b89aacb9f1a4fa6ae73320878fc00fce58f9163e0b2ba804b6fb671465c7fba",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/coverage.json",
+    "sha256": "2a71d94eeab9fd069b9e8157da78571abf72a7985c197c4bab284c9f46d662de",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/ledger.json",
+    "sha256": "e816149e072f2c5450af6c61e807581ffe8c429e1bb448132b3b9f02defb7c67",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/mapping.json",
+    "sha256": "b8534fe1ccae2bd4b857951bead88eb71d71426798d18a5b408f16f4b4a60718",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/model-eligibility.json",
+    "sha256": "3de9756205b2227081e5a1874091d272b4752ce3ca681e4216d5fdd2d527d2f5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/opening-balance.json",
+    "sha256": "18eb9a0f76063077aab34b25c6d094189b0ae61e34f56f1f907252f954eb9f7d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/opening-snapshot.json",
+    "sha256": "2975b3d4f9eb0f86cc15a528dd0dca3313e523c3a4d7a2c4e4833d0e27350aa9",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/request-core.json",
+    "sha256": "30d3d8ec6f727c8345993140557bc21b7182a122f842107d96541819055649d8",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/salary.json",
+    "sha256": "802d2b8aaa6b12fc1a91bc2c1fbca18c39d3ebc50d9b7f3c460709d9252b6528",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/scenario.json",
+    "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-hash-data-bundle/source-registry.json",
+    "sha256": "3088f6c7db9783a7894ce038c62d475bda5e008f89511502f9059d197cdef7a1",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/aggregate-provenance.json",
+    "sha256": "b672670306dd42b3160623f31b552c341d167d64124dff85108ca262af4ce3bf",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/bill-calendar.json",
+    "sha256": "62f52572a953917f27caf57f59599579f53aaa6d839548e310200832d15503b0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/bills.json",
+    "sha256": "06ff7867f672e189114b763b2c40486075be5b1c43f48a45df9f5491a361cc91",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/bundle-manifest.json",
+    "sha256": "1ddd75525e1c8f9892329bb920b53c843006d29cadf64d59dda5d0b7d08ea645",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/coverage.json",
+    "sha256": "2a71d94eeab9fd069b9e8157da78571abf72a7985c197c4bab284c9f46d662de",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/ledger.json",
+    "sha256": "78aac6a9f568e40949e22ecf34432780479ecd1473fc29413232cbe8fd30554e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/mapping.json",
+    "sha256": "b8534fe1ccae2bd4b857951bead88eb71d71426798d18a5b408f16f4b4a60718",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/model-eligibility.json",
+    "sha256": "3de9756205b2227081e5a1874091d272b4752ce3ca681e4216d5fdd2d527d2f5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/opening-balance.json",
+    "sha256": "18eb9a0f76063077aab34b25c6d094189b0ae61e34f56f1f907252f954eb9f7d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/opening-snapshot.json",
+    "sha256": "2975b3d4f9eb0f86cc15a528dd0dca3313e523c3a4d7a2c4e4833d0e27350aa9",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/request-core.json",
+    "sha256": "96e49cf583a60028a87b641687770650f587515d517dc5db35c482d04d7cef6c",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/salary.json",
+    "sha256": "802d2b8aaa6b12fc1a91bc2c1fbca18c39d3ebc50d9b7f3c460709d9252b6528",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/scenario.json",
+    "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-manifest-core-data-bundle/source-registry.json",
+    "sha256": "3088f6c7db9783a7894ce038c62d475bda5e008f89511502f9059d197cdef7a1",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-unknown-mapping.json",
+    "sha256": "0506210300d0c26dcbecc6f75e380e08daae1124b09ac00074c0281dcbe0c8fe",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/aggregate-provenance.json",
+    "sha256": "b672670306dd42b3160623f31b552c341d167d64124dff85108ca262af4ce3bf",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/bill-calendar.json",
+    "sha256": "62f52572a953917f27caf57f59599579f53aaa6d839548e310200832d15503b0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/bills.json",
+    "sha256": "06ff7867f672e189114b763b2c40486075be5b1c43f48a45df9f5491a361cc91",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/bundle-manifest.json",
+    "sha256": "1ea598e8ccb7c9cd6ae959e82dc687beb0297634337290e01d021fb07ffca1cb",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/coverage.json",
+    "sha256": "2a71d94eeab9fd069b9e8157da78571abf72a7985c197c4bab284c9f46d662de",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/ledger.json",
+    "sha256": "78aac6a9f568e40949e22ecf34432780479ecd1473fc29413232cbe8fd30554e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/mapping.json",
+    "sha256": "b8534fe1ccae2bd4b857951bead88eb71d71426798d18a5b408f16f4b4a60718",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/model-eligibility.json",
+    "sha256": "3de9756205b2227081e5a1874091d272b4752ce3ca681e4216d5fdd2d527d2f5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/opening-balance.json",
+    "sha256": "18eb9a0f76063077aab34b25c6d094189b0ae61e34f56f1f907252f954eb9f7d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/opening-snapshot.json",
+    "sha256": "2975b3d4f9eb0f86cc15a528dd0dca3313e523c3a4d7a2c4e4833d0e27350aa9",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/request-core.json",
+    "sha256": "30d3d8ec6f727c8345993140557bc21b7182a122f842107d96541819055649d8",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/salary.json",
+    "sha256": "802d2b8aaa6b12fc1a91bc2c1fbca18c39d3ebc50d9b7f3c460709d9252b6528",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/scenario.json",
+    "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/invalid-version-data-bundle/source-registry.json",
+    "sha256": "3088f6c7db9783a7894ce038c62d475bda5e008f89511502f9059d197cdef7a1",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/unknown-day-invalid-precision.json",
+    "sha256": "2e7c9cac37195bcb51fa39540f64bffe1debac9c654cdda12a9aee20b3ccfa84",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/aggregate-provenance.json",
+    "sha256": "b672670306dd42b3160623f31b552c341d167d64124dff85108ca262af4ce3bf",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/bill-calendar.json",
+    "sha256": "62f52572a953917f27caf57f59599579f53aaa6d839548e310200832d15503b0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/bills.json",
+    "sha256": "06ff7867f672e189114b763b2c40486075be5b1c43f48a45df9f5491a361cc91",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/bundle-manifest.json",
+    "sha256": "2b89aacb9f1a4fa6ae73320878fc00fce58f9163e0b2ba804b6fb671465c7fba",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/coverage.json",
+    "sha256": "2a71d94eeab9fd069b9e8157da78571abf72a7985c197c4bab284c9f46d662de",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/ledger.json",
+    "sha256": "78aac6a9f568e40949e22ecf34432780479ecd1473fc29413232cbe8fd30554e",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/mapping.json",
+    "sha256": "b8534fe1ccae2bd4b857951bead88eb71d71426798d18a5b408f16f4b4a60718",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/model-eligibility.json",
+    "sha256": "3de9756205b2227081e5a1874091d272b4752ce3ca681e4216d5fdd2d527d2f5",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/opening-balance.json",
+    "sha256": "18eb9a0f76063077aab34b25c6d094189b0ae61e34f56f1f907252f954eb9f7d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/opening-snapshot.json",
+    "sha256": "2975b3d4f9eb0f86cc15a528dd0dca3313e523c3a4d7a2c4e4833d0e27350aa9",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/request-core.json",
+    "sha256": "30d3d8ec6f727c8345993140557bc21b7182a122f842107d96541819055649d8",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/salary.json",
+    "sha256": "802d2b8aaa6b12fc1a91bc2c1fbca18c39d3ebc50d9b7f3c460709d9252b6528",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/scenario.json",
+    "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-data-bundle/source-registry.json",
+    "sha256": "3088f6c7db9783a7894ce038c62d475bda5e008f89511502f9059d197cdef7a1",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/examples/valid-wire.json",
+    "sha256": "7f1e76447b451b4830f74faafa37d6b5fc66b8c24c99157c0e1a4ffdf1ed89b8",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/pinned/contract.json",
+    "sha256": "a3e82787143abb92f333ecfdf051d23a87ed545b41fe806df452c44d386e625d",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/pinned/contract.schema.json",
+    "sha256": "81150a045cf83a638bdb07bbf0cabf64f3357b2b44a9183a245826632e4245bc",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/pinned/evidence/application-review-inputs/conflict-C01-request.json",
+    "sha256": "f6aeb4b882377318e2b18d66cabcca992fc69a11730606f721dfbf03ac3b09ef",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/pinned/fixtures.json",
+    "sha256": "8cff970cef59052b91d013eec53c20887e5a111b4c62581c0b1d260864582cd6",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/pinned/forecast.request.schema.json",
+    "sha256": "fa3858861226feca9077f5b4213027fcb341c55f1cc223ec479544ed7d30bade",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/pinned/forecast.response.schema.json",
+    "sha256": "4615dbd27fc92b46da532c49b8ba90f56ad5d22ac2a7526c35defacf6cf9e1f1",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/pinned/request.schema.json",
+    "sha256": "c220b444ec617cc3f585e1bf2fb6e85f593b9fbe0020b6e3d2cf80cde409c0e0",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/pinned/response.schema.json",
+    "sha256": "d251d4b96caf3cffe00129a943c7a0c7d1398eacb444584bfe78bfdd9837a5b9",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/pinned/revision-manifest.json",
+    "sha256": "17edca0dbbd4a1e57aea2380d97f37044893585c3b4c0aa71e1c94bd3a05c0ce",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "docs/contracts/flowsense-vnext-review/proposed.3/pinned/targeted-fixtures.json",
+    "sha256": "debacac9e54ad8d13e854cedaf7dd8751d435de3b6dbd5ca20326a3c91983068",
+    "reason": "Sealed acceptance/schema fixture dependency; no runtime ingestion or new research data"
+  },
+  {
+    "path": "models/legacy/flowsense.onnx",
+    "sha256": "1b82c684aec7ee8c67c81cc5ac384533b6b22a1573b268c497a4faefe842443a",
+    "reason": "Original pinned legacy pair retained for explicit integrity/compatibility only; not selected"
+  },
+  {
+    "path": "models/legacy/trustgraph.onnx",
+    "sha256": "4994d970cd6c9f61da271b4153d1b413fffaa35b2c55fd8ac4423ae2f035eeaf",
+    "reason": "Original pinned legacy pair retained for explicit integrity/compatibility only; not selected"
+  },
+  {
+    "path": "models/legacy/trustgraph_embeddings.csv",
+    "sha256": "31c16b9994d987a9a53b7b99af7b8173d18b60885e2fecf99edf3e54c44d9342",
+    "reason": "Original pinned legacy pair retained for explicit integrity/compatibility only; not selected"
+  },
+  {
+    "path": "models/packages/2026.10.27.1/flowsense.onnx",
+    "sha256": "5d96f506ea16ef87dc2c40fa3cbbc426557d62583c4e28deae6458e9edc5a186",
+    "reason": "Unchanged approved runtime bytes / original manifest; no training outputs"
+  },
+  {
+    "path": "models/packages/2026.10.27.1/manifest.json",
+    "sha256": "d73fd16f7f4e304c6a00900b1771d09c09aa6136f49b98a951409200d1931b4a",
+    "reason": "Unchanged approved runtime bytes / original manifest; no training outputs"
+  },
+  {
+    "path": "models/packages/2026.10.27.1/trustgraph.onnx",
+    "sha256": "e290222ed939caabf5455d4aac17e1a7f680c9d395ebabb99e057367c449efe3",
+    "reason": "Unchanged approved runtime bytes / original manifest; no training outputs"
+  },
+  {
+    "path": "models/packages/2026.10.27.1/trustgraph_embeddings.csv",
+    "sha256": "3a5f0f348ae3578c65bb1ef2ad661e32adb7e7907bb929fbd26d3101ac136ab0",
+    "reason": "Unchanged approved runtime bytes / original manifest; no training outputs"
+  },
+  {
+    "path": "models/serving.json",
+    "sha256": "acdeac1fa7a3bc7b814afcd0bcb89d0188645b4ee9edf5f1954ff7d30a1c407e",
+    "reason": "Release packaging, dependencies, CI or dated evidence/documentation"
+  },
+  {
+    "path": "package.json",
+    "sha256": "1f1038cd7480dc9d3daac5a27f40c6fcdb2a09eec2f85b560e145e302bc09b4f",
+    "reason": "Release packaging, dependencies, CI or dated evidence/documentation"
+  },
+  {
+    "path": "requirements-dev.txt",
+    "sha256": "32a08aac2b346407e7027752c7cec02e692374210c0b2a1e07e8c26c7ed9efcf",
+    "reason": "Release packaging, dependencies, CI or dated evidence/documentation"
+  },
+  {
+    "path": "scripts/baseline_fixture.py",
+    "sha256": "8b6324e3e80c700137bd5f57542ac12cb7cbbd4d01d1f26034625191bb011f46",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "scripts/baseline_http_smoke.py",
+    "sha256": "b3658124425bc8e6a64ec7c823313e3dee7e915d688cff1602092affbdd516ac",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "scripts/build_release.mjs",
+    "sha256": "ad3f390fb5846dedc971763cf3715af1ef8c2dbf3a849e80664619d680d62986",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "scripts/review_flowsense_vnext_proposed3.py",
+    "sha256": "9aba386a8e885f3f43b624c7e9485a65d892de3125a11ef6c3d9a3fd052b412c",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "scripts/review_flowsense_vnext_proposed4.py",
+    "sha256": "cd0af25a625087c4c741fb6d3e82afad1fbc34cc1f44c46b79afb48eee526cde",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "scripts/verify_baseline.py",
+    "sha256": "dfe7e031c119aa2e0e3464cb9f6f5c8c94b37d89bedcad41715eef37df2b6bbb",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "scripts/verify_flowsense_vnext.py",
+    "sha256": "19f36104f54668bcb553c2fa2865f74e6fcb1aa6a7726ad6447c9c9fcf4aaec2",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "scripts/verify_flowsense_vnext_proposed4.py",
+    "sha256": "3b1f6ae69b816f9053a0ba0728275b7c903d698e671b0fbae7075f154d83dcec",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "scripts/verify_release.py",
+    "sha256": "9dd8019b6a5b3279902ed0e73e3cf076e53c9e0013fd9487103a4900c9820220",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "scripts/verify_release_public.py",
+    "sha256": "11ade978e6d3be5b61b1f3d5aeddce3bcf43154ac17a0cf03c7ee5c7f3636c16",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "scripts/verify_release_serving.py",
+    "sha256": "4456e09559a025cc118b978fb8afa68a88f5143f9a4e63579a285bf5881b08c0",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "scripts/verify_retry_http.mjs",
+    "sha256": "dc78c0b9b8e4ce55af0bfb66deb270892fd46b5e81d6a7bac74af51e0ef2a08f",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "src/app_v2.py",
+    "sha256": "8da4cd564e1a82fda8defddc4e38fa4a9ab13283eb00bd5594174d295b65600b",
+    "reason": "Accepted shared baseline/bill/money/security dependencies and release identity"
+  },
+  {
+    "path": "src/baseline_policy.py",
+    "sha256": "9423479cd945866b81ca77c1c76948e41abecf00b7fc63a5615d5bf8f8624800",
+    "reason": "Accepted shared baseline/bill/money/security dependencies and release identity"
+  },
+  {
+    "path": "src/demo_security.py",
+    "sha256": "711a683cedce05219e22360463d88eb38ac265dbe5e6947273e7ac3a349a7666",
+    "reason": "Accepted shared baseline/bill/money/security dependencies and release identity"
+  },
+  {
+    "path": "src/flowsense_engine.py",
+    "sha256": "f08cb909b223bf0ef77072fb4a7089a8da8ef0317ebaab3ccadc260c25268848",
+    "reason": "Accepted shared baseline/bill/money/security dependencies and release identity"
+  },
+  {
+    "path": "src/flowsense_vnext/__init__.py",
+    "sha256": "eecde3f5f0c1a7e7a1fdf5a2c322c96cf414e950356c8e8b91a7c99535aacc48",
+    "reason": "Existing sealed history adapter dependency; no public history endpoints"
+  },
+  {
+    "path": "src/flowsense_vnext/bills.py",
+    "sha256": "727915904e22cc4649a27af8f0e48eafe63840a1d7b499bcda2de50c97c1e044",
+    "reason": "Existing sealed history adapter dependency; no public history endpoints"
+  },
+  {
+    "path": "src/flowsense_vnext/boundary.py",
+    "sha256": "723f57d8b14cf6f46eecee754956a49ed71a797fe81c9b62d8597e67bddf99a5",
+    "reason": "Existing sealed history adapter dependency; no public history endpoints"
+  },
+  {
+    "path": "src/flowsense_vnext/dataset.py",
+    "sha256": "356d6fefce6f2e6be4ea847a1a08f7da6bd77df61767a15e4f0d139c5e20267f",
+    "reason": "Existing sealed history adapter dependency; no public history endpoints"
+  },
+  {
+    "path": "src/flowsense_vnext/files.py",
+    "sha256": "49dbbefc216702977e8df51f7ce73979ff63039f4a8a7e11924def1310217709",
+    "reason": "Existing sealed history adapter dependency; no public history endpoints"
+  },
+  {
+    "path": "src/flowsense_vnext/historical.py",
+    "sha256": "a5653b9c83efd219c28fe2a34b20a73d26ac932f91e63a28c4642771a24699df",
+    "reason": "Existing sealed history adapter dependency; no public history endpoints"
+  },
+  {
+    "path": "src/flowsense_vnext/ingestion.py",
+    "sha256": "866b5a9eb6c469e0315f381d1106ce7b80b600ed9c3107d7a78690ef43a3ebb3",
+    "reason": "Existing sealed history adapter dependency; no public history endpoints"
+  },
+  {
+    "path": "src/flowsense_vnext/issuance.py",
+    "sha256": "f6e4df783c08c4254805b0507efbb296f86910fdea2c6c2362009a0e1b0d182d",
+    "reason": "Existing sealed history adapter dependency; no public history endpoints"
+  },
+  {
+    "path": "src/flowsense_vnext/projection.py",
+    "sha256": "8df85b6675c2c14829cc9d15196fc11d49313b4e60d5a9197c7618348b3a2966",
+    "reason": "Existing sealed history adapter dependency; no public history endpoints"
+  },
+  {
+    "path": "src/flowsense_vnext/response.py",
+    "sha256": "c33b383aa60cbce418b155a93979c02689b7e53891bae0f92e249c06c48aff51",
+    "reason": "Existing sealed history adapter dependency; no public history endpoints"
+  },
+  {
+    "path": "src/flowsense_vnext/sources.py",
+    "sha256": "b6ed72b1d49e292c68b94054d10dbabfa23f5daf98e19365835e4116e0597713",
+    "reason": "Existing sealed history adapter dependency; no public history endpoints"
+  },
+  {
+    "path": "src/liquidity_forecast.py",
+    "sha256": "62d57ced6ce4c2dbb4f0d67aafafc4d0d37ae8c331df82e9c2e964c45b7fc906",
+    "reason": "Accepted shared baseline/bill/money/security dependencies and release identity"
+  },
+  {
+    "path": "src/model_package.py",
+    "sha256": "e122d3e006e9d9273051b947d87d51a24c7be8324208c45e66e00c9f21e9adff",
+    "reason": "Accepted shared baseline/bill/money/security dependencies and release identity"
+  },
+  {
+    "path": "src/spending_contract.py",
+    "sha256": "dd396d8177ee344387eeae3dc047f7c5b6a483d436e8c0a22daef602414d6952",
+    "reason": "Accepted shared baseline/bill/money/security dependencies and release identity"
+  },
+  {
+    "path": "src/transfer_planning.py",
+    "sha256": "157dd278e73d80a94b0ed69d142c032af19cf98390e685b866cf2ff3f6324b35",
+    "reason": "Accepted shared baseline/bill/money/security dependencies and release identity"
+  },
+  {
+    "path": "src/ui/App.jsx",
+    "sha256": "0be56a88f35ef3249a3e943fccf72522f21250b6d4253e82e197db9ae6509ce6",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/DailyPlan.jsx",
+    "sha256": "6ea346abc0ecd85bdeb209a885d50559473aa26ad174dec842167f71446d553d",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/Dashboard.jsx",
+    "sha256": "21a473c54806b77b8445a31a091ce6d271775e9eb9ddb1998559d028b23e156b",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/ForecastChart.jsx",
+    "sha256": "873c7f9d8734617b58a8edda626f86614cff50ba3da5f67fe7c1d16b250e1092",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/InsightsLab.jsx",
+    "sha256": "2431c8949d193046267355160a998f4331b9a6eee4c6b4eff02abcdca18f7718",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/KBankSurfaces.jsx",
+    "sha256": "1edf467108201d7819e7913fccbb546743ad0be5cab598667b51702185fac52d",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/LiquidityGuide.jsx",
+    "sha256": "be13bc6682feb58f915f563975cf1a667a13eded342f4ee834ff342366ec0509",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/NexusIcons.jsx",
+    "sha256": "ad80f3a66e2bdb9d0d82fd8a35fae1bdaef3af065ad2564ac25a6136150b376c",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/ReserveSettings.jsx",
+    "sha256": "b3e0f77bbd8ab222eb7cb7ad2f6ab2ae7e90a53047912c2c00263afe59c1c8a5",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/SavingsPage.jsx",
+    "sha256": "7251d776b3b3753888c8b84a061e689044dd5c232c74e852d173374a41b666c9",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/ScenarioPicker.jsx",
+    "sha256": "73252fd7808e033e7093ae9f9e1a6f3ed5f962801e0b88394ccf5cdf2f82cbb2",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/SpendingBasis.jsx",
+    "sha256": "a3bc16a048abea809dad85c70fc61bc03d12fc93dbaaf436b9fcd8b9ea632c3d",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/TransferForm.jsx",
+    "sha256": "1776e836c9a9c1aa122531b4bb42310d6916a235fbcb5edf75f594eb8e83220d",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/TransferPlanning.jsx",
+    "sha256": "c80005783a706bb0dae548fdaf65437a5c61a38209bc0bc6fb04b02114f6fbd8",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/TransferProtectionSettings.jsx",
+    "sha256": "b696acf1bb1cf7277c550807386c1e80f6f197dcc5937c6388ca1558b97d4c97",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/TransferResult.jsx",
+    "sha256": "748337fcc2aa0577c0b1ad701c8cf2e4c285c81b9d82f617445816785f6ba3a2",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/api.js",
+    "sha256": "3f678a036d4adbe833b3a46fcd9967d2b40027c6dbac8b7e825e9708c0e1943d",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/commandJournal.mjs",
+    "sha256": "14f37cd42e42e1280ce0a074fec74fd85007e82a52df38d0302351f512ccd3d2",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/dailyPlanModel.mjs",
+    "sha256": "07b8ead1cd735b91c08b4c38683e82d974b2faa43bdcd3dca56c6dc5c884f5cc",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/forecastModel.mjs",
+    "sha256": "8eba4746cddce570d82837d4067665063b8fe0ef8066a5a9179a9aa8d1f309c1",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/kplus.css",
+    "sha256": "05d4b5d8ccb07d9d7135c0529a19ed91d042e7cdf84b939640d21ff4db824cde",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "src/ui/scenarios.css",
+    "sha256": "73f3514b846b3d37fef612c823ae9ff0068ec45d54ffa9ff01b97566b68141d1",
+    "reason": "Accepted baseline consumers, disclosures, shared null semantics and retry journal"
+  },
+  {
+    "path": "tests/command-journal.test.mjs",
+    "sha256": "689d72c8e41b67ff3bebe4a4a4b9cc218166c2c884845df7d7d33b7afa79860b",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "tests/daily-plan.test.mjs",
+    "sha256": "0b50a26ec702229325f51d7b281a96f02e176a50b803e1868c16c73be7440e66",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "tests/forecast.test.mjs",
+    "sha256": "485701b3f20a49df61758c0db976e7210a078d8a14070aefc7f7c666fef9cb29",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "tests/test_baseline_integration.py",
+    "sha256": "31fb52aef0484e7d56487170cc6864dc57712304a6845351a0aadca9eb915ea7",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "tests/test_daily_budget.py",
+    "sha256": "2c4bd12a4e570604fb7aae6450cdb549ff6c8596587bd881e15ac81bd5573cba",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "tests/test_features.py",
+    "sha256": "440720433ed596e89e2b1cd1fd16d14eb9c9e517c9ad2cfd9b1a4054cc1d0a19",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "tests/test_flowsense_vnext.py",
+    "sha256": "f8d777c8cdd4d16b7ea2f92b901ab5c801666621af9e4c6e2790ba694f3716b6",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "tests/test_flowsense_vnext_proposed3.py",
+    "sha256": "f008930168cf6245b7c8a709c1f4d33cb04a7a5feb863a86e564c211a5c7dbc9",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "tests/test_flowsense_vnext_proposed4.py",
+    "sha256": "2576388daa2ffd0259efd192460a48b9c9d32ee44b29f53827f64a20e9380d2d",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "tests/test_handoff_integration.py",
+    "sha256": "5e6d1621861de599434756296b5b1987dc9e46cc6d536ecde99d05cc502fd185",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "tests/test_release_runtime.py",
+    "sha256": "2d851eba3aeaa1fb4fa11ae0041f24fc11442fabc6c97618c69761dfe41fbabd",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "tests/test_savings_flow.py",
+    "sha256": "2e3bf7b7e384d0ce32a7826f920a1c5f0925daa544d70bafab76be189b0814c7",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "tests/test_security.py",
+    "sha256": "c1d1fbd046fe81324a14202d69c7cd56067ba937c090fa6ec87439a90e9004a3",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  },
+  {
+    "path": "tests/test_transfer_planning.py",
+    "sha256": "f8b47fb9fa9a1e115ee2219c12414e8408e1fa143b9a24911ddc6f2638c7e7fd",
+    "reason": "Reproducible candidate/public verification or source/build identity"
+  }
+]

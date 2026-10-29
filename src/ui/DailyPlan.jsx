@@ -1,11 +1,12 @@
+import SpendingBasis from './SpendingBasis';
 import React, { useMemo, useState } from 'react';
-import { ArrowRight, CalendarDays, ChevronDown, CircleAlert, Info, ShieldCheck, Target, TrendingUp } from 'lucide-react';
-import { ScenarioPicker } from './SavingsPage';
+import { ArrowRight, CalendarDays, ChevronDown, CircleAlert, Info, TrendingUp } from 'lucide-react';
+import { PlanIcon, ProtectionIcon } from './NexusIcons';
 import { simulateDailyBudget, spendingOutlook } from './dailyPlanModel.mjs';
 import ReserveSettings from './ReserveSettings';
 import LiquidityGuide from './LiquidityGuide';
 
-const money = (value, digits = 0) => Number(value || 0).toLocaleString('th-TH', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+const money = (value, digits = 0) => (value == null ? '—' : Number(value).toLocaleString('th-TH', { minimumFractionDigits: digits, maximumFractionDigits: digits }));
 const dateLabel = (date) => date ? new Date(`${date}T12:00:00+07:00`).toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short' }) : '—';
 
 // Home answers today's question. The plan page is a separate editing workspace.
@@ -13,7 +14,7 @@ export function DailySummary({ horizon, openTab }) {
   const reserveShort = horizon.budget_reserve_shortfall > 0;
   const used = Math.min(100, horizon.daily_safe_limit > 0 ? horizon.spent_today / horizon.daily_safe_limit * 100 : 100);
   return <section className={`today-budget ${reserveShort ? 'needs-attention' : ''}`} aria-label="งบใช้จ่ายวันนี้">
-    <div className="today-budget-heading"><span><Target size={18} /> งบใช้จ่ายวันนี้</span><time dateTime={horizon.as_of_date}>{dateLabel(horizon.as_of_date)}</time></div>
+    <div className="today-budget-heading"><span><PlanIcon size={18} /> งบใช้จ่ายวันนี้</span><time dateTime={horizon.as_of_date}>{dateLabel(horizon.as_of_date)}</time></div>
     <div className="today-budget-amount"><div><h2>วันนี้ใช้เพิ่มได้อีก</h2><strong>฿{money(horizon.remaining_today, 2)}</strong></div><button className="round-link" onClick={() => openTab('plan')} aria-label="ไปตั้งงบรายวัน"><ArrowRight size={21} /></button></div>
     <div className="today-budget-stats"><span>ใช้แล้ว <b>฿{money(horizon.spent_today, 2)}</b></span><span>จากงบ <b>฿{money(horizon.daily_safe_limit, 2)}</b></span></div>
     <div className="daily-progress" role="progressbar" aria-label="สัดส่วนงบวันนี้ที่ใช้ไป" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(used)}><i style={{ width: `${used}%` }} /></div>
@@ -27,13 +28,13 @@ function SpendingOutlook({ horizon, forecast }) {
   return <section className="surface spending-outlook">
     <div className="section-heading"><span className="section-icon lilac"><TrendingUp size={19} /></span><h2>ถ้าใช้จ่ายแบบเดิม</h2></div>
     <div className="outlook-value"><span>รายจ่ายคาดการณ์เฉลี่ย</span><strong>{outlook.average === null ? '—' : `฿${money(outlook.average)}`}<small> / วัน</small></strong></div>
-    <p>{outlook.average === null ? 'ไม่มีวันคาดการณ์ก่อนเงินเดือนรอบนี้' : `${outlook.days} วันข้างหน้า ก่อน ${dateLabel(horizon.payday_date)} · ไม่รวมบิล`}</p>
-    {outlook.average !== null && <div className={`outlook-comparison ${difference > 0 ? 'adjust' : ''}`}>{difference > 0 ? <CircleAlert size={17} /> : <ShieldCheck size={17} />}<span>{difference > 0 ? `สูงกว่างบแนะนำ ฿${money(difference)} / วัน` : 'อยู่ในงบต่อวันที่คำนวณได้'}</span></div>}
-    <p className="small-note">โมเดลคาดการณ์จากข้อมูลสมมติ ส่วนงบแนะนำคำนวณจากเงินที่มี บิล และเงินสำรอง</p>
+    <p>{outlook.average === null ? 'ข้อมูลไม่พอหรือไม่มีวันประมาณการก่อนเงินเดือนรอบนี้' : `${outlook.days} วันข้างหน้า ก่อน ${dateLabel(horizon.payday_date)} · ไม่รวมบิล`}</p>
+    {outlook.average !== null && <div className={`outlook-comparison ${difference > 0 ? 'adjust' : ''}`}>{difference > 0 ? <CircleAlert size={17} /> : <ProtectionIcon size={17} />}<span>{difference > 0 ? `สูงกว่างบแนะนำ ฿${money(difference)} / วัน` : 'อยู่ในงบต่อวันที่คำนวณได้'}</span></div>}
+    <SpendingBasis basis={horizon.spending_basis} asOf={forecast?.input_as_of} start={forecast?.projection_start}/>
   </section>;
 }
 
-export default function DailyPlan({ profile, horizon, forecast, busy, onScenario, openTab, onWithdraw, onReservePreview, onReserveSave }) {
+export default function DailyPlan({ profile, horizon, forecast, busy, openTab, onWithdraw, onReservePreview, onReserveSave }) {
   const recommended = Math.floor(horizon.daily_safe_limit);
   const [amount, setAmount] = useState(String(recommended));
   const plan = useMemo(() => simulateDailyBudget(horizon, amount), [horizon, amount]);
@@ -54,7 +55,7 @@ export default function DailyPlan({ profile, horizon, forecast, busy, onScenario
         <div className="budget-slider-labels"><span>฿0</span><span>฿{money(ceiling)}</span></div>
         <div className="budget-presets">{[300, 500, 1000].map(value => <button key={value} aria-pressed={Number(amount) === value} onClick={() => setAmount(String(value))}>฿{money(value)}</button>)}</div>
         {!plan ? <p className="budget-validation" role="alert">กรอกงบระหว่าง 0–100,000 บาท</p> : <div className={`budget-result ${plan.withinReserve ? 'on-track' : 'needs-plan'}`} aria-live="polite">
-          <div className="budget-result-title">{plan.withinReserve ? <ShieldCheck size={19} /> : <CircleAlert size={19} />}<strong>{plan.withinReserve ? 'งบนี้ยังรักษาเงินสำรองได้' : plan.minimum < 0 ? 'งบนี้อาจทำให้เงินไม่พอ' : 'งบนี้ต้องใช้เงินสำรองบางส่วน'}</strong></div>
+          <div className="budget-result-title">{plan.withinReserve ? <ProtectionIcon size={19} /> : <CircleAlert size={19} />}<strong>{plan.withinReserve ? 'งบนี้ยังรักษาเงินสำรองได้' : plan.minimum < 0 ? 'งบนี้อาจทำให้เงินไม่พอ' : 'งบนี้ต้องใช้เงินสำรองบางส่วน'}</strong></div>
           <div className="budget-result-main"><span>เงินเหลือก่อนเงินเดือน</span><strong>฿{money(plan.endBalance, 2)}</strong></div>
           <div className="budget-result-reserve"><span>{plan.withinReserve ? 'เงินสำรองที่คงไว้' : 'ต่ำกว่าเงินสำรองในแผน'}</span><b>฿{money(plan.withinReserve ? horizon.emergency_buffer : plan.shortfall, 2)}</b></div>
           {!plan.withinReserve && <><p>{plan.billAtRisk ? 'มีบิลที่เงินอาจไม่พอ ลองลดงบหรือเตรียมเงินเพิ่ม' : 'ลองลดงบรายวัน หรือดูเงินออมที่สามารถถอนได้'}</p><button className="text-link" onClick={() => openTab('savings')}>ดูทางเลือกถอนเงินออม <ArrowRight size={15} /></button></>}
@@ -77,12 +78,11 @@ export default function DailyPlan({ profile, horizon, forecast, busy, onScenario
               <div className="formula-total"><dt>งบต่อวัน</dt><dd>฿{money(horizon.daily_safe_limit, 2)}</dd></div>
             </dl>
             <p className="small-note">บวกรายจ่ายวันนี้กลับเพื่อหางบทั้งวัน แล้วหักยอดใช้แล้วครั้งเดียวเพื่อหายอดที่ยังใช้เพิ่มได้</p>
-            <div className="budget-bills"><h3>บิลก่อนเงินเดือน</h3>{bills.length ? bills.map(row => <div key={row.name}><span>{row.name}<small>{dateLabel(row.due_date)}</small></span><strong>฿{money(row.amount)}</strong></div>) : <p>ไม่มีบิลตามข้อมูลจำลองในช่วงนี้</p>}</div>
+            <div className="budget-bills"><h3>บิลก่อนเงินเดือน</h3>{bills.length ? bills.map(row => <div key={row.id}><span>{row.name}<small>{dateLabel(row.due_date)}{row.overdue ? " · ค้างชำระ" : ""}</small></span><strong>฿{money(row.amount)}</strong></div>) : <p>ไม่มีบิลตามข้อมูลจำลองในช่วงนี้</p>}</div>
           </div>
         </details>
-        <p className="small-note plan-assumptions">สมมติว่าใช้งบเดียวกันทุกวันและจ่ายบิลตามกำหนด ไม่นับเงินเดือนหรือดึงเงินออมก่อนวันเงินเข้า</p>
+        <p className="small-note plan-assumptions">เริ่มเดโมโดยถือว่าบิลเดือนปัจจุบันยังไม่จ่าย และเดือนก่อนหน้าชำระแล้ว บิลค้างจะอยู่จนชำระครบ · สมมติว่าใช้งบเดียวกันทุกวันและจ่ายบิลตามกำหนด ไม่นับเงินเดือนหรือดึงเงินออมก่อนวันเงินเข้า</p>
       </aside>
     </div>
-    <ScenarioPicker {...{ horizon, busy, onScenario }} />
   </div>;
 }

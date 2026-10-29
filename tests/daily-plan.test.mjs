@@ -15,7 +15,22 @@ test('budget plan counts posted spend once, pays bills, and excludes payday debi
 test('overspent today cannot be undone by lowering the simulated daily budget', () => {
   const plan = simulateDailyBudget({ ...horizon, spent_today: 1200, current_balance: 3800 }, 500);
   assert.equal(plan.endBalance, 1800);
-  for (const invalid of ['', -1, 'bad', Infinity, 100001]) assert.equal(simulateDailyBudget(horizon, invalid), null);
+  for (const invalid of [null, undefined, '', -1, 'bad', Infinity, 100001]) assert.equal(simulateDailyBudget(horizon, invalid), null);
+});
+
+test('unknown facts stop manual simulation and forecast-dependent spending averages', () => {
+  assert.equal(simulateDailyBudget({...horizon,current_balance:null},100),null);
+  assert.equal(simulateDailyBudget({...horizon,recurring_commitments:[{due_days:1,amount:null}]},100),null);
+  assert.equal(spendingOutlook([{date:'2026-10-26',is_future:true,predicted_spend:100},{date:'2026-10-27',is_future:true,predicted_spend:null}],'2026-10-28').average,null);
+  assert.equal(simulateDailyBudget(horizon,0).budget,0);
+});
+
+test('overdue and due-today bills remain reserved exactly once in the budget simulation', () => {
+  const bills = [{ id:'old', due_days:-5, amount:700 }, {id:'today',due_days:0,amount:300}, {id:'new',due_days:1,amount:500}];
+  const state={current_balance:5000,spent_today:0,days_to_payday:3,emergency_buffer:1000,recurring_commitments:bills};
+  assert.equal(simulateDailyBudget(state,500).endBalance,2000);
+  assert.equal(simulateDailyBudget(state,500).endBalance,2000);
+  assert.equal(bills[0].amount,700);
 });
 
 test('predicted spending is drawn from model days, excluding payday and history', () => {

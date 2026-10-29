@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Activity, ArrowRight, Network, RefreshCw, ShieldCheck } from 'lucide-react';
 import { api } from './api';
-const money = (v, digits = 0) => Number(v || 0).toLocaleString('th-TH', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+const money = (v, digits = 0) => (v == null ? '—' : Number(v).toLocaleString('th-TH', { minimumFractionDigits: digits, maximumFractionDigits: digits }));
 const eventNames = { RESERVE_PREFERENCE_UPDATED: 'ตั้งเงินสำรองในแผน', MICRO_SWEEP_EXECUTED: 'ย้ายเงินออม', SAVINGS_WITHDRAWAL: 'ถอนเงินออม', SAVINGS_PREFERENCE_UPDATED: 'ตั้งค่าการแยกเงินออม', TRANSFER_EXECUTED: 'โอนเงินจำลอง', TRANSFER_EXECUTED_ZERO_DELAY: 'โอนปกติ', TRANSFER_CANCELLED_BY_USER: 'ยกเลิกการโอน', ACCOUNT_STATE_RESET: 'รีเซ็ตบัญชี', SCENARIO_CHANGED: 'เปลี่ยนสถานการณ์', TRANSFER_BLOCKED: 'ระงับรายการเสี่ยง', TRANSFER_CHECK_REQUIRED: 'รอตรวจสอบก่อนโอน', TRANSFER_PREFERENCE_UPDATED: 'ตั้งค่าพักก่อนโอน', TRANSFER_REJECTED_INVALID_TOKEN: 'การยืนยันไม่ผ่าน' };
 export const describeEvent = (event) => {
   const d = event.details || {};

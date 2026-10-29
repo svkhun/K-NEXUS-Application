@@ -1,0 +1,148 @@
+{
+  "package_version": "2026.10.27.1",
+  "status": "READY",
+  "synthetic_only": true,
+  "created_at_utc": "2026-10-27T04:49:18.880746+00:00",
+  "random_seed": 42,
+  "models": {
+    "flowsense": {
+      "file": "flowsense.onnx",
+      "purpose": "one-day-ahead non-bill debit spending, THB",
+      "ordered_feature_schema": [
+        "days_to_payday",
+        "fixed_due_in_7d",
+        "is_weekend",
+        "spend_lag_1",
+        "spend_lag_3",
+        "spend_lag_7"
+      ],
+      "input": {
+        "name": "float_input",
+        "type": "tensor(float)",
+        "shape": [
+          null,
+          6
+        ]
+      },
+      "outputs": [
+        {
+          "name": "variable",
+          "type": "tensor(float)",
+          "shape": [
+            null,
+            1
+          ]
+        }
+      ],
+      "target_definition": "daily non-bill debit spending in THB, including food and transport",
+      "category_mapping": {
+        "salary": "income",
+        "rent": "bill",
+        "debt_emi": "bill",
+        "utilities": "bill",
+        "food_daily": "non_bill",
+        "transport": "non_bill",
+        "entertainment": "non_bill",
+        "unplanned_transfer": "non_bill"
+      },
+      "assumptions": [
+        "Payday 28; known synthetic bill dates 1 and 5; fixed_due_in_7d includes today through today+6.",
+        "No transaction date = missing (NaN); confirmed ledger date with no non-bill debits = zero."
+      ],
+      "missing_lags": "IEEE float32 NaN, never replace unknown history with zero",
+      "forecast_horizon_validated": "one-step-ahead only; not recursive 30-day"
+    },
+    "trustgraph": {
+      "file": "trustgraph.onnx",
+      "purpose": "model-only synthetic transaction scam classification",
+      "ordered_feature_schema": [
+        "amount",
+        "is_first_time_transfer",
+        "device_switch_last_24h",
+        "session_duration_sec",
+        "ratio_to_daily_avg",
+        "auth_face_scan",
+        "auth_none",
+        "auth_pin",
+        "target_emb_0",
+        "target_emb_1",
+        "target_emb_2",
+        "target_emb_3",
+        "target_emb_4",
+        "target_emb_5",
+        "target_emb_6",
+        "target_emb_7",
+        "target_emb_8",
+        "target_emb_9",
+        "target_emb_10",
+        "target_emb_11",
+        "target_emb_12",
+        "target_emb_13",
+        "target_emb_14",
+        "target_emb_15"
+      ],
+      "input": {
+        "name": "float_input",
+        "type": "tensor(float)",
+        "shape": [
+          null,
+          24
+        ]
+      },
+      "outputs": [
+        {
+          "name": "label",
+          "type": "tensor(int64)",
+          "shape": [
+            "batch"
+          ]
+        },
+        {
+          "name": "probabilities",
+          "type": "tensor(float)",
+          "shape": [
+            null,
+            2
+          ]
+        }
+      ],
+      "positive_class_index": 1,
+      "target_definition": "is_scam synthetic transaction label; not is_mule",
+      "threshold": 0.5,
+      "embedding_file": "trustgraph_embeddings.csv",
+      "embedding_cutoff_exclusive": "2026-08-13T00:00:00",
+      "unknown_account": "16 float32 zeros; lookup miss is not evidence of safety",
+      "assumptions": [
+        "Synthetic labels are generated from strongly separable patterns; high AUC is not field efficacy.",
+        "Static age/KYC/velocity metadata excluded because as-of dates are absent.",
+        "24h label availability is an experimental assumption, not observed reporting history.",
+        "Graph frozen at context cutoff; no online refresh or drift evaluation.",
+        "OOV embeddings are zeros, which do not establish low risk.",
+        "No blacklist, is_mule boost, policy override or demo outcome enters these metrics."
+      ]
+    }
+  },
+  "compatibility": "Requires application serving changes described in README.md; not a drop-in replacement.",
+  "checks": {
+    "onnx_checker": true,
+    "prediction_parity": true,
+    "temporal_boundaries": true,
+    "active_models_unchanged": true
+  },
+  "performance_gate": "No requirement to beat baseline; all measured comparisons retained. READY means artifact/contract checks, not production approval.",
+  "hashes": {
+    "evaluation.json": "2f978e2254f874ccf8b9ded18cae9e7ace57206a7ec24a51359169d7815a5413",
+    "flowsense-evaluation.json": "ccc9199dae74927a2762ab62354d871d630802e1d0298f5991e9f7329709247e",
+    "flowsense.onnx": "5d96f506ea16ef87dc2c40fa3cbbc426557d62583c4e28deae6458e9edc5a186",
+    "flowsense_lgbm.txt": "ebef7577d48177dde71591e63113050ebab0f495cce8ad9c5ce31844f5ae0c0a",
+    "flowsense_parity_inputs.npy": "ba2ce25e0b404fb1c12e81638656163d73b92b0903fe2139245ec7aedafe8c62",
+    "README.md": "13b1ee5243f682d4dc6e0578f26c1f45de18002607784f76c33e2f38e1ad7460",
+    "trustgraph-evaluation.json": "2ebd4efc7eda60408e90e6d30b74d0ff5fcfa36892a70272ea0efdcb54ac41ab",
+    "trustgraph.onnx": "e290222ed939caabf5455d4aac17e1a7f680c9d395ebabb99e057367c449efe3",
+    "trustgraph_baseline_lgbm.txt": "94ae63b3dbbf0a802eaa90a07f8507e193c52f0a06d29015cc8f100bcd781a90",
+    "trustgraph_embeddings.csv": "3a5f0f348ae3578c65bb1ef2ad661e32adb7e7907bb929fbd26d3101ac136ab0",
+    "trustgraph_lgbm.txt": "54905ce470e7903ec59847695758a75f38e181160472be40d555de8e963b89e2",
+    "trustgraph_parity_inputs.npy": "eb19c1ddb83d1c1dc95725eea2efcf0a6af8428e931428ac74c1019e60f1cb99",
+    "trustgraph_rgcn.pt": "8045742085404ec16fd7712da4e4080d457955661c0c2f8823cc171de0adb507"
+  }
+}

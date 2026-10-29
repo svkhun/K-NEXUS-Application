@@ -95,7 +95,8 @@ class TransferPlanningTests(unittest.TestCase):
         rent = next(row for row in future if row['date'] == '2026-10-26')
         self.assertEqual(rent['commitment_payment'], 0)
         self.datetime.now.return_value = datetime(2026, 11, 10, tzinfo=ZoneInfo('Asia/Bangkok'))
-        self.assertEqual(self.horizon()['total_recurring_commitments'], 7160)
+        # October utilities remain unpaid alongside November's new instances.
+        self.assertEqual(self.horizon()['total_recurring_commitments'], 7160 + 1660)
 
     def test_partial_bill_and_repeat_payment_cannot_overpay_or_reuse_the_receipt(self):
         payload = self.payload(1000.25, matched_bill_id='rent:2026-10-26')

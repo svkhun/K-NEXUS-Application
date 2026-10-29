@@ -1,5 +1,7 @@
 # K-NEXUS — FlowSense × TrustGraph Interactive Web Prototype
 
+Current local integration: TrustGraph **2026.10.27.1** and its paired embedding remain enabled. FlowSense ML stays disabled; local mode uses the shared **HISTORY_MEAN → SCENARIO → ABSTAIN** baseline. Persona defaults are explicit versioned synthetic assumptions, independent of the legacy transaction mean. See [baseline report and rollback](BASELINE_INTEGRATION_REPORT.md), [Showcase handoff](SHOWCASE_HANDOFF.md), and [historical model acceptance](docs/model-acceptance-2026-10-27.md).
+
 [![Live Demo](https://img.shields.io/badge/Render-Live_Demo-00C7B7?style=for-the-badge&logo=render&logoColor=white)](https://k-nexus-app.onrender.com)
 [![FastAPI](https://img.shields.io/badge/FastAPI-4.0.0-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
@@ -9,7 +11,7 @@
 An independent interactive UX prototype demonstrating two next-generation financial AI capabilities designed for modern mobile banking experiences (inspired by K+ / MAKE by KBank):
 
 1. **FlowSense**: daily spending guidance, a budget simulator, 30-day cashflow forecasting, and surplus-only simulated micro-savings (Micro-Sweep).
-2. **TrustGraph**: Pre-transfer mule account interdiction and transaction fraud intelligence with an explainable AI (XAI) risk panel and simulated step-up micro-authentication.
+2. **TrustGraph**: Pre-transfer mule account interdiction and transaction fraud scoring with a contextual/policy information panel and simulated step-up micro-authentication.
 
 Built with a responsive mobile/desktop interface and isolated visitor sessions. Financial data and transfers are synthetic; this is not a production banking service.
 
@@ -48,7 +50,7 @@ The current interface follows the user-supplied K+ visual reference: a teal home
 - **Context and Sequence:** Job/task payments, requests to pay more to withdraw funds, and changed recipient accounts receive tailored verification guidance. Reviews show successful transfers to the same recipient today in the demo session. These are decision aids, not validated scam detection outcomes. See [implementation and validation notes](docs/transfer-planning.md).
 - **Fresh Plan at Confirmation:** Confirmation checks the server-side plan snapshot and refuses a stale balance, bill allocation or calendar date until the user reviews again. Separate signed review and simulated-auth token purposes prevent routine review tokens from authorizing risky transfers.
 - **Risk Scoring with Precomputed Graph Features:** ONNX inference uses saved graph embeddings and synthetic account/behavioral features. It does not build a live banking graph.
-- **Explainable AI (XAI) Risk Factors:** Human-readable risk explanations (e.g., dormant account reactivated, sudden deviation from historical averages, recipient velocity surge).
+- **Context and Policy Explanations:** Human-readable synthetic context and policy information, explicitly separate from the raw model score. No model attribution or causal explanation is computed.
 - **Risky Transfer Review Period:** Enabled by default: a 15-minute server-enforced pause only for risky transfers, with reasons and verification guidance. A visible settings card controls the optional pause for new risky transfers. Existing active reviews retain their policy, while cancellation ends that transaction and its timer; the next request uses current settings. Risk evaluation, simulated authentication and blocked destinations remain enforced. Results open in an accessible modal instead of scrolling the page. Reload restores the pending review within the in-memory visitor session. Time elapsed never automatically sends money or certifies safety. See [cooldown policy and verification](docs/transfer-cooldown.md).
 - **Bank Contact from Risk Warnings:** Risky and blocked transfer dialogs keep a contact action visible alongside cancellation where available. It opens official KBank contact information within the existing dialog, without cancelling, resetting the review timer, approving the recipient or transmitting transaction data. The phone link opens a real dialer; this prototype does not connect to bank staff or simulate a completed consultation. K-Contact Center 02-888-8888, 24-hour service and fraud information menu 00 were checked against [KBank's official contact page](https://www.kasikornbank.com/th/contact/pages/k-contact-center.aspx) on 17 October 2026. Recheck the official page before changing these details.
 - **Simulated Micro-Auth (5s Step-Up):** A simulated 5-second facial liveness verification gate that generates a cryptographically signed clearance token (HMAC-SHA256, 120s TTL) binding source, recipient, amount, and visitor session.

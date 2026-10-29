@@ -8,6 +8,9 @@ from zoneinfo import ZoneInfo
 from fastapi.testclient import TestClient
 from src.app_v2 import app
 from src.flowsense_engine import get_savings_capacity, horizon
+from src.baseline_policy import seed_assumptions
+import json
+from pathlib import Path
 
 BASE = '/api/v2/flowsense'
 ACCOUNT = 'ACC_0100'
@@ -52,7 +55,9 @@ class SavingsFlowTests(unittest.TestCase):
         self.prepare()
         original = self.profile()
         self.assertEqual(self.post('/micro-sweep', {'custom_sweep_amount': 500.01}).status_code, 400)
-        for _ in range(20):
+        # Bound by the actual initial capacity rather than a date-dependent 20 sweeps.
+        import math
+        for _ in range(math.ceil(original['savings_capacity']['safe_to_save'] / 500) + 1):
             capacity = self.profile()['savings_capacity']
             if capacity['max_sweep_amount'] == 0:
                 break
@@ -115,22 +120,29 @@ class SavingsCapacityTests(unittest.TestCase):
     profile = dict(monthly_salary=24000, fixed_rent=4000, fixed_debt=1000,
                    fixed_utilities=500, emergency_buffer=3000, avg_daily_spend=200)
 
+    def explicit_state(self, posted):
+        config = json.loads(Path("config/baseline-personas.v1.json").read_text())
+        result = dict(main_balance=20000, **seed_assumptions("ACC_0100", datetime(2026,10,16,tzinfo=ZoneInfo("Asia/Bangkok")), config))
+        result["spending_scenario"]["daily_satang"] = 30000
+        result["daily_spent_today"] = posted
+        return result
+
     def test_source_formula_reserves_living_bills_and_minimum_buffer(self):
-        state = dict(main_balance=20000, daily_spent_today=300)
+        state = self.explicit_state(300)
         estimate = get_savings_capacity(state, self.profile, datetime(2026, 10, 16))
         self.assertEqual(estimate['days_to_payday'], 12)
-        self.assertEqual(estimate['projected_living_cost'], 3600)
-        self.assertEqual(estimate['safe_to_save'], 7900)
+        self.assertEqual(estimate['projected_living_cost'], 3300)
+        self.assertEqual(estimate['safe_to_save'], 8200)
         self.assertEqual(estimate['max_sweep_amount'], 500)
         self.assertEqual(get_savings_capacity(state, {**self.profile, 'emergency_buffer': 0}, datetime(2026, 10, 16))['emergency_buffer'], 500)
 
     def test_payday_rollover_and_forecast_guard_cannot_inflate_capacity(self):
-        state = dict(main_balance=20000, daily_spent_today=200)
+        state = self.explicit_state(200)
         self.assertEqual(get_savings_capacity(state, self.profile, datetime(2026, 12, 28))['payday_date'], '2027-01-28')
         self.assertEqual(get_savings_capacity(state, self.profile, datetime(2028, 2, 29))['days_to_payday'], 28)
         with patch('src.flowsense_engine.datetime') as clock:
             clock.now.return_value = datetime(2026, 10, 16, tzinfo=ZoneInfo('Asia/Bangkok'))
-            guarded = horizon(self.profile, state, {'2026-10-21': 3050})
+            guarded = horizon(self.profile, state, {'2026-10-21': 3050, '2026-10-27': 4000})
         self.assertEqual(guarded['savings_capacity'], 50)
         self.assertEqual(guarded['max_sweep_amount'], 50)
         self.assertGreater(guarded['savings_estimate']['forecast_reserve_adjustment'], 0)

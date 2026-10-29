@@ -1,0 +1,93 @@
+{
+  "accepted_definitions": [
+    "D01",
+    "D02",
+    "D03",
+    "D04",
+    "D05"
+  ],
+  "clarifications": [
+    {
+      "consumer_acknowledgement": "PENDING",
+      "evidence": "fixtures.json",
+      "id": "C01",
+      "producer_status": "ADDRESSED"
+    },
+    {
+      "consumer_acknowledgement": "PENDING",
+      "evidence": "fixtures.json",
+      "id": "C02",
+      "producer_status": "ADDRESSED"
+    },
+    {
+      "consumer_acknowledgement": "PENDING",
+      "evidence": "fixtures.json",
+      "id": "C03",
+      "producer_status": "ADDRESSED"
+    },
+    {
+      "consumer_acknowledgement": "PENDING",
+      "evidence": "fixtures.json",
+      "id": "C04",
+      "producer_status": "ADDRESSED"
+    }
+  ],
+  "clauses": [
+    "C01.T1",
+    "C02.C1",
+    "C02.R1",
+    "D05.M1",
+    "C03.E1",
+    "C03.B1",
+    "C04.R1"
+  ],
+  "contract_id": "knexus.flowsense.calendar-nonbill",
+  "contract_version": "2.0.0-proposed.2",
+  "feature_semantics_version": "2.0.0-proposed.2",
+  "gate0": "OPEN_PENDING_CONSUMER_ACKNOWLEDGEMENT",
+  "gates": {
+    "Gate0": "Definitions/schema/fixtures and producer+consumer acknowledgement; OPEN",
+    "Gate1": "Reproducible synthetic-v2 data/provenance; NOT_RUN; legacy UNKNOWN does not block Gate0",
+    "Gate2": "Preregister numerical thresholds/protocol before candidate scores, then evaluation; NOT_RUN",
+    "Gate3": "Application/new immutable artifact integration; NOT_RUN",
+    "Gate4": "Separately authorized activation/release; NOT_RUN"
+  },
+  "incompatible_existing_package": "2026.10.27.1",
+  "model_package_version": null,
+  "normative_files": [
+    "CONTRACT.md",
+    "contract.json",
+    "contract.schema.json",
+    "request.schema.json",
+    "forecast.request.schema.json",
+    "response.schema.json",
+    "forecast.response.schema.json",
+    "semantic_validator.py",
+    "fixtures.json",
+    "adversarial-mutations.json"
+  ],
+  "overall_review_status": "CHANGES_REQUESTED",
+  "prior_revision": {
+    "manifest": "evidence/proposed.1-manifest.json",
+    "raw_contract_sha256": "c3fe8587ad4cd0aaab9e80a6cd6f8629e08e10e01c011af4c2181b6950892147",
+    "snapshot": "snapshot-proposed.1",
+    "version": "2.0.0-proposed.1"
+  },
+  "responding_to": {
+    "application_head_from_review": "4eb7821e7ad776fa90c5fd2cf44616836f9d0ec2",
+    "application_review_date": "2026-10-27",
+    "live_application_git_status": "UNAVAILABLE_SANDBOX_DENIED",
+    "review_file_sha256": {
+      "IMPLEMENTATION_PLAN.md": "957b836352f47c2f3070d0ba4279eebdeea5e43df0e9ec7461833a67cc02d1be",
+      "REVIEW.md": "41889ac744319da6b4d48602cf25b29bc2e31c300db847a307fcfb4039c3f0b9",
+      "SHOWCASE_FEEDBACK.md": "67a4d331e1377c3c05e7de8b5112735fb1f9524267121de1e3314b69151e0720",
+      "conformance-results.json": "c890fbc5b2951d7cc9918615b73bda1e9481aa5a95d33d315482a7907c7cc921",
+      "decisions.json": "ff197b08b7c801c0e5df8a51da9426f8aa1664aab7a8f1977b4f6136ee5a0bf6",
+      "schema-diagnostics.json": "a3e18a8405fa2b4c1f1e8029e6bdff7135f9f7c056f351ed9d8e3d64a5e45dc2"
+    },
+    "reviewed_contract_raw_sha256": "c3fe8587ad4cd0aaab9e80a6cd6f8629e08e10e01c011af4c2181b6950892147",
+    "reviewed_contract_version": "2.0.0-proposed.1"
+  },
+  "schema_version": "2.0.0-proposed.2",
+  "status": "PROPOSED_FOR_APPLICATION_ACKNOWLEDGEMENT"
+}

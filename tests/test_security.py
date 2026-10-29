@@ -120,7 +120,7 @@ class SecurityTests(unittest.TestCase):
             self.assertEqual(self.balance(other), before)
         self.assertEqual(self.post("/flowsense/vault/withdraw", {"account_id": SOURCE, "amount": 200}).status_code, 200)
         self.assertEqual(self.balance(), before)
-        self.assertEqual(len(self.client.get(f"{BASE}/flowsense/forecast-30d/{SOURCE}").json()["timeline"]), 38)
+        self.assertEqual(len(self.client.get(f"{BASE}/flowsense/forecast-30d/{SOURCE}").json()["timeline"]), 31)
 
     def test_idempotency_prevents_duplicate_debit_and_payload_reuse(self):
         before = self.balance()

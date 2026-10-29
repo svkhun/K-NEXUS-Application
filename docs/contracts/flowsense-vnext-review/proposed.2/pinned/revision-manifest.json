@@ -1,0 +1,28 @@
+{
+  "algorithm": "sha256(raw file bytes)",
+  "bundle_digest_algorithm": "sha256(canonical JSON of {algorithm,files}, final LF)",
+  "bundle_sha256": "283e24f5f6f80ae925b8ed821b200cccb3822a63c80c488690230418354a7d46",
+  "files": {
+    "APPLICATION_REVISION_HANDOFF.md": "337bff9504d76d027974cd9dcc361b9227d76514b9d19bfce1483a827ef80ace",
+    "CHANGELOG.md": "5657f6dc5f47149510037c04e9faa76ab77014812f6934fbdd7c4d9359b3febf",
+    "CONTRACT.md": "0890894ffc227a1675d6233dac7603e9c134d0b0dd6f616b132218e3e71f9d78",
+    "README.md": "6a3134e81fd41bea03029843ec977fe8fb60d046fccc1e7b99f79de7bca75784",
+    "adversarial-mutations.json": "4fc02c3d7f565c726cd14ea1a1cc1553274e468991fb6d073fca4d605a29505f",
+    "build_fixtures.py": "c0d068393f58527194f780a2588abf421f42e0c672cd64ad54c75d63f7c2e8ab",
+    "build_metadata.py": "cf3ca1bbdb850bbdda429966eaf34a0f3086581fef688c409570e1947a5af8d7",
+    "build_schemas.py": "4db2d656f2b3f7a205bea922464248c5faf0be29c658a8bf4710134b5cf71fa1",
+    "check_contract.py": "a0614a4270f67e7ddcdded3b0b26d941a7a9384ffef811da71c0e7ac85effc10",
+    "contract.json": "47854eb2d09df6d018c86aa3087e6c27ee6846f54e912f9bec8757627003953c",
+    "contract.schema.json": "08fd18db8f86bc158c21cf483d7f0e32c262c9d4baa4f2c513614bc26965adb3",
+    "fixtures.json": "b3e0e66c35328d163d5fcb5785f50cfb7ca1594e585c64a6150e85d810d4996a",
+    "forecast-request-example.json": "dcd7c7ed6e259773c97e481c484d700dcba824267317ddc93a1bf547ab29b7bc",
+    "forecast-response-example.json": "7644b1ae4ea823752616fddb57721947a6b7674b1d48fa6c5554b25a5834ea0c",
+    "forecast.request.schema.json": "0591315a4ff7d444d48d42f825ac2442f7775b348b18783b7c899e1849be62ed",
+    "forecast.response.schema.json": "62888cb559b346a56f773e38c3a3e43138c4d02d0dee109466d74bc92f43b6c2",
+    "request.schema.json": "5c6e8f302ec26b2b476a293af870fd3e47f2b9198e5522133a6cbb4e157a05c2",
+    "response.schema.json": "792844cd1a0f7dc1f58771c107660865340ce809087827a7ffa2d4283944a64d",
+    "semantic_validator.py": "2f3ade775647cb7bcea5578f44dd8073cbcdccec200e417e449636332ae9f422",
+    "test_checker.py": "89a9f4a789af9c78f20f44f335abad78131569b21cb28f7bd89a5c1eccffd24d",
+    "verify_revision.py": "bb739a0d6851556954c5dcfab6fda3ebff4fe3c5a8699bcba293b95278602f67"
+  }
+}

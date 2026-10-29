@@ -3,3 +3,5 @@
 *.png binary
 *.jpg binary
 *.ico binary
+models/** -text -diff
+docs/contracts/** -text -diff

@@ -23,6 +23,8 @@ COOKIE_NAME = "__Host-flowsense" if PRODUCTION else "flowsense_demo"
 SESSION_TTL = 3600
 MAX_SESSIONS = 200
 MAX_BODY = 8192
+MAX_COMMANDS = 512
+MAX_REPLY_BYTES = 2 * 1024 * 1024
 SESSION_RATE = 120
 DEMO_ACCOUNTS = frozenset({"ACC_0100", "ACC_0101", "ACC_0150"})
 DEMO_RECIPIENTS = DEMO_ACCOUNTS | {"ACC_0000", "ACC_0001"}
@@ -47,6 +49,7 @@ if PRODUCTION and any(urlsplit(origin).scheme != "https" for origin in ALLOWED_O
 ALLOWED_HOSTS = list({urlsplit(origin).hostname for origin in ALLOWED_ORIGINS}) + ["localhost", "127.0.0.1"]
 SESSION_CONTEXT = ContextVar("demo_session")
 SEED_ACCOUNTS = {}
+ACCOUNT_INITIALIZER = None
 
 
 @dataclass
@@ -57,6 +60,8 @@ class DemoSession:
     accounts: dict = field(default_factory=lambda: copy.deepcopy(SEED_ACCOUNTS))
     pending: dict = field(default_factory=dict)
     replies: OrderedDict = field(default_factory=OrderedDict)
+    commands: dict = field(default_factory=dict)
+    reply_bytes: int = 0
     requests: deque = field(default_factory=deque)
     request_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     account_lock: threading.RLock = field(default_factory=threading.RLock)
@@ -150,8 +155,11 @@ class DemoSessionMiddleware(BaseHTTPMiddleware):
                     return self.deny("พื้นที่ทดลองเต็มชั่วคราว กรุณาลองอีกครั้ง", 503)
                 counts.append(now)
                 session = DemoSession()
+                if ACCOUNT_INITIALIZER:
+                    ACCOUNT_INITIALIZER(session.accounts)
                 self.sessions[session.sid] = session
-            response = JSONResponse({"csrf_token": session.csrf, "expires_in_seconds": max(0, int(session.expires - now)), "mode": "synthetic_demo"})
+            response = JSONResponse({"csrf_token": session.csrf, "session_id": session.sid, "expires_in_seconds": max(0, int(session.expires - now)), "mode": "synthetic_demo",
+                "idempotency": {"scope": "THIS_SESSION_THIS_PROCESS", "max_commands": MAX_COMMANDS, "response_cache_entries": 32}})
             response.set_cookie(COOKIE_NAME, session.sid, max_age=max(0, int(session.expires - now)), httponly=True, secure=PRODUCTION, samesite="strict", path="/")
             return response
         if session is None:
@@ -185,16 +193,33 @@ class DemoSessionMiddleware(BaseHTTPMiddleware):
                 old_fingerprint, payload, status, content_type = session.replies[request_key]
                 if old_fingerprint != fingerprint:
                     return self.deny("Idempotency key was already used for another request", 409)
-                return Response(payload, status_code=status, media_type=content_type)
+                return Response(payload, status_code=status, media_type=content_type,
+                                headers={"X-Idempotency-Result": "recorded"})
+            if request_key in session.commands:
+                old_fingerprint, status = session.commands[request_key]
+                if old_fingerprint != fingerprint:
+                    return self.deny("Idempotency key was already used for another request", 409, code="IDEMPOTENCY_COLLISION")
+                return self.deny("คำสั่งนี้ถูกประมวลผลแล้ว ผลตอบกลับไม่อยู่ใน cache กรุณาตรวจยอดและประวัติ ห้ามส่งเป็นรายการใหม่", 409,
+                    code="RESULT_EVICTED", original_status=status)
+            if request_key and len(session.commands) >= MAX_COMMANDS:
+                return self.deny("พื้นที่คำสั่งของ session เต็ม ยังไม่รับคำสั่งใหม่ กรุณาตรวจยอดและประวัติก่อนจบ session", 409, code="COMMAND_CAPACITY")
+            if request_key:
+                # Reserve before execution. Even cancellation/exception after a debit
+                # leaves a tombstone: never blindly execute an ambiguous command again.
+                session.commands[request_key] = (fingerprint, None)
             token = SESSION_CONTEXT.set(session)
             try:
                 response = await call_next(request)
-                if request_key and 200 <= response.status_code < 300:
+                if request_key:
                     payload = b"".join([chunk async for chunk in response.body_iterator])
+                    session.commands[request_key] = (fingerprint, response.status_code)
                     session.replies[request_key] = (fingerprint, payload, response.status_code, "application/json")
-                    while len(session.replies) > 32:
-                        session.replies.popitem(last=False)
-                    response = Response(payload, status_code=response.status_code, headers=dict(response.headers))
+                    session.reply_bytes += len(payload)
+                    while len(session.replies) > 32 or session.reply_bytes > MAX_REPLY_BYTES:
+                        _, old = session.replies.popitem(last=False)
+                        session.reply_bytes -= len(old[1])
+                    response = Response(payload, status_code=response.status_code,
+                                        headers={**dict(response.headers), "X-Idempotency-Result": "recorded"})
                 return response
             finally:
                 SESSION_CONTEXT.reset(token)

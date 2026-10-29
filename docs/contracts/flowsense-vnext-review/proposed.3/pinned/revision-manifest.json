@@ -1,0 +1,33 @@
+{
+  "algorithm": "sha256(raw file bytes)",
+  "bundle_digest_algorithm": "sha256(canonical JSON of {algorithm,files}, final LF)",
+  "bundle_sha256": "981045aa753f0eaf076e109636c97c4a979c2922319f7b7ef946e73753653e06",
+  "files": {
+    "CHANGELOG.md": "3af5c0decac2ce9e897cf5feaac61a6901e03a329e7f8602d2f995530d7e4f27",
+    "CONTRACT.md": "bffd6c2fb8bbe3454c793fdecd8fb037723901b7635a477bf724546e6495747b",
+    "README.md": "48c3df5d5603ff34e9896388bf5915dbac4eca81ee5d5aad8b53d8a6fadcf1e5",
+    "adversarial-mutations.json": "a7799a39698993e79ccc2d4778798040c25ef79e004dac7a0c1604161cc474ab",
+    "build_fixtures.py": "ab708ab4959b7c54ef92cb36ea47e1b10ff11dd0324ca5a69efef305276418d6",
+    "build_metadata.py": "3af38abcea21c0f2260e5332c35afa83e335e204bda27bd241279365b7d94755",
+    "build_schemas.py": "122067c57d71b8ecdbb63fa29fcb3dfa51605a262fbe0397adf2893d014632e7",
+    "build_targeted_fixtures.py": "4d673c7fc843bea489d59fbe73f50846dfabf12fff77ab2bcca4aa2f9e40576e",
+    "capture_baseline.py": "0ba678aa06c374bdbcb0ad3c94e71ac58f13b4d8488a7608fd41566a0603e28c",
+    "check_contract.py": "f92b6725ae042b0f91e6974b07b9154034f23d84ddc1e19bf9e06eca718f4795",
+    "contract.json": "a3e82787143abb92f333ecfdf051d23a87ed545b41fe806df452c44d386e625d",
+    "contract.schema.json": "81150a045cf83a638bdb07bbf0cabf64f3357b2b44a9183a245826632e4245bc",
+    "fixtures.json": "8cff970cef59052b91d013eec53c20887e5a111b4c62581c0b1d260864582cd6",
+    "forecast-request-example.json": "3a47e37c5e8366c6d87e590b977296dc7eba8ba2fc6741e9fd1fc652db30b3c8",
+    "forecast-response-example.json": "bb0f533ec2a80f5201ae5eb94f376ed7d1cdcd4e3949b73372fb2041f15349b6",
+    "forecast.request.schema.json": "fa3858861226feca9077f5b4213027fcb341c55f1cc223ec479544ed7d30bade",
+    "forecast.response.schema.json": "4615dbd27fc92b46da532c49b8ba90f56ad5d22ac2a7526c35defacf6cf9e1f1",
+    "request.schema.json": "c220b444ec617cc3f585e1bf2fb6e85f593b9fbe0020b6e3d2cf80cde409c0e0",
+    "response.schema.json": "d251d4b96caf3cffe00129a943c7a0c7d1398eacb444584bfe78bfdd9837a5b9",
+    "run_adversarial.py": "73c1b40cb469363a4f7b72b7058bfda563a8605ecda6c43313dd2823a5f71cd0",
+    "run_targeted.py": "10ca1194d694aa6be9cc05c5ebaf3d7037688faca872298e176d0ec89e065fce",
+    "semantic_validator.py": "8e9391a350c7f7d08565a7db4de2b3dcfa82b2a8e64bfb81d87043a569a42dc6",
+    "targeted-fixtures.json": "debacac9e54ad8d13e854cedaf7dd8751d435de3b6dbd5ca20326a3c91983068",
+    "test_checker.py": "89a9f4a789af9c78f20f44f335abad78131569b21cb28f7bd89a5c1eccffd24d",
+    "test_targeted.py": "68c03e46cb42a28792f1b6dfe83958fdbda3e6962ee16c9b66bdb40b67dcfd7c",
+    "verify_revision.py": "dc72878672411f20fd8a00b2bc9662dad1031264d778c50f66f994ed9ecd49b7"
+  }
+}

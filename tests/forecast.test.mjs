@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { bangkokDate, buildForecastView, buildMoneyScale, cashOut, niceAxis, paydayCountdown } from '../src/ui/forecastModel.mjs';
+import { bangkokDate, buildForecastView, buildMoneyScale, cashOut, niceAxis, paydayCountdown, balancePath } from '../src/ui/forecastModel.mjs';
 
 const timeline = [
   { date: '2026-10-24', is_past: true, projected_balance: -100 },
@@ -30,7 +30,24 @@ test('changing the visible range retains payday insights beyond that range', () 
 test('expense bars include fixed debits and choose historical simulated spend correctly', () => {
   assert.equal(cashOut(timeline[2]), 4700);
   assert.equal(cashOut({ is_past: true, actual_spend: 50, predicted_spend: 100, commitment_payment: 20 }), 70);
-  assert.equal(cashOut({ salary_inflow: 24000 }), 0);
+  assert.equal(cashOut({ salary_inflow: 24000 }), null);
+});
+
+test('unknown balances break paths and invalidate dependent minima and expense totals', () => {
+  const points = [{ projected_balance: 10, is_today: true, date: '2026-10-25' }, { projected_balance: null, is_future: true, date: '2026-10-26' }, { projected_balance: 20, is_future: true, date: '2026-10-27' }];
+  assert.equal(balancePath(points, i => i, v => v), 'M0,10  M2,20');
+  assert.equal(buildForecastView(points).minimum, null);
+  assert.equal(buildMoneyScale(points, 0, 100).y(null), null);
+  assert.equal(cashOut({ predicted_spend: null, commitment_payment: 500 }), null);
+  assert.equal(cashOut({ predicted_spend: 0, commitment_payment: 0 }), 0);
+});
+
+test('abstention cannot show a nonnegative baseline claim on the eve of payday', () => {
+  const view = buildForecastView([
+    {date:'2026-10-27',is_today:true,projected_balance:5000},
+    {date:'2026-10-28',is_future:true,method:'ABSTAIN',salary_inflow:20000,projected_balance:null},
+  ]);
+  assert.equal(view.minimum,null);
 });
 
 test('axes include zero and do not clip deficits or produce an empty range', () => {

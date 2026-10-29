@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, Check, CircleAlert, Clock3, Download, Fingerprint, LockKeyhole, ShieldAlert, ShieldCheck, X } from 'lucide-react';
 import { formatCooldown, remainingCooldown } from './transferCooldown.mjs';
 import TransferPlanning from './TransferPlanning';
-const money = (v) => Number(v || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const money = (v) => (v == null ? '—' : Number(v).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 function saveReceipt(result, amount, recipient) {
   const content = `K-NEXUS · FlowSense × TrustGraph\nใบรายการทดลอง — ไม่มีการโอนเงินจริง\n${result.receipt_id || 'DEMO'}\n${result.executed_at || new Date().toISOString()}\nยอดโอน ${money(amount)} บาท\nไปยัง ${recipient.name} (${recipient.id})\n${result.message || 'ดำเนินการในบัญชีจำลองสำเร็จ'}\nไม่ใช่หลักฐานการชำระเงินจริงหรือผลิตภัณฑ์ทางการของ KBank`;
   const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
@@ -29,7 +29,8 @@ export default function TransferResult({ result, amount, recipient, busy, cleara
   const blocked = result?.status === 'BLOCKED_MULE_INTERDICTION';
   const canceled = result?.status === 'TRANSFER_CANCELLED';
   const expired = result?.status === 'REVIEW_EXPIRED' || (result?.review_expires_at && serverTime >= result.review_expires_at);
-  const terminal = success || blocked || canceled || expired;
+  const unknown = result?.status === 'OUTCOME_UNKNOWN';
+  const terminal = success || blocked || canceled || expired || unknown;
   const normalReview = result?.status === 'TRANSFER_REVIEW';
   const changed = result?.plan_changed;
   const Icon = success ? Check : blocked ? LockKeyhole : canceled || expired ? ShieldCheck : ShieldAlert;
@@ -39,12 +40,13 @@ export default function TransferResult({ result, amount, recipient, busy, cleara
     <span className="section-kicker">TRUSTGRAPH · ผลการตรวจสอบ</span>
     {!result ? <div className="result-empty"><span><ShieldCheck size={29} /></span><h3>พร้อมตรวจสอบ</h3><p>เลือกสถานการณ์และกดทดลองโอน เพื่อดูว่าระบบช่วยคุณอย่างไร</p></div> : <div className="result-detail">
       {!normalReview && <span className={`result-symbol ${success || canceled || expired ? 'approved' : blocked ? 'blocked' : 'warning'}`}><Icon size={28} /></span>}
-      <h3>{success ? 'โอนเงินจำลองสำเร็จ' : blocked ? 'ระงับรายการนี้' : canceled ? 'ยกเลิกรายการแล้ว' : expired ? 'รายการตรวจสอบหมดอายุ' : changed ? 'แผนเงินเปลี่ยน กรุณาตรวจใหม่' : normalReview ? 'ดูแผนเงินก่อนยืนยันโอน' : result.risk_tier === 'HIGH_VALUE_DEMO_CHECK' ? 'ยืนยันรายการมูลค่าสูง' : result.cooldown_required ? 'พักก่อนโอน ตรวจให้มั่นใจ' : 'พบความเสี่ยงที่ควรรู้'}</h3>
-      <p>{success ? result.zero_delay_baseline ? 'รายการปกติผ่านทันที · ไม่มีขั้นตอนยืนยันเพิ่ม' : 'ดำเนินการตามการตัดสินใจของคุณแล้ว' : canceled ? 'ยังไม่ได้โอนเงิน ตรวจสอบผู้รับผ่านช่องทางที่คุณรู้จักก่อนทำรายการใหม่' : expired ? 'ยังไม่ได้โอนเงิน รายการใหม่ต้องตรวจความเสี่ยงอีกครั้ง' : result.primary_reason_th || result.direct_risk_reasoning}</p>
-      {success ? <><div className="demo-slip"><span>ใบรายการทดลอง</span><strong>฿{money(amount)}</strong><p>{recipient.name}</p><small>{result.receipt_id}</small><b>ไม่มีการโอนเงินจริง</b></div><button className="secondary-button" onClick={() => saveReceipt(result, amount, recipient)}><Download size={17} /> บันทึกใบรายการทดลอง</button></> : !canceled && !expired && <>
+      <h3>{unknown ? 'ยังไม่ทราบผลรายการ' : success ? 'โอนเงินจำลองสำเร็จ' : blocked ? 'ระงับรายการนี้' : canceled ? 'ยกเลิกรายการแล้ว' : expired ? 'รายการตรวจสอบหมดอายุ' : changed ? 'แผนเงินเปลี่ยน กรุณาตรวจใหม่' : normalReview ? 'ดูแผนเงินก่อนยืนยันโอน' : result.risk_tier === 'HIGH_VALUE_DEMO_CHECK' ? 'ยืนยันรายการมูลค่าสูง' : result.cooldown_required ? 'พักก่อนโอน ตรวจให้มั่นใจ' : 'พบความเสี่ยงที่ควรรู้'}</h3>
+      <p>{unknown ? 'อาจบันทึกการโอนจำลองแล้ว กรุณาใช้ปุ่มรับผลคำสั่งเดิมและตรวจยอด/ประวัติ ห้ามสร้างรายการซ้ำ' : success ? result.zero_delay_baseline ? 'รายการปกติผ่านทันที · ไม่มีขั้นตอนยืนยันเพิ่ม' : 'ดำเนินการตามการตัดสินใจของคุณแล้ว' : canceled ? 'ยังไม่ได้โอนเงิน ตรวจสอบผู้รับผ่านช่องทางที่คุณรู้จักก่อนทำรายการใหม่' : expired ? 'ยังไม่ได้โอนเงิน รายการใหม่ต้องตรวจความเสี่ยงอีกครั้ง' : result.primary_reason_th || result.direct_risk_reasoning}</p>
+      {success ? <><div className="demo-slip"><span>ใบรายการทดลอง</span><strong>฿{money(amount)}</strong><p>{recipient.name}</p><small>{result.receipt_id}</small><b>ไม่มีการโอนเงินจริงหรือยืนยันว่าผู้รับได้รับเงิน</b></div><button className="secondary-button" onClick={() => saveReceipt(result, amount, recipient)}><Download size={17} /> บันทึกใบรายการทดลอง</button></> : !canceled && !expired && !unknown && <>
         {!normalReview && <div className="risk-explanation"><CircleAlert size={17} /><span>ยังไม่มีการหักเงินจากบัญชีของคุณ</span></div>}
         {!normalReview && <details className="risk-details" open={!result.cooldown_required}>
-          <summary>เหตุผลที่ตรวจเพิ่ม</summary>
+          <summary>ข้อมูลประกอบและ policy ที่ตรวจเพิ่ม</summary>
+          <p className="small-note">รายการต่อไปนี้เป็นบริบทและกฎจำลอง ไม่ใช่ attribution หรือเหตุผลเชิงเหตุและผลจากโมเดล</p>
           <ul>{result.direct_risk_reasons_list?.map((reason, i) => <li key={i}>{reason}</li>)}</ul>
           {result.target_meta && <dl className="risk-meta" aria-label="ข้อมูลบัญชีผู้รับ อธิบายเพิ่มเติม">
             <div>
@@ -80,8 +82,10 @@ export default function TransferResult({ result, amount, recipient, busy, cleara
         {!changed && <div className="auth-actions">{normalReview ? <button className="primary-button" disabled={busy} onClick={() => decide('PROCEED')}><Check size={18} />ยืนยันโอนจำลอง ฿{money(amount)}</button> : !tokenValid ? <button className="primary-button" disabled={busy || waiting} onClick={verify}><Fingerprint size={18} />{waiting ? `รอพักก่อนโอน · ${formatCooldown(seconds)}` : 'จำลองยืนยันตัวตน 5 วินาที'}</button> : <button className="primary-button" disabled={busy || waiting} onClick={() => decide('PROCEED')}><Check size={18} /> ยืนยันโอนต่อ ฿{money(amount)}</button>}{!cancelInFooter && <button className="secondary-button" disabled={busy} onClick={() => decide('CANCEL')}><X size={17} /> ยกเลิกรายการ</button>}</div>}
         {!normalReview && <small className="auth-note">จำลองเท่านั้น ไม่เปิดกล้องหรือเก็บใบหน้า · หลังยืนยันจำลองแล้วมีเวลา 2 นาทีในการยืนยันโอน หากหมดเวลายืนยันใหม่ได้</small>}
       </>}
+      {result.raw_model_score !== undefined && <p className="small-note">คะแนนโมเดล {Number(result.raw_model_score).toFixed(4)} · คะแนนหลัง policy {Number(result.policy_score).toFixed(4)} · {result.explanation_note}</p>}
+      {result.missing_graph_context && <p className="message error">บัญชีนี้เป็นบัญชีที่เดโมรู้จัก แต่ไม่มี graph embedding ใช้เวกเตอร์ศูนย์ตาม contract การไม่มีข้อมูลไม่ได้รับรองว่าปลอดภัย</p>}
       {result.latency_ms !== undefined && <div className="inference-note">เวลาประเมินความเสี่ยงในต้นแบบ {result.latency_ms} ms · ไม่รวมแผนเงินและเครือข่าย</div>}
-      {terminal && <button className="text-link" onClick={clear}>ลองสถานการณ์อื่น <ArrowRight size={16} /></button>}
+      {terminal && !unknown && <button className="text-link" onClick={clear}>ลองสถานการณ์อื่น <ArrowRight size={16} /></button>}
     </div>}
   </div>;
 }

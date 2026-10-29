@@ -1,0 +1,305 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "account_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "aggregate": {
+      "additionalProperties": false,
+      "properties": {
+        "complete_known_days": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "coverage_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "excluded": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "date": {
+                "format": "date",
+                "type": "string"
+              },
+              "reasons": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "date",
+              "reasons"
+            ],
+            "type": "object"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "expected_calendar_days": {
+          "const": 28
+        },
+        "input_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "mapping_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "mean_satang": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "numerator_satang": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "provenance_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "window_end": {
+          "format": "date",
+          "type": "string"
+        },
+        "window_start": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "window_start",
+        "window_end",
+        "numerator_satang",
+        "complete_known_days",
+        "expected_calendar_days",
+        "mean_satang",
+        "excluded",
+        "mapping_ids",
+        "coverage_ids",
+        "input_sha256",
+        "provenance_id"
+      ],
+      "type": "object"
+    },
+    "contract_version": {
+      "const": "2.0.0-proposed.2"
+    },
+    "forecast_dependent_claim": {
+      "enum": [
+        "UNAVAILABLE",
+        "NOT_ASSESSED"
+      ]
+    },
+    "forecast_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "forecast_mode": {
+      "enum": [
+        "ORIGIN_FROZEN",
+        "MOCK_CONTRACT_EXAMPLE"
+      ]
+    },
+    "horizon": {
+      "enum": [
+        1,
+        7,
+        14,
+        30
+      ]
+    },
+    "input_as_of": {
+      "format": "date-time",
+      "pattern": "\\+07:00$",
+      "type": "string"
+    },
+    "issued_at": {
+      "format": "date-time",
+      "pattern": "\\+07:00$",
+      "type": "string"
+    },
+    "model_package_version": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "origin": {
+      "format": "date-time",
+      "pattern": "\\+07:00$",
+      "type": "string"
+    },
+    "points": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bill_payment_thb": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "cumulative_non_bill_thb": {
+            "minimum": 0,
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "date": {
+            "format": "date",
+            "type": "string"
+          },
+          "feature_row": {
+            "maxItems": 6,
+            "minItems": 6,
+            "prefixItems": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "enum": [
+                  0,
+                  1
+                ]
+              },
+              {
+                "enum": [
+                  0,
+                  1
+                ]
+              },
+              {
+                "minimum": 0,
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              {
+                "minimum": 0,
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              {
+                "minimum": 0,
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            ],
+            "type": "array"
+          },
+          "method": {
+            "enum": [
+              "MODEL",
+              "HISTORY_MEAN",
+              "SCENARIO",
+              "ABSTAIN",
+              "MOCK"
+            ]
+          },
+          "predicted_non_bill_thb": {
+            "minimum": 0,
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "projected_balance_thb": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "reason": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "salary_inflow_thb": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "selection_reason": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "date",
+          "feature_row",
+          "predicted_non_bill_thb",
+          "cumulative_non_bill_thb",
+          "bill_payment_thb",
+          "salary_inflow_thb",
+          "projected_balance_thb",
+          "method",
+          "reason",
+          "selection_reason",
+          "source_id"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "request_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "contract_version",
+    "account_id",
+    "origin",
+    "request_sha256",
+    "model_package_version",
+    "forecast_id",
+    "issued_at",
+    "input_as_of",
+    "horizon",
+    "forecast_mode",
+    "aggregate",
+    "points",
+    "forecast_dependent_claim"
+  ],
+  "type": "object"
+}

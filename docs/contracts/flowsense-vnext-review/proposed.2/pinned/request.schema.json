@@ -1,0 +1,629 @@
+{
+  "$defs": {
+    "bill": {
+      "additionalProperties": false,
+      "properties": {
+        "available_at": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "due_date": {
+          "format": "date",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "debt",
+            "rent",
+            "utilities"
+          ]
+        },
+        "observed_at": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "original_satang": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "paid_satang": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "payment_events": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "amount_satang": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "available_at": {
+                "format": "date-time",
+                "pattern": "\\+07:00$",
+                "type": "string"
+              },
+              "event_time": {
+                "format": "date-time",
+                "pattern": "\\+07:00$",
+                "type": "string"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "source": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "source",
+              "amount_satang",
+              "event_time",
+              "available_at"
+            ],
+            "type": "object"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "revision": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "source": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "due_date",
+        "original_satang",
+        "paid_satang",
+        "revision",
+        "observed_at",
+        "available_at",
+        "source",
+        "payment_events"
+      ],
+      "type": "object"
+    },
+    "coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "account_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "available_at": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "covered_sources": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "date": {
+          "format": "date",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "sealed_at": {
+          "format": "date-time",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "missing",
+            "unavailable"
+          ]
+        }
+      },
+      "required": [
+        "account_id",
+        "date",
+        "status",
+        "available_at",
+        "sealed_at",
+        "revision",
+        "source",
+        "covered_sources"
+      ],
+      "type": "object"
+    },
+    "mapping": {
+      "additionalProperties": false,
+      "properties": {
+        "account_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "available_at": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "effective_from": {
+          "format": "date",
+          "type": "string"
+        },
+        "effective_to": {
+          "format": "date",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mapping_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "provenance_kind": {
+          "enum": [
+            "verified_source",
+            "synthetic_generator_explicit",
+            "legacy_modulo_fixture"
+          ]
+        },
+        "source": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "user_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "mapping_id",
+        "user_id",
+        "account_id",
+        "effective_from",
+        "effective_to",
+        "available_at",
+        "source",
+        "provenance_kind"
+      ],
+      "type": "object"
+    },
+    "opening": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "assumption": {
+          "enum": [
+            "CURRENT_MONTH_UNPAID_PRIOR_MONTHS_SETTLED",
+            "EXPLICIT_OBSERVATION"
+          ]
+        },
+        "available_at": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "prior_overdue_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "snapshot_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "as_of",
+        "available_at",
+        "source",
+        "assumption",
+        "prior_overdue_ids",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "available_at": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "verified_source",
+            "synthetic_generator_explicit",
+            "explicit_scenario"
+          ]
+        },
+        "sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "source",
+        "as_of",
+        "available_at",
+        "sha256",
+        "kind"
+      ],
+      "type": "object"
+    },
+    "schedule": {
+      "additionalProperties": false,
+      "properties": {
+        "available_at": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "effective_from": {
+          "format": "date",
+          "type": "string"
+        },
+        "known_at": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "monthly_amounts_satang": {
+          "additionalProperties": false,
+          "properties": {
+            "debt": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "rent": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "utilities": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "debt",
+            "rent",
+            "utilities"
+          ],
+          "type": "object"
+        },
+        "revision": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "schedule_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "schedule_id",
+        "revision",
+        "effective_from",
+        "monthly_amounts_satang",
+        "known_at",
+        "available_at",
+        "source"
+      ],
+      "type": "object"
+    },
+    "transaction": {
+      "additionalProperties": false,
+      "properties": {
+        "account_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "available_at": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "bill_instance_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "bill_payment_event_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "category": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "DR",
+            "CR"
+          ]
+        },
+        "event_time": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "original_ref": {
+          "additionalProperties": false,
+          "properties": {
+            "source": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "transaction_id": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "source",
+            "transaction_id"
+          ],
+          "type": "object"
+        },
+        "posting_time": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "raw_amount_thb": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "represented_charge_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "revision": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "same_owner_provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "signed_amount_thb": {
+          "pattern": "^-?(0|[1-9][0-9]*)\\.[0-9]{2}$",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "transaction_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "user_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "transaction_id",
+        "revision",
+        "account_id",
+        "user_id",
+        "event_time",
+        "posting_time",
+        "available_at",
+        "category",
+        "direction",
+        "raw_amount_thb",
+        "signed_amount_thb",
+        "represented_charge_ids",
+        "source"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "account_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "bill_calendar": {
+      "additionalProperties": false,
+      "properties": {
+        "materialized_through": {
+          "format": "date",
+          "type": "string"
+        },
+        "revisions": {
+          "items": {
+            "$ref": "#/$defs/schedule"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "revisions",
+        "materialized_through"
+      ],
+      "type": "object"
+    },
+    "bills": {
+      "items": {
+        "$ref": "#/$defs/bill"
+      },
+      "minItems": 0,
+      "type": "array"
+    },
+    "contract_version": {
+      "const": "2.0.0-proposed.2"
+    },
+    "coverage": {
+      "items": {
+        "$ref": "#/$defs/coverage"
+      },
+      "minItems": 0,
+      "type": "array"
+    },
+    "history_source": {
+      "enum": [
+        "EXPLICIT_COMPLETE_LEDGER"
+      ]
+    },
+    "horizon": {
+      "enum": [
+        1,
+        7,
+        14,
+        30
+      ]
+    },
+    "mappings": {
+      "items": {
+        "$ref": "#/$defs/mapping"
+      },
+      "minItems": 0,
+      "type": "array"
+    },
+    "opening_snapshot": {
+      "$ref": "#/$defs/opening"
+    },
+    "origin": {
+      "format": "date-time",
+      "pattern": "T00:00:00\\+07:00$",
+      "type": "string"
+    },
+    "request_kind": {
+      "enum": [
+        "FEATURE_ONLY"
+      ]
+    },
+    "source_registry": {
+      "additionalProperties": false,
+      "properties": {
+        "available_at": {
+          "format": "date-time",
+          "pattern": "\\+07:00$",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "registry_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "registry_id",
+        "available_at",
+        "sources",
+        "provenance"
+      ],
+      "type": "object"
+    },
+    "transactions": {
+      "items": {
+        "$ref": "#/$defs/transaction"
+      },
+      "minItems": 0,
+      "type": "array"
+    },
+    "user_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "contract_version",
+    "request_kind",
+    "account_id",
+    "user_id",
+    "origin",
+    "horizon",
+    "history_source",
+    "source_registry",
+    "mappings",
+    "coverage",
+    "transactions",
+    "bills",
+    "bill_calendar",
+    "opening_snapshot"
+  ],
+  "type": "object"
+}

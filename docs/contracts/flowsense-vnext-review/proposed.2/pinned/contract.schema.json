@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "accepted_definitions": {
+      "const": [
+        "D01",
+        "D02",
+        "D03",
+        "D04",
+        "D05"
+      ]
+    },
+    "clarifications": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "consumer_acknowledgement": {
+            "const": "PENDING"
+          },
+          "evidence": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "id": {
+            "enum": [
+              "C01",
+              "C02",
+              "C03",
+              "C04"
+            ]
+          },
+          "producer_status": {
+            "const": "ADDRESSED"
+          }
+        },
+        "required": [
+          "id",
+          "producer_status",
+          "consumer_acknowledgement",
+          "evidence"
+        ],
+        "type": "object"
+      },
+      "minItems": 4,
+      "type": "array"
+    },
+    "clauses": {
+      "const": [
+        "C01.T1",
+        "C02.C1",
+        "C02.R1",
+        "D05.M1",
+        "C03.E1",
+        "C03.B1",
+        "C04.R1"
+      ]
+    },
+    "contract_id": {
+      "const": "knexus.flowsense.calendar-nonbill"
+    },
+    "contract_version": {
+      "const": "2.0.0-proposed.2"
+    },
+    "feature_semantics_version": {
+      "const": "2.0.0-proposed.2"
+    },
+    "gate0": {
+      "const": "OPEN_PENDING_CONSUMER_ACKNOWLEDGEMENT"
+    },
+    "gates": {
+      "additionalProperties": false,
+      "properties": {
+        "Gate0": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "Gate1": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "Gate2": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "Gate3": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "Gate4": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "Gate0",
+        "Gate1",
+        "Gate2",
+        "Gate3",
+        "Gate4"
+      ],
+      "type": "object"
+    },
+    "incompatible_existing_package": {
+      "const": "2026.10.27.1"
+    },
+    "model_package_version": {
+      "type": "null"
+    },
+    "normative_files": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 10,
+      "type": "array"
+    },
+    "overall_review_status": {
+      "const": "CHANGES_REQUESTED"
+    },
+    "prior_revision": {
+      "additionalProperties": false,
+      "properties": {
+        "manifest": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "raw_contract_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "snapshot": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "const": "2.0.0-proposed.1"
+        }
+      },
+      "required": [
+        "version",
+        "raw_contract_sha256",
+        "snapshot",
+        "manifest"
+      ],
+      "type": "object"
+    },
+    "responding_to": {
+      "additionalProperties": false,
+      "properties": {
+        "application_head_from_review": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "application_review_date": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "live_application_git_status": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "review_file_sha256": {
+          "additionalProperties": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "minProperties": 6,
+          "type": "object"
+        },
+        "reviewed_contract_raw_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "reviewed_contract_version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "application_review_date",
+        "reviewed_contract_version",
+        "reviewed_contract_raw_sha256",
+        "review_file_sha256",
+        "application_head_from_review",
+        "live_application_git_status"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "2.0.0-proposed.2"
+    },
+    "status": {
+      "const": "PROPOSED_FOR_APPLICATION_ACKNOWLEDGEMENT"
+    }
+  },
+  "required": [
+    "contract_id",
+    "contract_version",
+    "schema_version",
+    "feature_semantics_version",
+    "status",
+    "overall_review_status",
+    "gate0",
+    "model_package_version",
+    "incompatible_existing_package",
+    "prior_revision",
+    "responding_to",
+    "accepted_definitions",
+    "clauses",
+    "clarifications",
+    "normative_files",
+    "gates"
+  ],
+  "type": "object"
+}

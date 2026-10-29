@@ -1,7 +1,8 @@
 import React from 'react';
+import SpendingBasis from './SpendingBasis';
 import { ArrowRight, CircleAlert } from 'lucide-react';
 
-const money = (value) => Number(value ?? 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const money = (value) => (value == null ? '—' : Number(value).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
 export default function TransferPlanning({ result }) {
   const impact = result.liquidity_impact;
@@ -13,6 +14,7 @@ export default function TransferPlanning({ result }) {
     <section className={`transfer-impact ${impact.reserve_at_risk ? 'reserve-shortfall' : ''}`} aria-labelledby="transfer-impact-title">
       <span className="section-kicker">FLOWSENSE · ผลต่อแผนเงินของคุณ</span>
       <h4 id="transfer-impact-title">ถ้าโอนรายการนี้ เงินใช้ชีวิตจะเหลือเท่าไร</h4>
+      <SpendingBasis basis={impact.spending_basis}/>
       <p>งบเฉลี่ยที่เหลือต่อวัน ใน {impact.days_to_payday} วันก่อนเงินเดือนออก</p>
       <div className="impact-comparison"><div><span>ก่อนโอน</span><strong>฿{money(impact.before.average_per_day)}</strong></div><ArrowRight size={20} aria-hidden="true" /><div><span>หลังโอน</span><strong>฿{money(impact.after.average_per_day)}</strong></div></div>
       <dl className="impact-breakdown"><div><dt>เงินบัญชีหลังโอน</dt><dd>฿{money(impact.after.balance)}</dd></div><div><dt>บิลที่ยังต้องกันไว้</dt><dd>฿{money(impact.after.bills_remaining)}</dd></div><div><dt>เงินสำรองในแผน</dt><dd>฿{money(impact.emergency_buffer)}</dd></div></dl>

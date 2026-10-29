@@ -1,0 +1,10 @@
+{
+  "version": "synthetic-persona-assumptions.2026-10-29.1",
+  "author": "Application baseline demo configuration",
+  "description": "Explicit engineering scenarios; not measured from legacy CSV, not observed transactions, no USER-to-ACC mapping. Seeded posted-today amounts are included in opening current balance.",
+  "personas": {
+    "ACC_0100": {"daily_non_bill_satang": 35000, "seeded_posted_today_satang": 12000},
+    "ACC_0101": {"daily_non_bill_satang": 60000, "seeded_posted_today_satang": 20000},
+    "ACC_0150": {"daily_non_bill_satang": 30000, "seeded_posted_today_satang": 9000}
+  }
+}

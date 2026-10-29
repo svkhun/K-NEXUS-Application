@@ -1,0 +1,13 @@
+{
+  "package_version": "2026.10.27.1",
+  "manifest_sha256": "d73fd16f7f4e304c6a00900b1771d09c09aa6136f49b98a951409200d1931b4a",
+  "trustgraph_enabled": true,
+  "flowsense_enabled": false,
+  "flowsense_gate": "CALENDAR_REVALIDATION_REQUIRED: training bills 1/5 versus application 22/26/27; no verified USER-to-ACC history mapping",
+  "source": "D:\\All Project\\k-flowsense-trustgraph\\artifacts\\model-handoff",
+  "legacy_hashes": {
+    "flowsense.onnx": "1b82c684aec7ee8c67c81cc5ac384533b6b22a1573b268c497a4faefe842443a",
+    "trustgraph.onnx": "4994d970cd6c9f61da271b4153d1b413fffaa35b2c55fd8ac4423ae2f035eeaf",
+    "trustgraph_embeddings.csv": "31c16b9994d987a9a53b7b99af7b8173d18b60885e2fecf99edf3e54c44d9342"
+  }
+}

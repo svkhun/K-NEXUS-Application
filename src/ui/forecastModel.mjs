@@ -10,19 +10,32 @@ export function buildForecastView(timeline = [], days = 30, includeHistory = tru
   const future = ordered.filter((point) => point.is_future);
   const payday = future.find((point) => Number(point.salary_inflow) > 0);
   const beforePayday = [today, ...future.filter((point) => !payday || point.date < payday.date)].filter(Boolean);
-  const minimum = beforePayday.reduce((lowest, point) => !lowest || Number(point.projected_balance) < Number(lowest.projected_balance) ? point : lowest, null);
+  const minimum = future.some(p => p.method === 'ABSTAIN') || beforePayday.some(p => !knownMoney(p.projected_balance)) ? null : beforePayday.reduce((lowest, point) => !lowest || point.projected_balance < lowest.projected_balance ? point : lowest, null);
   const points = [...(includeHistory ? history : []), ...(today ? [today] : []), ...future.slice(0, days)];
   return { points, today, history, payday, minimum, future, todayIndex: points.findIndex((point) => point.is_today) };
 }
 
 export function cashOut(point) {
-  return Math.max(0, Number(point.is_past ? point.actual_spend : point.predicted_spend) || 0) + Math.max(0, Number(point.commitment_payment) || 0);
+  const spend = point.is_today ? point.actual_spend : point.is_past ? point.actual_spend : point.predicted_spend;
+  return knownMoney(spend) && knownMoney(point.commitment_payment) ? Math.max(0, spend) + Math.max(0, point.commitment_payment) : null;
+}
+
+export const knownMoney = value => typeof value === 'number' && Number.isFinite(value);
+
+export function balancePath(points, x, y) {
+  let open = false;
+  return points.map((point, index) => {
+    if (!knownMoney(point.projected_balance)) { open = false; return ''; }
+    const segment = `${open ? 'L' : 'M'}${x(index)},${y(point.projected_balance)}`;
+    open = true;
+    return segment;
+  }).join(' ');
 }
 
 export function buildMoneyScale(points, top, bottom) {
-  const balances = points.map((point) => Number(point.projected_balance));
-  const axis = niceAxis(Math.min(0, ...balances), Math.max(0, ...balances, ...points.map(cashOut)) * 1.12);
-  const y = (value) => bottom - (Number(value) - axis.min) / (axis.max - axis.min) * (bottom - top);
+  const balances = points.map(point => point.projected_balance).filter(knownMoney);
+  const axis = niceAxis(Math.min(0, ...balances), Math.max(0, ...balances, ...points.map(cashOut).filter(knownMoney)) * 1.12);
+  const y = (value) => knownMoney(value) ? bottom - (value - axis.min) / (axis.max - axis.min) * (bottom - top) : null;
   return { axis, y, baseline: y(0) };
 }
 

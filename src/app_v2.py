@@ -170,56 +170,36 @@ def serve_favicon():
     return {"status": "Favicon not found"}
 
 
+@app.get('/k-nexus-logo.svg', include_in_schema=False)
+def serve_public_logo():
+    return FileResponse(os.path.join(REACT_DIST_DIR, 'k-nexus-logo.svg'), media_type='image/svg+xml')
+
+
 # ==============================================================================
 # 1. MODEL SESSIONS & FEATURE STORES (IN-MEMORY TIER 1)
 # ==============================================================================
-# KBTG SECURITY: Model Integrity Verification (SHA-256 Checksum Validation)
-EXPECTED_MODEL_HASHES = {
-    "models/trustgraph.onnx": "4994d970cd6c9f61da271b4153d1b413fffaa35b2c55fd8ac4423ae2f035eeaf",
-    "models/flowsense.onnx": "1b82c684aec7ee8c67c81cc5ac384533b6b22a1573b268c497a4faefe842443a",
-    "models/k_sentinel.onnx": "4994d970cd6c9f61da271b4153d1b413fffaa35b2c55fd8ac4423ae2f035eeaf",
-    "models/wealthpilot.onnx": "1b82c684aec7ee8c67c81cc5ac384533b6b22a1573b268c497a4faefe842443a"
-}
-
-def verify_file_sha256(filepath: str, expected_hash: str) -> bool:
-    if not os.path.exists(filepath):
-        return False
-    h = hashlib.sha256()
-    with open(filepath, "rb") as f:
-        while chunk := f.read(8192):
-            h.update(chunk)
-    return h.hexdigest().lower() == expected_hash.lower()
-
-def get_existing_model_path(primary: str, fallback: str) -> str:
-    primary_path = os.path.join(BASE_DIR, primary)
-    fallback_path = os.path.join(BASE_DIR, fallback)
-    if os.path.exists(primary_path):
-        return primary_path
-    if os.path.exists(fallback_path):
-        return fallback_path
-    return primary_path
-
-trustgraph_model_path = get_existing_model_path("models/trustgraph.onnx", "models/k_sentinel.onnx")
-flowsense_model_path = get_existing_model_path("models/flowsense.onnx", "models/wealthpilot.onnx")
-
-for model_p in [trustgraph_model_path, flowsense_model_path]:
-    exp_h = EXPECTED_MODEL_HASHES.get(os.path.relpath(model_p, BASE_DIR).replace("\\", "/"))
-    if exp_h and verify_file_sha256(model_p, exp_h):
-        print(f"[SecOps Check] Model Integrity Verified: {model_p} (SHA-256 Checksum Match)")
-    else:
-        raise RuntimeError(f"Model integrity check failed: {os.path.basename(model_p)}")
-
-print("[Init] Loading ONNX Inference Engines into RAM...")
-session_options = rt.SessionOptions()
-session_options.intra_op_num_threads = 1
-session_options.inter_op_num_threads = 1
-sentinel_sess = rt.InferenceSession(trustgraph_model_path, sess_options=session_options, providers=["CPUExecutionProvider"])
+# The old files stay intact for rollback. New TrustGraph is a pinned atomic pair.
+from src.model_package import load_package, load_legacy
+from src.liquidity_forecast import forecast as rule_forecast
+from pathlib import Path as FilePath
+from src.baseline_policy import seed_assumptions, select_spending, VERSION as BASELINE_VERSION
+SERVING_CONFIG = json.loads((FilePath(BASE_DIR) / "models/serving.json").read_text(encoding="utf-8"))
+BASELINE_CONFIG = json.loads((FilePath(BASE_DIR) / 'config/baseline-personas.v1.json').read_text(encoding='utf-8'))
+BASELINE_MODE = os.environ.get('FLOWSENSE_BASELINE_MODE', 'OFF' if PRODUCTION else 'BASELINE')
+if BASELINE_MODE not in ('BASELINE', 'OFF'):
+    raise RuntimeError('Unknown baseline mode')
+PACKAGE_DIR = FilePath(BASE_DIR) / "models/packages" / SERVING_CONFIG["package_version"]
+if SERVING_CONFIG.get("flowsense_enabled"):
+    raise RuntimeError("FlowSense activation requires calendar revalidation and an application release")
+if SERVING_CONFIG.get("trustgraph_enabled"):
+    PACKAGE_MANIFEST, PACKAGE_SESSIONS, PACKAGE_EMBEDDINGS = load_package(PACKAGE_DIR, SERVING_CONFIG["manifest_sha256"], enabled_models=('trustgraph',), integrity_scope='runtime')
+    sentinel_sess = PACKAGE_SESSIONS["trustgraph"]
+    ACTIVE_TRUSTGRAPH_VERSION = PACKAGE_MANIFEST["package_version"]
+else:
+    sentinel_sess, PACKAGE_EMBEDDINGS = load_legacy(FilePath(BASE_DIR)/"models/legacy", SERVING_CONFIG["legacy_hashes"])
+    ACTIVE_TRUSTGRAPH_VERSION = "legacy-pre-2026.10.27.1"
 sentinel_in_name = sentinel_sess.get_inputs()[0].name
 sentinel_out_prob = sentinel_sess.get_outputs()[1].name
-
-wealth_sess = rt.InferenceSession(flowsense_model_path, sess_options=session_options, providers=["CPUExecutionProvider"])
-wealth_in_name = wealth_sess.get_inputs()[0].name
-wealth_out_name = wealth_sess.get_outputs()[0].name
 
 def load_data_csv(primary_file: str, fallback_file: str = None) -> pd.DataFrame:
     p_primary = os.path.join(BASE_DIR, "data", primary_file)
@@ -232,11 +212,7 @@ def load_data_csv(primary_file: str, fallback_file: str = None) -> pd.DataFrame:
     raise FileNotFoundError(f"Neither {p_primary} nor {fallback_file} could be found.")
 
 print("[Init] Caching In-Memory Feature Store (Redis Simulation)...")
-df_embeddings = load_data_csv("05_trustgraph_graph_node_embeddings.csv", "05_sentinel_graph_node_embeddings.csv").set_index("account_id")
-FEATURE_STORE_CACHE: Dict[str, np.ndarray] = {
-    acc_id: df_embeddings.loc[acc_id].values.astype(np.float32)
-    for acc_id in df_embeddings.index
-}
+FEATURE_STORE_CACHE = PACKAGE_EMBEDDINGS
 
 df_users_raw = load_data_csv("03_trustgraph_users_and_mule_labels.csv", "03_sentinel_users_and_mule_labels.csv").set_index("account_id")
 USERS_METADATA_CACHE: Dict[str, Dict[str, Any]] = df_users_raw.to_dict(orient="index")
@@ -256,11 +232,20 @@ for acc_id in DEMO_ACCOUNTS:
         "vault_balance": float(prof["initial_vault_savings"]),
         "total_swept": 0.0,
         "savings_enabled": False,
-        "daily_spent_today": float(prof["avg_daily_spend"] * 0.45),
+        "daily_spent_today": 0.0,
         "last_sweep_ts": time.time()
     }
 
 SEED_ACCOUNTS.update(INITIAL_ACCOUNT_STATES)
+def initialize_session_bills(accounts):
+    for account_id, state in accounts.items():
+        now = demo_now(state)
+        state.update(seed_assumptions(account_id, now, BASELINE_CONFIG))
+        state['baseline_mode'] = BASELINE_MODE
+        commitments(BEHAVIORAL_PROFILES_CACHE[account_id], now, state)
+
+from src import demo_security as security_state
+security_state.ACCOUNT_INITIALIZER = initialize_session_bills
 LIVE_ACCOUNT_STATES = SessionMapping("accounts")
 START_TIME = time.time()
 
@@ -470,11 +455,10 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
     details = planning_details(payload, LIVE_ACCOUNT_STATES[payload.source_account_id], BEHAVIORAL_PROFILES_CACHE[payload.source_account_id])
     t_start = time.perf_counter()
 
-    # 1. Feature Store Lookup (Tier 1 Redis Simulation)
-    if payload.target_account_id not in FEATURE_STORE_CACHE:
-        raise HTTPException(status_code=404, detail="Target beneficiary account not found in Graph Feature Store.")
-
-    target_emb = FEATURE_STORE_CACHE[payload.target_account_id]
+    # Unknown accounts are rejected by StrictRequest. Known accounts without
+    # graph context get precisely 16 zeros, plus a response-only context flag.
+    missing_context = payload.target_account_id not in FEATURE_STORE_CACHE
+    target_emb = FEATURE_STORE_CACHE.get(payload.target_account_id, np.zeros(16, dtype=np.float32))
     target_meta = USERS_METADATA_CACHE.get(payload.target_account_id, {})
 
     # 2. Prepare Vector: [amount, is_first_time, device_switch, duration, ratio, auth_face, auth_none, auth_pin, 16 embeddings]
@@ -497,9 +481,18 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
 
     # 3. ONNX Fast Inference (<80ms Target SLA)
     raw_probs = sentinel_sess.run([sentinel_out_prob], {sentinel_in_name: feature_vec})[0]
-    current_risk = float(raw_probs[0][1])
+    raw_model_score = float(raw_probs[0, 1] if SERVING_CONFIG['trustgraph_enabled'] else raw_probs[0][1])
+    current_risk = raw_model_score
     if target_meta.get("is_mule", 0) == 1:
         current_risk = max(current_risk, 0.45)
+
+    details.update(raw_model_score=raw_model_score, policy_score=current_risk,
+        synthetic_score_floor=0.45 if target_meta.get("is_mule", 0) == 1 else None,
+        synthetic_blacklist=payload.target_account_id == "ACC_0000",
+        missing_graph_context=missing_context, model_package_version=ACTIVE_TRUSTGRAPH_VERSION,
+        model_threshold_experimental=0.5, policy_review_threshold=0.45,
+        explanation_type="CONTEXTUAL_AND_POLICY_NOT_MODEL_ATTRIBUTION",
+        explanation_note="ข้อมูลประกอบและ policy จำลอง ไม่ใช่ attribution ของโมเดล; ไม่มี graph context ไม่ได้แปลว่าปลอดภัย")
 
     # 4. Beneficiary Contextual Metadata
     account_age_days = target_meta.get("account_age_days", 90)
@@ -526,15 +519,15 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
             "action": "BLOCK",
             "hard_blocked": True,
             "final_decision_left_to_user": False,
-            "direct_risk_reasoning": "บัญชีปลายทางอยู่ในเครือข่ายบัญชีม้าความเสี่ยงสูงมาก (Mule Ring Tier-1) ธนาคารระงับการทำรายการตาม พ.ร.ก. ปราบปรามอาชญากรรมทางเทคโนโลยี พ.ศ. 2566",
-            "counterfactual_message": "บัญชีปลายทางอยู่ในเครือข่ายบัญชีม้าความเสี่ยงสูงมาก (Mule Ring Tier-1) ธนาคารระงับการทำรายการตาม พ.ร.ก. ปราบปรามอาชญากรรมทางเทคโนโลยี พ.ศ. 2566",
-            "reason_summary": "Relational GCN ตรวจพบลักษณะตรงกับเครือข่ายบัญชีม้าความเสี่ยงสูงมาก",
+            "direct_risk_reasoning": "บัญชีปลายทางอยู่ใน synthetic blacklist ของเดโม จึงบล็อกตาม policy จำลอง",
+            "counterfactual_message": "บัญชีปลายทางอยู่ใน synthetic blacklist ของเดโม จึงบล็อกตาม policy จำลอง",
+            "reason_summary": "ป้ายระงับรายการในข้อมูลสมมติ เป็น policy ไม่ใช่ข้อสรุปจากโมเดล",
             "direct_risk_reasons_list": [
-                "Relational GCN ตรวจพบลักษณะตรงกับเครือข่ายบัญชีม้าความเสี่ยงสูงมาก",
+                "ป้ายระงับรายการในข้อมูลสมมติ เป็น policy ไม่ใช่ข้อสรุปจากโมเดล",
                 "บัญชีนี้มีป้ายกำกับระงับการโอนในชุดข้อมูลสมมติ"
             ],
             "primary_reason_th": "บัญชีปลายทางมีป้ายระงับในข้อมูลจำลอง จึงหยุดรายการนี้",
-            "actionable_warning": "⛔ ระงับการทำรายการ: พบบัญชีปลายทางเป็นบัญชีม้าในเครือข่ายอาชญากรรม",
+            "actionable_warning": "ระงับรายการตาม synthetic blacklist ของเดโม",
             "target_meta": {
                 "account_id": payload.target_account_id,
                 "account_age_days": account_age_days,
@@ -574,6 +567,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
             },
             "latency_ms": round(latency_ms, 2)
         }
+        result.update(details)
         return retain_transfer_review(result, payload)
 
     # --------------------------------------------------------------------------
@@ -592,6 +586,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
             "primary_reason_th": "ยังไม่พบสัญญาณผิดปกติจากข้อมูลจำลองที่มี กรุณาดูผลต่อแผนเงินก่อนยืนยัน",
             "direct_risk_reasons_list": [], "latency_ms": round(latency_ms, 2),
         }
+        result.update(details)
         return retain_transfer_review(result, payload)
 
     # --------------------------------------------------------------------------
@@ -610,7 +605,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
         direct_reasons.append(f"ยอดโอนสูงกว่าค่าเฉลี่ยต่อวัน {payload.ratio_to_daily_avg:.1f} เท่า")
 
     if not direct_reasons:
-        direct_reasons.append("รูปแบบความสัมพันธ์ของบัญชีคล้ายเครือข่ายเสี่ยงในข้อมูลจำลอง")
+        direct_reasons.append("คะแนนหลังใช้ policy ถึงเกณฑ์ตรวจเพิ่มของเดโม ไม่ใช่ attribution ของกราฟ")
 
     primary_reason = direct_reasons[0]
     reason_summary = " | ".join(direct_reasons)
@@ -628,13 +623,13 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
         "friction_type": "5_SECOND_LIVENESS",
         "auth_duration_sec": 5,
         "eliminates_arbitrary_waiting": False,
-        "direct_risk_reasoning": f"Recipient account opened {account_age_days} days ago with rapid pass-through fund patterns ({int(inflow_velocity)}s)",
-        "counterfactual_message": f"Recipient account opened {account_age_days} days ago with rapid pass-through fund patterns ({int(inflow_velocity)}s)",
+        "direct_risk_reasoning": "ข้อมูลประกอบและ policy จำลอง ไม่ใช่ model attribution",
+        "counterfactual_message": "ไม่มีการคำนวณ counterfactual หรือ attribution ในรุ่นนี้",
         "reason_summary": reason_summary,
         "direct_risk_reasons_list": direct_reasons,
         "primary_reason_th": primary_reason,
         "actionable_warning": f"⚠️ ตรวจพบความผิดปกติวิกฤต: {reason_summary}",
-        "user_confirmation_prompt": "ระบบเปิดการยืนยัน Micro-Auth ด้วยการสแกนใบหน้า 5 วินาที เพื่อดึงสติและตรวจสอบผู้ใช้งานจริง และให้คุณเป็นผู้ตัดสินใจโอนเงินขั้นสุดท้าย",
+        "user_confirmation_prompt": "จำลองยืนยัน 5 วินาที ไม่มีการตรวจตัวตนหรือเปิดกล้อง แล้วตัดสินใจยืนยันหรือยกเลิกเอง",
         "final_decision_left_to_user": True,
         "target_meta": {
             "account_id": payload.target_account_id,
@@ -644,6 +639,7 @@ def evaluate_transfer_v2(payload: TransferEvaluationRequest):
         },
         "latency_ms": round(latency_ms, 2)
     }
+    result.update(details)
     return retain_transfer_review(result, payload)
 
 @app.post("/api/v2/trustgraph/verify-micro-auth")
@@ -692,7 +688,7 @@ def confirm_transfer(payload: TransferConfirmRequest, x_idempotency_key: Optiona
 
     if decision == "CANCEL":
         clear_step_up(src_id, payload.target_account_id, payload.amount)
-        state = LIVE_ACCOUNT_STATES.get(src_id, {"main_balance": 24500.0, "vault_balance": 15000.0})
+        state = LIVE_ACCOUNT_STATES[src_id]
         res = {
             "status": "TRANSFER_CANCELLED",
             "decision": "CANCEL",
@@ -743,9 +739,12 @@ def confirm_transfer(payload: TransferConfirmRequest, x_idempotency_key: Optiona
         "executed_at": datetime.now(ZoneInfo("Asia/Bangkok")).isoformat(),
         "decision": "PROCEED",
         "amount": payload.amount,
+        "source_account_id": src_id,
+        "target_account_id": payload.target_account_id,
         "remaining_balance": remaining,
         "matched_bill": bill,
-        "message": f"โอนเงิน ฿ {payload.amount:,.2f} ไปยังบัญชี {mask_account_id(payload.target_account_id)} สำเร็จแล้วตามความประสงค์ของคุณ"
+        "data_mode": "synthetic_demo",
+        "message": f"บันทึกการโอนจำลอง ฿ {payload.amount:,.2f} สำเร็จ ไม่มีการโอนเงินจริงหรือยืนยันว่าผู้รับได้รับเงิน"
     }
     audit_log("TRANSFER_EXECUTED", src_id, {"target": mask_account_id(payload.target_account_id), "amount": payload.amount, "remaining": remaining, "matched_bill_id": bill["id"] if bill else None})
 
@@ -790,16 +789,15 @@ def get_flowsense_profile(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,
         raise HTTPException(status_code=404, detail="Unknown demo account")
 
     prof = BEHAVIORAL_PROFILES_CACHE[account_id]
-    state = LIVE_ACCOUNT_STATES.get(account_id, {
-        "main_balance": 24500.0,
-        "vault_balance": float(prof["initial_vault_savings"]),
-        "total_swept": 1250.0,
-        "daily_spent_today": 280.0
-    })
+    state = LIVE_ACCOUNT_STATES[account_id]
 
-    demo_now(state)
+    now = demo_now(state)
     return {
         "account_id": account_id,
+        "baseline_mode": state.get('baseline_mode', BASELINE_MODE),
+        "input_as_of": now.isoformat(),
+        "spending_basis": select_spending(state, now),
+        "posted_today_provenance": state.get('seeded_posted_today'),
         "masked_account_id": mask_account_id(account_id),
         "cf_user_id": prof["cf_user_id"],
         "monthly_salary": prof["monthly_salary"],
@@ -842,162 +840,11 @@ def get_flowsense_horizon_status(account_id: str = Path(..., pattern=r"^[A-Za-z0
 
 @app.get("/api/v2/flowsense/forecast-30d/{account_id}")
 def forecast_cashflow_30d(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,30}$", description="Sanitized Banking Account ID")):
-    """
-    30-Day Liquidity Forecast via LightGBM:
-    Method & Architecture: LightGBM with rolling-window lag features & transaction seasonality.
-    Operational Objective: Forecasts safe liquidity margins 30 days ahead; suppresses alerts during normal dips.
-    """
+    """Rule-based scenario until the new model's calendar is revalidated."""
     if account_id not in DEMO_ACCOUNTS:
         raise HTTPException(status_code=404, detail="Unknown demo account")
+    return {"account_id": account_id, **rule_forecast(BEHAVIORAL_PROFILES_CACHE[account_id], LIVE_ACCOUNT_STATES[account_id])}
 
-    prof = BEHAVIORAL_PROFILES_CACHE[account_id]
-    state = LIVE_ACCOUNT_STATES.get(account_id, {
-        "main_balance": 24500.0,
-        "vault_balance": float(prof["initial_vault_savings"]),
-        "total_swept": 1250.0,
-        "daily_spent_today": 310.0
-    })
-
-    now = demo_now(state)
-    cur_balance = float(state["main_balance"])
-    salary = float(prof["monthly_salary"])
-    avg_spend = float(prof["avg_daily_spend"])
-    spent_today = float(state.get("daily_spent_today", avg_spend * 0.45))
-
-    # Past 7 days
-    past_points = []
-    running_past_bal = cur_balance + spent_today
-    past_spends = []
-    for p_step in range(1, 8):
-        p_date = now - timedelta(days=p_step)
-        is_wk = 1.0 if p_date.weekday() >= 5 else 0.0
-        factor = 1.28 if is_wk else (0.86 + (p_step % 3) * 0.08)
-        day_spend = round(avg_spend * factor, 2)
-        past_spends.append((p_date, is_wk, day_spend))
-
-    for p_date, is_wk, day_spend in past_spends:
-        running_past_bal += day_spend
-
-    temp_bal = running_past_bal
-    for p_date, is_wk, day_spend in reversed(past_spends):
-        temp_bal -= day_spend
-        past_points.append({
-            "date": p_date.strftime("%Y-%m-%d"),
-            "day_name": p_date.strftime("%a"),
-            "is_weekend": bool(is_wk),
-            "days_to_payday": (next_payday(p_date).date() - p_date.date()).days,
-            "predicted_spend": day_spend,
-            "actual_spend": day_spend,
-            "salary_inflow": 0.0,
-            "projected_balance": round(temp_bal, 2),
-            "status": "PAST",
-            "is_past": True,
-            "is_today": False,
-            "is_future": False
-        })
-
-    # Today's point
-    is_today_weekend = 1.0 if now.weekday() >= 5 else 0.0
-    dtp_today = (next_payday(now).date() - now.date()).days
-    today_point = {
-        "date": now.strftime("%Y-%m-%d"),
-        "day_name": now.strftime("%a"),
-        "is_weekend": bool(is_today_weekend),
-        "days_to_payday": int(dtp_today),
-        "predicted_spend": round(spent_today, 2),
-        "actual_spend": round(spent_today, 2),
-        "salary_inflow": 0.0,
-        "projected_balance": round(cur_balance, 2),
-        "status": "TODAY",
-        "is_past": False,
-        "is_today": True,
-        "is_future": False,
-        "current_time": now.strftime("%H:%M")
-    }
-
-    # Future 30 days (LightGBM rolling-window lag features & transaction seasonality)
-    future_points = []
-    lag_1 = spent_today
-    lag_3 = float(avg_spend * 0.95)
-    lag_7 = float(avg_spend * 1.05)
-    cum_bal = cur_balance
-
-    fixed_rent = float(prof.get("fixed_rent", round(salary * 0.25, 2)))
-    fixed_debt_emi = float(prof.get("fixed_debt", round(salary * 0.12, 2)))
-    fixed_utilities = float(prof.get("fixed_utilities", round(salary * 0.05, 2)))
-    due_today = sum(row["amount"] for row in commitments(prof, now, state) if row["due_days"] == 0)
-
-    for f_step in range(1, 31):
-        target_date = now + timedelta(days=f_step)
-        is_weekend = 1.0 if target_date.weekday() >= 5 else 0.0
-
-        dtp = float((next_payday(target_date).date() - target_date.date()).days)
-
-        fixed_due_7d = 1.0 if (target_date.day >= 25 or target_date.day <= 2) else 0.0
-
-        feat = np.array([[dtp, fixed_due_7d, is_weekend, lag_1, lag_3, lag_7]], dtype=np.float32)
-        pred_spend = float(wealth_sess.run([wealth_out_name], {wealth_in_name: feat})[0][0][0])
-        pred_spend = max(150.0, pred_spend)
-
-        # Accurately reflect recurring commitments on due days
-        # Remaining amounts share the same bill IDs as the transfer planner.
-        # An unpaid bill due today is conservatively carried into tomorrow.
-        fixed_due_deduction = due_today if f_step == 1 else 0.0
-        for kind, day, value in (("debt", 22, fixed_debt_emi), ("rent", 26, fixed_rent), ("utilities", 27, fixed_utilities)):
-            if target_date.day == day:
-                paid = state.get("paid_commitments", {}).get(f"{kind}:{target_date:%Y-%m-%d}", 0)
-                fixed_due_deduction += max(0, value-paid)
-
-        inflow = salary if target_date.day == 28 else 0.0
-        cum_bal = cum_bal - pred_spend - fixed_due_deduction + inflow
-
-        future_points.append({
-            "date": target_date.strftime("%Y-%m-%d"),
-            "day_name": target_date.strftime("%a"),
-            "is_weekend": bool(is_weekend),
-            "days_to_payday": int(dtp),
-            "predicted_spend": round(pred_spend, 2),
-            "actual_spend": 0.0,
-            "salary_inflow": inflow,
-            "commitment_payment": round(fixed_due_deduction, 2),
-            "projected_balance": round(cum_bal, 2),
-            "status": "FUTURE",
-            "is_past": False,
-            "is_today": False,
-            "is_future": True
-        })
-
-        lag_7 = lag_3
-        lag_3 = lag_1
-        lag_1 = pred_spend
-
-    full_timeline = past_points + [today_point] + future_points
-    min_proj_balance = min(p["projected_balance"] for p in [today_point] + future_points)
-    is_safe = min_proj_balance >= 500.0
-    payday_target = now + timedelta(days=int(dtp_today))
-
-    return {
-        "account_id": account_id,
-        "forecast_days": 30,
-        "history_days": 7,
-        "data_mode": "synthetic_demo",
-        "model_architecture": "LightGBM with rolling-window lag features & transaction seasonality",
-        "operational_objective": "Forecasts safe liquidity margins 30 days ahead; suppresses alerts during normal dips.",
-        "today_index": len(past_points),
-        "current_datetime": now.strftime("%Y-%m-%d %H:%M:%S"),
-        "days_to_payday": int(dtp_today),
-        "payday_date": payday_target.strftime("%Y-%m-%d"),
-        "current_balance": round(cur_balance, 2),
-        "min_projected_balance": round(min_proj_balance, 2),
-        "liquidity_health": "HEALTHY" if is_safe else "RISK_OF_DEFICIT",
-        "alerts_suppressed_during_normal_dips": True,
-        "projection_summary": (
-            "สุขภาพสภาพคล่องแข็งแรง มีเส้นทางกระแสเงินสดรองรับภาระผูกพันถึงวันเงินเดือนออก"
-            if is_safe
-            else "ยอดคาดการณ์บางวันต่ำกว่าเกณฑ์สภาพคล่อง ฿500 ควรวางแผนเงินที่ต้องใช้"
-        ),
-        "timeline": full_timeline
-    }
 
 @app.post("/api/v2/flowsense/micro-sweep")
 def trigger_micro_sweep(payload: MicroSweepRequest, x_idempotency_key: Optional[str] = Header(None)):
@@ -1015,6 +862,8 @@ def trigger_micro_sweep(payload: MicroSweepRequest, x_idempotency_key: Optional[
             raise HTTPException(status_code=400, detail="กรุณาเปิดการแยกเงินออมก่อน")
 
         liquidity = get_flowsense_horizon_status(acc_id)
+        if liquidity['max_sweep_amount'] is None:
+            raise HTTPException(status_code=409, detail='ข้อมูลไม่พอสำหรับประมาณการความสามารถในการออม: ' + liquidity['spending_basis']['reason'])
         sweep_amount = payload.custom_sweep_amount
         if sweep_amount is None:
             sweep_amount = liquidity["recommended_sweep_amount"]
@@ -1096,9 +945,10 @@ def reset_account_state(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,30
         "vault_balance": float(prof["initial_vault_savings"]),
         "total_swept": 0.0,
         "savings_enabled": False,
-        "daily_spent_today": float(prof["avg_daily_spend"] * 0.45),
+        "daily_spent_today": 0.0,
         "last_sweep_ts": time.time()
     }
+    initialize_session_bills({account_id: LIVE_ACCOUNT_STATES[account_id]})
     for key in list(PENDING_STEP_UP):
         if key[0] == account_id:
             del PENDING_STEP_UP[key]
@@ -1116,7 +966,28 @@ def reset_account_state(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,30
 # ==============================================================================
 @app.get("/api/v2/health")
 def health_check():
-    return {"status": "HEALTHY", "mode": "synthetic_demo", "version": "4.0.0"}
+    return {"status": "HEALTHY", "mode": "synthetic_demo", "version": "4.0.0",
+            "trustgraph_version": ACTIVE_TRUSTGRAPH_VERSION,
+            "flowsense_model_enabled": False, "forecast_mode": "LIVE_INTRADAY_BASELINE",
+            "baseline_mode": BASELINE_MODE, "baseline_policy_version": BASELINE_VERSION,
+            "loaded_models": list(PACKAGE_SESSIONS) if SERVING_CONFIG['trustgraph_enabled'] else ['trustgraph_legacy']}
+
+
+@app.get('/release.json', include_in_schema=False)
+def release_identity():
+    path = FilePath(REACT_DIST_DIR) / 'release.json'
+    if not path.is_file():
+        raise HTTPException(status_code=503, detail='Release identity is unavailable')
+    build = json.loads(path.read_text(encoding='utf-8'))
+    # Render injects the final deployed revision at runtime, independent of build hashes.
+    commit = os.environ.get('RENDER_GIT_COMMIT', '')
+    return JSONResponse({**build,
+        'deployed_commit': commit if len(commit) == 40 and all(c in '0123456789abcdef' for c in commit) else None,
+        'baseline_mode': BASELINE_MODE, 'flowsense_model_enabled': False,
+        'trustgraph_version': ACTIVE_TRUSTGRAPH_VERSION,
+        'loaded_models': list(PACKAGE_SESSIONS) if SERVING_CONFIG['trustgraph_enabled'] else ['trustgraph_legacy'],
+        'package_manifest_sha256': SERVING_CONFIG['manifest_sha256']},
+        headers={'Cache-Control': 'no-store'})
 
 
 @app.post("/api/v2/flowsense/scenario")
@@ -1129,16 +1000,15 @@ def set_liquidity_scenario(payload: LiquidityScenarioRequest):
     prof = BEHAVIORAL_PROFILES_CACHE[payload.account_id]
     salary = float(prof["monthly_salary"])
     state["scenario"] = payload.scenario
-    state["daily_spent_today"] = float(prof["avg_daily_spend"]) * .45
     draft = calculate_horizon(prof, state)
     obligations = draft["total_recurring_commitments"]
-    burn = draft["projected_daily_burn"] * draft["days_to_payday"]
+    burn = draft["savings_estimate"]["projected_living_cost"]
     if payload.scenario == "high_value":
         state["main_balance"] = 60000.0
-    elif payload.scenario == "healthy":
+    elif payload.scenario == "healthy" and burn is not None:
         estimate = draft["savings_estimate"]
         state["main_balance"] = round(max(salary * .9, estimate["fixed_commitments"] + estimate["projected_living_cost"] + estimate["emergency_buffer"] + 2000), 2)
-    elif payload.scenario == "normal_dip":
+    elif payload.scenario == "normal_dip" and burn is not None:
         # Presets adjust demo spending, not the visitor's genuine financial data.
         state["main_balance"] = round(salary * .49, 2)
         state["daily_spent_today"] = 0
@@ -1147,7 +1017,7 @@ def set_liquidity_scenario(payload: LiquidityScenarioRequest):
             state["main_balance"] = round(obligations + burn + 1000, 2)
     else:
         state["main_balance"] = round(max(500, obligations * .45), 2)
-    if payload.scenario in {"healthy", "normal_dip"}:
+    if payload.scenario in {"healthy", "normal_dip"} and burn is not None:
         # Keep safe presets safe for the current calendar and actual model forecast.
         forecast = forecast_cashflow_30d(payload.account_id)
         minimum = min(point["projected_balance"] for point in forecast["timeline"]

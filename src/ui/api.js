@@ -1,3 +1,4 @@
+import { createCommandJournal, isDefinitiveRejection } from './commandJournal.mjs';
 const base = '/api/v2';
 let sessionPromise;
 
@@ -7,7 +8,7 @@ function ensureSession() {
       .then(async (response) => {
         const body = await response.json();
         if (!response.ok) throw new Error(body.detail ?? 'ไม่สามารถเริ่ม session ทดลองได้');
-        return body.csrf_token;
+        return { csrf: body.csrf_token, id: body.session_id };
       })
       .catch((error) => { sessionPromise = undefined; throw error; });
   }
@@ -15,7 +16,7 @@ function ensureSession() {
 }
 
 async function request(path, options = {}) {
-  const csrf = await ensureSession();
+  const { csrf } = await ensureSession();
   const response = await fetch(`${base}${path}`, {
     ...options,
     credentials: 'same-origin',
@@ -33,12 +34,29 @@ async function request(path, options = {}) {
   return body;
 }
 
-const post = (path, body) => request(path, {
-  method: 'POST', body: JSON.stringify(body),
-  headers: { 'X-Idempotency-Key': crypto.randomUUID() },
+const journal = createCommandJournal({
+  storage: window.sessionStorage, uuid: () => crypto.randomUUID(), session: ensureSession,
+  async send(path, body, key, csrf) {
+    const response = await fetch(`${base}${path}`, {
+      method: 'POST', body: JSON.stringify(body), credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf, 'X-Idempotency-Key': key },
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      if (result.code === 'SESSION_EXPIRED') sessionPromise = undefined;
+      const error = new Error(result.detail || 'ไม่สามารถรับผลคำสั่งได้');
+      error.code = result.code;
+      error.definitive = isDefinitiveRejection(response.status, response.headers.get('X-Idempotency-Result'));
+      throw error;
+    }
+    return result;
+  },
 });
+const post = (path, body) => journal.post(path, body);
 
 export const api = {
+  pendingCommand: journal.pending,
+  retryPending: journal.retry,
   profile: (id) => request(`/flowsense/profile/${id}`),
   horizon: (id) => request(`/flowsense/horizon-status/${id}`),
   forecast: (id) => request(`/flowsense/forecast-30d/${id}`),

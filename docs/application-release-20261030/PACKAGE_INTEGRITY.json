@@ -1,0 +1,37 @@
+{
+  "manifest_sha256": "d73fd16f7f4e304c6a00900b1771d09c09aa6136f49b98a951409200d1931b4a",
+  "manifest_entries": 13,
+  "runtime_files": [
+    {
+      "path": "flowsense.onnx",
+      "sha256": "5d96f506ea16ef87dc2c40fa3cbbc426557d62583c4e28deae6458e9edc5a186",
+      "matches": true
+    },
+    {
+      "path": "trustgraph.onnx",
+      "sha256": "e290222ed939caabf5455d4aac17e1a7f680c9d395ebabb99e057367c449efe3",
+      "matches": true
+    },
+    {
+      "path": "trustgraph_embeddings.csv",
+      "sha256": "3a5f0f348ae3578c65bb1ef2ad661e32adb7e7907bb929fbd26d3101ac136ab0",
+      "matches": true
+    }
+  ],
+  "omitted": [
+    "evaluation.json",
+    "flowsense-evaluation.json",
+    "flowsense_lgbm.txt",
+    "flowsense_parity_inputs.npy",
+    "README.md",
+    "trustgraph-evaluation.json",
+    "trustgraph_baseline_lgbm.txt",
+    "trustgraph_lgbm.txt",
+    "trustgraph_parity_inputs.npy",
+    "trustgraph_rgcn.pt"
+  ],
+  "loaded_models": [
+    "trustgraph"
+  ],
+  "flowsense_enabled": false
+}

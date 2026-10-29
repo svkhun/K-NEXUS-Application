@@ -75,9 +75,9 @@ class FeatureTests(unittest.TestCase):
         forecast = self.client.get(BASE + '/flowsense/forecast-30d/ACC_0100').json()
         future = [p for p in forecast['timeline'] if p['is_future']]
         self.assertEqual(len(future), 30)
-        self.assertEqual(len([p for p in forecast['timeline'] if p['is_past']]), 7)
-        self.assertEqual(len({p['date'] for p in forecast['timeline']}), 38)
-        for previous, current in zip([forecast['timeline'][7]]+future, future):
+        self.assertEqual(len([p for p in forecast['timeline'] if p['is_past']]), 0)
+        self.assertEqual(len({p['date'] for p in forecast['timeline']}), 31)
+        for previous, current in zip([forecast['timeline'][0]]+future, future):
             self.assertAlmostEqual(current['projected_balance'], previous['projected_balance']-current['predicted_spend']-current['commitment_payment']+current['salary_inflow'], delta=.02)
         for year, month, day, expected in ((2026,12,31,'2027-01-28'), (2028,2,29,'2028-03-28'), (2026,1,28,'2026-02-28')):
             self.assertEqual(next_payday(datetime(year,month,day,tzinfo=ZoneInfo('Asia/Bangkok'))).strftime('%Y-%m-%d'), expected)

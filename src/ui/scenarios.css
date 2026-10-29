@@ -1,0 +1,30 @@
+.scenario-explorer { margin: 0 0 16px; border: 1px solid #ffffff20; border-radius: 8px; background: #ffffff03; color: #c6dddf; }
+.scenario-drawer-toggle { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 12px; font-size: 12px; }
+.scenario-drawer-toggle > span:first-of-type { flex: none; }
+.scenario-current { min-width: 0; margin-left: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; color: #abc5ca; }
+.scenario-explorer[open] > summary .scenario-drawer-chevron { transform: rotate(180deg); }
+.scenario-drawer-body { padding: 10px 12px 0; border-top: 1px solid #ffffff18; }
+.scenario-guidance { font-size: 12px; color: #abc5ca; margin-bottom: 8px; }
+.scenario-choices { display: flex; flex-wrap: wrap; gap: 6px; }
+.scenario-choices button { min-height: 44px; padding: 7px 12px; border: 1px solid #ffffff30; border-radius: 8px; background: transparent; color: #d7e8e7; font-size: 13px; font-weight: 400; }
+.scenario-choices button:hover:not(:disabled) { background: #ffffff0c; border-color: #8ebdb7; }
+.scenario-choices button[aria-pressed=true] { background: #a3dbcd; border-color: #a3dbcd; color: #214c48; opacity: 1; cursor: default; }
+.kplus-experience .scenario-choices button:focus-visible, .kplus-experience .scenario-explorer summary:focus-visible { outline: 3px solid #a3dbcd; outline-offset: 3px; }
+.scenario-label-short { display: none; }
+.scenario-info { flex-basis: 100%; font-size: 12px; color: #abc5ca; }
+.scenario-info summary { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+.scenario-info[open] summary svg { transform: rotate(180deg); }
+.scenario-info > div { border-top: 1px solid #ffffff20; padding: 10px 0 4px; line-height: 1.8; }
+.scenario-info ul { margin: 8px 0; padding-left: 18px; }
+.scenario-info li + li { margin-top: 4px; }
+.scenario-info strong { font-weight: 500; color: #d0e4e2; }
+.scenario-pending { display: flex; flex-basis: 100%; flex-wrap: wrap; gap: 0 12px; align-items: center; border-top: 1px solid #ffffff20; padding-top: 4px; }
+.scenario-pending p { font-size: 12px; color: #e7cf9f; }
+.scenario-explorer .scenario-pending .text-link { color: #a3dbcd; font-size: 12px; }
+@media (max-width: 599px) {
+  .scenario-drawer-toggle { gap: 6px; padding-inline: 10px; }
+  .scenario-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+  .scenario-choices button { padding: 7px 4px; font-size: 12px; }
+  .scenario-label-full { display: none; }
+  .scenario-label-short { display: inline; }
+}

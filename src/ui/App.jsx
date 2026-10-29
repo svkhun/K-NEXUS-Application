@@ -1,15 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  Activity, ArrowDownLeft, ArrowRight, ArrowUpRight, BadgeCheck,
-  Bell, Check, ChevronDown, CircleAlert, CreditCard, Fingerprint,
-  Home, LockKeyhole, RotateCcw, Send, ShieldAlert, ShieldCheck,
-  Sparkles, Wallet, X, Search, ChevronRight, Target, Eye, EyeOff, UserRound, BarChart3,
-} from 'lucide-react';
+import { Activity, ArrowDownLeft, ArrowRight, ArrowUpRight, BadgeCheck, Bell, Check, ChevronDown, CircleAlert, Fingerprint, LockKeyhole, RotateCcw, ShieldAlert, Sparkles, X, Search, ChevronRight, Target, Eye, EyeOff } from 'lucide-react';
+import { AccountIcon, ForecastIcon, HomeIcon, ProfileIcon, ProtectionIcon, SavingsIcon, TransferIcon } from './NexusIcons';
 import { api } from './api';
 import Dashboard, { AccountsPage } from './Dashboard';
 import TransferForm from './TransferForm';
 import ForecastChart from './ForecastChart';
 import SavingsPage from './SavingsPage';
+import ScenarioPicker, { scenarioLabel } from './ScenarioPicker';
 import TransferResult from './TransferResult';
 import { describeEvent } from './InsightsLab';
 import { bangkokDate } from './forecastModel.mjs';
@@ -29,16 +26,16 @@ const recipientTemplates = [
   { id: 'ACC_0001', name: 'บัญชีที่ควรตรวจเพิ่ม', meta: 'ทดลองเห็นคำเตือนความเสี่ยง', icon: ShieldAlert, tone: 'orange', amount: 1200 },
   { id: 'ACC_0000', name: 'บัญชีที่ถูกระงับ', meta: 'ทดลองกรณีหยุดรายการ', icon: LockKeyhole, tone: 'red', amount: 1200 },
 ];
-const money = (value, digits = 0) => new Intl.NumberFormat('th-TH', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(Number(value ?? 0));
+const money = (value, digits = 0) => value == null ? '—' : new Intl.NumberFormat('th-TH', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(Number(value));
 const isPendingTransfer = (result) => ['MICRO_AUTH_REQUIRED', 'TRANSFER_REVIEW', 'REVIEW_CHANGED'].includes(result?.status);
 const navItems = [
-  { id: 'home', label: 'หน้าหลัก', icon: Home },
-  { id: 'plan', label: 'การเงิน', icon: BarChart3 },
-  { id: 'transactions', label: 'ธุรกรรม', icon: CreditCard },
-  { id: 'savings', label: 'ออมเงิน', icon: Wallet },
-  { id: 'profile', label: 'โปรไฟล์', icon: UserRound },
+  { id: 'home', label: 'หน้าหลัก', icon: HomeIcon },
+  { id: 'plan', label: 'การเงิน', icon: ForecastIcon },
+  { id: 'transactions', label: 'ธุรกรรม', icon: AccountIcon },
+  { id: 'savings', label: 'ออมเงิน', icon: SavingsIcon },
+  { id: 'profile', label: 'โปรไฟล์', icon: ProfileIcon },
 ];
-const serviceItems = [...navItems, { id: 'accounts', label: 'บัญชีและแนวโน้มเงิน', icon: CreditCard }, { id: 'transfer', label: 'โอน / จ่าย', icon: Send }];
+const serviceItems = [...navItems, { id: 'accounts', label: 'บัญชีและแนวโน้มเงิน', icon: AccountIcon }, { id: 'transfer', label: 'โอน / จ่าย', icon: TransferIcon }];
 
 function App() {
   const [tab, setTab] = useState('home');
@@ -129,9 +126,32 @@ function App() {
     if (inFlight.current) return;
     inFlight.current = true;
     setBusy(true); setError(''); setNotice('');
-    try { await action(); } catch (err) { setError(err.message); }
+    try { await action(); } catch (err) {
+      setError(err.message);
+      if (['OUTCOME_UNKNOWN', 'PENDING_SESSION_EXPIRED'].includes(err.code) && api.pendingCommand()?.path === '/trustgraph/confirm-transfer') {
+        setTransferResult({ status:'OUTCOME_UNKNOWN' }); setReviewOpen(true);
+      }
+    }
     finally { inFlight.current = false; setBusy(false); }
   };
+  const retryCommand = () => run(async () => {
+    const command = api.pendingCommand();
+    const result = await api.retryPending();
+    if (command?.path.startsWith('/trustgraph/') && result?.status) {
+      const original = command.body;
+      if (original.source_account_id !== accountId) {
+        setError('รับผลเดิมแล้ว กรุณากลับไปดูบัญชี '+original.source_account_id+' และตรวจประวัติ');
+        await refresh();
+        return;
+      }
+      const originalRecipient = recipients.find(item => item.id === original.target_account_id);
+      if (originalRecipient) setRecipient(originalRecipient);
+      setAmount(String(original.amount));
+      setTransferResult(result); setReviewOpen(true); setClearanceToken(null);
+    }
+    await refresh();
+    setNotice('รับผลคำสั่งเดิมแล้ว กรุณาตรวจยอดและประวัติรายการจำลอง');
+  });
   const changePersona = (id) => {
     setTutorialStep(null);
     activeAccount.current = id;
@@ -161,7 +181,13 @@ function App() {
     await refresh();
     setNotice(`ถอนเงินออม ฿${money(result.withdrawn_amount, 2)} เข้าบัญชีหลักแล้ว`);
   });
-  const onScenario = (scenario) => run(async () => { await api.scenario(accountId, scenario); setMatchedBillId(''); setTransferPurpose('general'); await refresh(); setTransferResult(null); setClearanceToken(null); setReviewOpen(false); setNotice('เปลี่ยนสถานการณ์จำลองแล้ว ลองดูคำแนะนำและกราฟที่เปลี่ยนไป'); });
+  const onScenario = (scenario) => run(async () => {
+    if (isPendingTransfer(transferResult)) throw new Error('กรุณาจัดการรายการโอนที่รอตรวจสอบก่อนเปลี่ยนสถานการณ์');
+    await api.scenario(accountId, scenario);
+    setMatchedBillId(''); setTransferPurpose('general');
+    await refresh(); setTransferResult(null); setClearanceToken(null); setReviewOpen(false);
+    setNotice(`กำลังทดลอง: ${scenarioLabel(scenario)} · ยอดเงิน งบใช้จ่าย และคำแนะนำอัปเดตแล้ว`);
+  });
   const prepareHighValue = () => run(async () => { await api.scenario(accountId, 'high_value'); await refresh(); changeRecipient(recipients[0]); setAmount('50000'); setNotice('เตรียมยอดบัญชีสมมติ ฿60,000 สำหรับทดลองการตรวจรายการมูลค่าสูงแล้ว'); });
   const onSavingsToggle = (enabled) => run(async () => { await api.savingsPreference(accountId, enabled); await refresh(); setNotice(enabled ? 'เปิดการแยกเงินออมแล้ว เลือกจำนวนแล้วกดออมเมื่อพร้อม' : 'ปิดการแยกเงินออมแล้ว ยังถอนเงินออมที่มีอยู่ได้ตามปกติ'); });
   const onReservePreview = (value) => api.reservePreview(accountId, value);
@@ -319,7 +345,7 @@ function App() {
 
       <div className="app-content">
         <header className="topbar">
-          <button className="header-avatar" aria-label="เปิดโปรไฟล์ของฉัน" onClick={() => openTab('profile')}><UserRound size={23}/></button>
+          <button className="header-avatar" aria-label="เปิดโปรไฟล์ของฉัน" onClick={() => openTab('profile')}><ProfileIcon size={23}/></button>
           <div className="mobile-brand"><BankWordmark/></div>
           <div className="header-product">K-NEXUS</div>
           <div className="topbar-right">
@@ -332,33 +358,35 @@ function App() {
         <main className="main-content">
           <div className="page-intro"><div><h1>{title}</h1><p>{description}</p></div><details className="demo-context"><summary>บัญชีทดลอง · {persona.name}<ChevronDown size={15} /></summary><div className="demo-context-panel"><label htmlFor="persona">ลองเปลี่ยนโปรไฟล์</label><select id="persona" value={accountId} disabled={busy} onChange={(event) => changePersona(event.target.value)}>{personas.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.role}</option>)}</select><p>แอปต้นแบบอิสระ ใช้ข้อมูลสมมติ ไม่ใช่แอปทางการของ KBank</p><button className="text-link" disabled={busy || !profile} onClick={doReset}><RotateCcw size={15} /> รีเซ็ตบัญชีทดลอง</button></div></details></div>
 
-          <div className="demo-disclaimer"><ShieldCheck size={14} /><span>แอปต้นแบบ · ข้อมูลสมมติ · ไม่มีการโอนเงินจริง</span></div>
+          <div className="demo-disclaimer"><ProtectionIcon size={14} /><span>แอปต้นแบบ · ข้อมูลสมมติ · ไม่มีการโอนเงินจริง</span></div>
+          {api.pendingCommand() && <div className="message error" role="alert"><span>ยังมีคำสั่งที่ไม่ทราบผล อาจบันทึกสำเร็จแล้ว ระบบเก็บคำสั่งเดิมไว้และหยุดคำสั่งใหม่ กรุณาตรวจยอด/ประวัติและรับผลเดิม</span><button disabled={busy} onClick={retryCommand}>รับผลคำสั่งเดิม</button></div>}
           {error && !hidden && <div className="message error" role="alert"><CircleAlert size={18} /><span>{error}</span><button aria-label="ปิดข้อความ" onClick={() => setError('')}><X size={16} /></button></div>}
           {notice && !hidden && <div className="message success" role="status"><Check size={18} /><span>{notice}</span><button aria-label="ปิดข้อความ" onClick={() => setNotice('')}><X size={16} /></button></div>}
 
           {hidden ? <section className="surface privacy-cover"><EyeOff size={32} /><h2>ซ่อนข้อมูลการเงินแล้ว</h2><p>ยอดเงิน กราฟ และรายการต่าง ๆ จะกลับมาเมื่อคุณเลือกแสดงข้อมูล</p><button className="primary-button" onClick={() => setHidden(false)}>แสดงข้อมูลการเงิน <Eye size={17} /></button></section> : loading ? <div className="loading-card"><div className="spinner" /> กำลังโหลดข้อมูลจำลอง...</div> : profile && horizon ? <>
             {tab !== 'transfer' && isPendingTransfer(transferResult) && <div className="pending-transfer-banner"><ShieldAlert size={19} /><span>มีรายการรอตรวจสอบก่อนโอน · ยังไม่ได้หักเงิน</span><button className="text-link" onClick={showTransferReview}>กลับไปดูรายการ <ArrowRight size={16} /></button></div>}
+            {['home', 'plan', 'accounts', 'transactions', 'savings'].includes(tab) && <ScenarioPicker {...{horizon, busy, onScenario}} page={tab} pending={isPendingTransfer(transferResult)} onResume={showTransferReview}/>}
             {tab === 'home' && <Dashboard profile={profile} horizon={horizon} activities={(profile.events || []).slice(0, 5).map(describeEvent)} hidden={hidden} setHidden={setHidden} openTab={openTab} tryScenario={tryScenario} {...{onPayBill, onWithdraw, onTransferSettings, startTutorial, busy}} />}
             {tab === 'transactions' && <TransactionsHub {...{profile, horizon, openTab, onPayBill, onWithdraw, onTransferSettings}}/>}
             {tab === 'profile' && <ProfilePage {...{persona, profile, openTab, onTransferSettings, doReset, busy, setHidden}}/>}
             {['plan', 'accounts'].includes(tab) && <FinancialTabs active={tab} openTab={openTab}/>}
-            {tab === 'plan' && <DailyPlan key={`${accountId}-${horizon.scenario}`} {...{ profile, horizon, forecast, busy, onScenario, openTab, onWithdraw, onReservePreview, onReserveSave }}/>}
-            {tab === 'accounts' && <AccountsPage profile={profile} horizon={horizon} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} openTab={openTab} hidden={hidden} doReset={doReset} busy={busy} onScenario={onScenario} refresh={() => run(() => refresh())} />}
+            {tab === 'plan' && <DailyPlan key={`${accountId}-${horizon.scenario}`} {...{ profile, horizon, forecast, busy, openTab, onWithdraw, onReservePreview, onReserveSave }}/>}
+            {tab === 'accounts' && <AccountsPage profile={profile} horizon={horizon} chart={<ForecastChart timeline={forecast?.timeline} horizon={horizon} onRefresh={() => run(() => refresh())} busy={busy} />} openTab={openTab} hidden={hidden} doReset={doReset} busy={busy} refresh={() => run(() => refresh())} />}
 
-            {tab === 'savings' && <SavingsPage key={accountId} {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, onScenario, openTab, onReservePreview, onReserveSave }}/>}
+            {tab === 'savings' && <SavingsPage key={accountId} {...{ profile, horizon, busy, sweepAmount, setSweepAmount, doSweep, doRecommendedSweep, doWithdraw, doReset, onSavingsToggle, openTab, onReservePreview, onReserveSave }}/>}
 
             {tab === 'transfer' && <TransferProtectionSettings key={accountId} profile={profile} busy={busy} hasPending={isPendingTransfer(transferResult)} onChange={onTransferPreference} />}
             {tab === 'transfer' && <>
               {isPendingTransfer(transferResult) && <div className="transfer-active-review"><div><strong>มีรายการที่กำลังตรวจสอบ</strong><p>฿{money(amount, 2)} · {recipient.name} · ยังไม่ได้หักเงิน</p></div><div><button id="transfer-review-open" className="primary-button" disabled={busy} onClick={showTransferReview}>ดูรายการที่รอ <ArrowRight size={16} /></button><button className="text-link" disabled={busy} onClick={() => decide('CANCEL')}>ยกเลิกรายการเดิม</button></div></div>}
               {transferResult && !isPendingTransfer(transferResult) && <button className="transfer-last-result text-link" onClick={() => setReviewOpen(true)}>ดูผลรายการล่าสุด <ArrowRight size={16} /></button>}
-              <div className="transfer-workspace"><TransferForm profile={profile} persona={persona} recipients={recipients} recipient={recipient} amount={amount} setAmount={setAmount} changeRecipient={changeRecipient} clearResult={clearTransferResult} busy={busy} evaluate={evaluate} prepareHighValue={prepareHighValue} bills={(horizon.recurring_commitments || []).filter((bill) => bill.due_days < horizon.days_to_payday && bill.amount > 0)} matchedBillId={matchedBillId} setMatchedBillId={setMatchedBillId} transferPurpose={transferPurpose} setTransferPurpose={setTransferPurpose} telemetry={telemetry} setTelemetry={(value) => { setTelemetry(value); clearTransferResult(); }} /><div className="transfer-flow-note"><ShieldCheck size={19} /><p>ผลการตรวจสอบจะแสดงในหน้าต่าง Pop-up · เมื่อยกเลิก รายการและเวลาพักนั้นจะสิ้นสุด รายการใหม่ใช้ค่าตั้งค่าปัจจุบัน</p></div></div>
+              <div className="transfer-workspace"><TransferForm profile={profile} persona={persona} recipients={recipients} recipient={recipient} amount={amount} setAmount={setAmount} changeRecipient={changeRecipient} clearResult={clearTransferResult} busy={busy} evaluate={evaluate} prepareHighValue={prepareHighValue} bills={(horizon.recurring_commitments || []).filter((bill) => bill.due_days < horizon.days_to_payday && bill.amount > 0)} matchedBillId={matchedBillId} setMatchedBillId={setMatchedBillId} transferPurpose={transferPurpose} setTransferPurpose={setTransferPurpose} telemetry={telemetry} setTelemetry={(value) => { setTelemetry(value); clearTransferResult(); }} /><div className="transfer-flow-note"><ProtectionIcon size={19} /><p>ผลการตรวจสอบจะแสดงในหน้าต่าง Pop-up · เมื่อยกเลิก รายการและเวลาพักนั้นจะสิ้นสุด รายการใหม่ใช้ค่าตั้งค่าปัจจุบัน</p></div></div>
             </>}
             {reviewOpen && transferResult && <TransferReviewDialog busy={busy} pending={isPendingTransfer(transferResult)} canContactBank={transferResult.status === 'BLOCKED_MULE_INTERDICTION' || (transferResult.status === 'MICRO_AUTH_REQUIRED' && transferResult.risk_tier !== 'HIGH_VALUE_DEMO_CHECK')} error={error} onClose={() => setReviewOpen(false)} onSettings={editTransferSettings} onCancelTransfer={() => decide('CANCEL')}><TransferResult result={transferResult} {...{ amount, recipient, busy, clearanceToken, verify, decide, scanning, checkCooldown, evaluate }} cancelInFooter clear={clearTransferResult} /></TransferReviewDialog>}
 
           </> : null}
           <footer className="page-footer"><span>K-NEXUS · FlowSense × TrustGraph</span><span>Inspired by everyday banking · ไม่ใช่ผลิตภัณฑ์ทางการของ KBank</span></footer>
         </main>
-        <nav className="mobile-nav" aria-label="เมนูหลักบนมือถือ">{navItems.map(({ id, label, icon: Icon }) => <button key={id} data-tab={id} className={navSection === id ? 'active' : ''} aria-label={label} aria-current={navSection === id ? 'page' : undefined} onClick={() => openTab(id)}><span className="nav-icon">{id === 'transactions' ? <b aria-hidden="true">฿</b> : <Icon size={21} strokeWidth={1.7}/>}</span><span>{label}</span></button>)}</nav>
+        <nav className="mobile-nav" aria-label="เมนูหลักบนมือถือ">{navItems.map(({ id, label, icon: Icon }) => <button key={id} data-tab={id} className={navSection === id ? 'active' : ''} aria-label={label} aria-current={navSection === id ? 'page' : undefined} onClick={() => openTab(id)}><span className="nav-icon"><Icon size={21} strokeWidth={1.7}/></span><span>{label}</span></button>)}</nav>
       </div>
       {tutorialStep !== null && !hidden && !loading && <TutorialOverlay stepIndex={tutorialStep} busy={busy} error={tutorialStep === 4 ? error : ''} onNext={nextTutorial} onBack={() => visitTutorialStep(tutorialStep - 1)} onSkip={() => closeTutorial('skipped')} nextLabel={tutorialStep === 4 ? (Number(profile?.main_balance) > 0 || isPendingTransfer(transferResult) ? 'ดูผลตรวจตัวอย่าง' : 'ไปดูวิธีถอนเงินออม') : undefined}/> }
     </div>

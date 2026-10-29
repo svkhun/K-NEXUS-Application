@@ -5,6 +5,11 @@ RUN npm ci --no-audit --no-fund
 COPY index.html vite.config.js ./
 COPY public ./public
 COPY src ./src
+COPY config ./config
+COPY models ./models
+COPY data/01_flowsense_user_profiles.csv data/03_trustgraph_users_and_mule_labels.csv ./data/
+COPY requirements.lock requirements.txt Dockerfile run.py ./
+COPY scripts/build_release.mjs ./scripts/
 RUN npm run build
 
 FROM python:3.13-slim-bookworm AS runtime
@@ -17,7 +22,8 @@ COPY requirements.lock ./
 RUN pip install --no-cache-dir -r requirements.lock
 COPY src ./src
 COPY models ./models
-COPY data ./data
+COPY config ./config
+COPY data/01_flowsense_user_profiles.csv data/03_trustgraph_users_and_mule_labels.csv ./data/
 COPY run.py ./
 COPY --from=frontend /build/frontend/dist ./frontend/dist
 USER 10001:10001
