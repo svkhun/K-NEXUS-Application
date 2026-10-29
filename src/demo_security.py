@@ -141,6 +141,8 @@ class DemoSessionMiddleware(BaseHTTPMiddleware):
             del self.sessions[sid]
         session = self.sessions.get(request.cookies.get(COOKIE_NAME))
         if path == "/api/v2/session" and request.method == "GET":
+            lifecycle = "RESUMED" if session else "NEW"
+            previous_session_expired = bool(request.cookies.get(COOKIE_NAME)) and session is None
             if session is None:
                 peer = request.client.host if request.client else "unknown"
                 for key in list(self.creations):
@@ -158,7 +160,7 @@ class DemoSessionMiddleware(BaseHTTPMiddleware):
                 if ACCOUNT_INITIALIZER:
                     ACCOUNT_INITIALIZER(session.accounts)
                 self.sessions[session.sid] = session
-            response = JSONResponse({"csrf_token": session.csrf, "session_id": session.sid, "expires_in_seconds": max(0, int(session.expires - now)), "mode": "synthetic_demo",
+            response = JSONResponse({"csrf_token": session.csrf, "session_id": session.sid, "lifecycle": lifecycle, "previous_session_expired": previous_session_expired, "expires_in_seconds": max(0, int(session.expires - now)), "mode": "synthetic_demo",
                 "idempotency": {"scope": "THIS_SESSION_THIS_PROCESS", "max_commands": MAX_COMMANDS, "response_cache_entries": 32}})
             response.set_cookie(COOKIE_NAME, session.sid, max_age=max(0, int(session.expires - now)), httponly=True, secure=PRODUCTION, samesite="strict", path="/")
             return response
@@ -203,6 +205,9 @@ class DemoSessionMiddleware(BaseHTTPMiddleware):
                     code="RESULT_EVICTED", original_status=status)
             if request_key and len(session.commands) >= MAX_COMMANDS:
                 return self.deny("พื้นที่คำสั่งของ session เต็ม ยังไม่รับคำสั่งใหม่ กรุณาตรวจยอดและประวัติก่อนจบ session", 409, code="COMMAND_CAPACITY")
+            if request_key and (path == '/api/v2/flowsense/scenario' or path.startswith('/api/v2/flowsense/reset-state/')):
+                if any(status is None or status >= 500 for _, status in session.commands.values()):
+                    return self.deny("ยังมีคำสั่งที่ไม่ทราบผล กรุณาตรวจผลรายการเดิมก่อนเริ่มข้อมูลใหม่", 409, code="OUTCOME_UNKNOWN")
             if request_key:
                 # Reserve before execution. Even cancellation/exception after a debit
                 # leaves a tombstone: never blindly execute an ambiguous command again.

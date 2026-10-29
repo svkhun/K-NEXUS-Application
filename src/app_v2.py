@@ -237,12 +237,17 @@ for acc_id in DEMO_ACCOUNTS:
     }
 
 SEED_ACCOUNTS.update(INITIAL_ACCOUNT_STATES)
+DEMO_INITIALIZATION = json.loads(open(os.path.join(BASE_DIR, 'config', 'demo-initialization.v1.json'), encoding='utf-8').read())
 def initialize_session_bills(accounts):
     for account_id, state in accounts.items():
         now = demo_now(state)
         state.update(seed_assumptions(account_id, now, BASELINE_CONFIG))
         state['baseline_mode'] = BASELINE_MODE
         commitments(BEHAVIORAL_PROFILES_CACHE[account_id], now, state)
+        if BASELINE_MODE == 'BASELINE':
+            apply_demo_preset(account_id, state, DEMO_INITIALIZATION['opening_preset'])
+        state['scenario'] = 'default'
+        state['demo_initialization_version'] = DEMO_INITIALIZATION['version']
 
 from src import demo_security as security_state
 security_state.ACCOUNT_INITIALIZER = initialize_session_bills
@@ -836,7 +841,7 @@ def get_flowsense_horizon_status(account_id: str = Path(..., pattern=r"^[A-Za-z0
     points = forecast_cashflow_30d(account_id)["timeline"]
     projection = {point["date"]: point["projected_balance"] for point in points if not point["is_past"]}
     result = calculate_horizon(BEHAVIORAL_PROFILES_CACHE[account_id], LIVE_ACCOUNT_STATES[account_id], projection)
-    return {"account_id": account_id, "masked_account_id": mask_account_id(account_id), **result}
+    return {"account_id": account_id, "masked_account_id": mask_account_id(account_id), "demo_initialization_version": LIVE_ACCOUNT_STATES[account_id].get("demo_initialization_version"), **result}
 
 @app.get("/api/v2/flowsense/forecast-30d/{account_id}")
 def forecast_cashflow_30d(account_id: str = Path(..., pattern=r"^[A-Za-z0-9_]{3,30}$", description="Sanitized Banking Account ID")):
@@ -990,25 +995,20 @@ def release_identity():
         headers={'Cache-Control': 'no-store'})
 
 
-@app.post("/api/v2/flowsense/scenario")
-def set_liquidity_scenario(payload: LiquidityScenarioRequest):
-    saved_reserve = {key: LIVE_ACCOUNT_STATES[payload.account_id][key]
-                     for key in ("reserve_amount", "reserve_confirmed") if key in LIVE_ACCOUNT_STATES[payload.account_id]}
-    reset_account_state(payload.account_id)
-    state = LIVE_ACCOUNT_STATES[payload.account_id]
-    state.update(saved_reserve)
-    prof = BEHAVIORAL_PROFILES_CACHE[payload.account_id]
+def apply_demo_preset(account_id, state, scenario):
+    """Existing synthetic preset arithmetic, shared by explicit selection and opening."""
+    prof = BEHAVIORAL_PROFILES_CACHE[account_id]
     salary = float(prof["monthly_salary"])
-    state["scenario"] = payload.scenario
+    state["scenario"] = scenario
     draft = calculate_horizon(prof, state)
     obligations = draft["total_recurring_commitments"]
     burn = draft["savings_estimate"]["projected_living_cost"]
-    if payload.scenario == "high_value":
+    if scenario == "high_value":
         state["main_balance"] = 60000.0
-    elif payload.scenario == "healthy" and burn is not None:
+    elif scenario == "healthy" and burn is not None:
         estimate = draft["savings_estimate"]
         state["main_balance"] = round(max(salary * .9, estimate["fixed_commitments"] + estimate["projected_living_cost"] + estimate["emergency_buffer"] + 2000), 2)
-    elif payload.scenario == "normal_dip" and burn is not None:
+    elif scenario == "normal_dip" and burn is not None:
         # Presets adjust demo spending, not the visitor's genuine financial data.
         state["main_balance"] = round(salary * .49, 2)
         state["daily_spent_today"] = 0
@@ -1017,13 +1017,23 @@ def set_liquidity_scenario(payload: LiquidityScenarioRequest):
             state["main_balance"] = round(obligations + burn + 1000, 2)
     else:
         state["main_balance"] = round(max(500, obligations * .45), 2)
-    if payload.scenario in {"healthy", "normal_dip"} and burn is not None:
+    if scenario in {"healthy", "normal_dip"} and burn is not None:
         # Keep safe presets safe for the current calendar and actual model forecast.
-        forecast = forecast_cashflow_30d(payload.account_id)
+        forecast = rule_forecast(prof, state)
         minimum = min(point["projected_balance"] for point in forecast["timeline"]
                       if not point["is_past"] and point["date"] < forecast["payday_date"])
-        reserve = draft["emergency_buffer"] + 2000 if payload.scenario == "healthy" else 1000
+        reserve = draft["emergency_buffer"] + 2000 if scenario == "healthy" else 1000
         state["main_balance"] = round(state["main_balance"] + max(0, reserve - minimum), 2)
+
+
+@app.post("/api/v2/flowsense/scenario")
+def set_liquidity_scenario(payload: LiquidityScenarioRequest):
+    saved_reserve = {key: LIVE_ACCOUNT_STATES[payload.account_id][key]
+                     for key in ("reserve_amount", "reserve_confirmed") if key in LIVE_ACCOUNT_STATES[payload.account_id]}
+    reset_account_state(payload.account_id)
+    state = LIVE_ACCOUNT_STATES[payload.account_id]
+    state.update(saved_reserve)
+    apply_demo_preset(payload.account_id, state, payload.scenario)
     audit_log("SCENARIO_CHANGED", payload.account_id, {"scenario": payload.scenario})
     return get_flowsense_horizon_status(payload.account_id)
 

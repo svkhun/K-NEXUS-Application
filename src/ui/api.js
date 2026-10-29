@@ -8,7 +8,7 @@ function ensureSession() {
       .then(async (response) => {
         const body = await response.json();
         if (!response.ok) throw new Error(body.detail ?? 'ไม่สามารถเริ่ม session ทดลองได้');
-        return { csrf: body.csrf_token, id: body.session_id };
+        return { csrf: body.csrf_token, id: body.session_id, lifecycle: body.lifecycle, previousExpired: body.previous_session_expired };
       })
       .catch((error) => { sessionPromise = undefined; throw error; });
   }
@@ -55,6 +55,7 @@ const journal = createCommandJournal({
 const post = (path, body) => journal.post(path, body);
 
 export const api = {
+  session: ensureSession,
   pendingCommand: journal.pending,
   retryPending: journal.retry,
   profile: (id) => request(`/flowsense/profile/${id}`),

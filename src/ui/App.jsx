@@ -7,6 +7,9 @@ import TransferForm from './TransferForm';
 import ForecastChart from './ForecastChart';
 import SavingsPage from './SavingsPage';
 import ScenarioPicker, { scenarioLabel } from './ScenarioPicker';
+import DemoResetDialog from './DemoResetDialog';
+import DemoMoneyContext from './DemoMoneyContext';
+import { returnNotice } from './demoContext.mjs';
 import TransferResult from './TransferResult';
 import { describeEvent } from './InsightsLab';
 import { bangkokDate } from './forecastModel.mjs';
@@ -45,7 +48,11 @@ function App() {
   const [scanning, setScanning] = useState(0);
   const [telemetry, setTelemetry] = useState({ device: false, first: false, duration: 90, ratio: 1.1, auth: 'pin' });
   const [showAlerts, setShowAlerts] = useState(false);
-  const [accountId, setAccountId] = useState(personas[0].id);
+  const [accountId, setAccountId] = useState(() => { try { const id = sessionStorage.getItem('demo-persona-v1'); return personas.some(p => p.id === id) ? id : personas[0].id; } catch { return personas[0].id; } });
+  const [visitState, setVisitState] = useState(null);
+  const dismissedReturns = useRef(new Set());
+  const [returnDismissed, setReturnDismissed] = useState(false);
+  const [resetIntent, setResetIntent] = useState(null);
   const recipients = useMemo(() => recipientTemplates.map((item, index) => index === 0 ? { ...item, id: accountId === 'ACC_0101' ? 'ACC_0100' : 'ACC_0101' } : item), [accountId]);
   const [profile, setProfile] = useState(null);
   const [horizon, setHorizon] = useState(null);
@@ -78,7 +85,9 @@ function App() {
   const persona = useMemo(() => personas.find((item) => item.id === accountId) ?? personas[0], [accountId]);
 
   const refresh = useCallback(async (id = accountId) => {
-    const [nextProfile, nextHorizon, nextForecast] = await Promise.all([api.profile(id), api.horizon(id), api.forecast(id)]);
+    let nextProfile, nextHorizon, nextForecast;
+    try { [nextProfile, nextHorizon, nextForecast] = await Promise.all([api.profile(id), api.horizon(id), api.forecast(id)]); }
+    catch (err) { if (activeAccount.current === id) { setProfile(null); setHorizon(null); setForecast(null); } throw err; }
     if (activeAccount.current !== id) return;
     setProfile(nextProfile);
     setHorizon(nextHorizon);
@@ -88,11 +97,16 @@ function App() {
   useEffect(() => {
     let active = true;
     setLoading(true);
+    setProfile(null); setHorizon(null); setForecast(null);
     setError('');
-    Promise.all([api.profile(accountId), api.horizon(accountId), api.forecast(accountId), api.pendingTransfer(accountId)])
-      .then(([nextProfile, nextHorizon, nextForecast, review]) => {
+    Promise.all([api.profile(accountId), api.horizon(accountId), api.forecast(accountId), api.pendingTransfer(accountId), api.session()])
+      .then(([nextProfile, nextHorizon, nextForecast, review, session]) => {
         if (!active) return;
         setProfile(nextProfile); setHorizon(nextHorizon); setForecast(nextForecast);
+        let hadSession = false;
+        try { hadSession = Boolean(sessionStorage.getItem('demo-last-session-v1')); sessionStorage.setItem('demo-last-session-v1', session.id); } catch { /* Server lifecycle remains authoritative. */ }
+        setVisitState(current => current || returnNotice(session.lifecycle, hadSession || session.previousExpired));
+        setReturnDismissed(dismissedReturns.current.has(accountId));
         if (review.pending) {
           const pending = review.pending;
           const target = recipientTemplates.find((item) => item.id === pending.target_account_id) || { ...recipientTemplates[0], id: pending.target_account_id };
@@ -153,7 +167,9 @@ function App() {
     setNotice('รับผลคำสั่งเดิมแล้ว กรุณาตรวจยอดและประวัติรายการจำลอง');
   });
   const changePersona = (id) => {
-    setTutorialStep(null);
+    setTutorialStep(null); setResetIntent(null);
+    setReturnDismissed(dismissedReturns.current.has(id));
+    try { sessionStorage.setItem('demo-persona-v1', id); } catch { /* No financial state is stored here. */ }
     activeAccount.current = id;
     setAccountId(id); setTransferResult(null); setClearanceToken(null); setReviewOpen(false);
     setRecipient({ ...recipientTemplates[0], id: id === 'ACC_0101' ? 'ACC_0100' : 'ACC_0101' });
@@ -181,14 +197,24 @@ function App() {
     await refresh();
     setNotice(`ถอนเงินออม ฿${money(result.withdrawn_amount, 2)} เข้าบัญชีหลักแล้ว`);
   });
-  const onScenario = (scenario) => run(async () => {
-    if (isPendingTransfer(transferResult)) throw new Error('กรุณาจัดการรายการโอนที่รอตรวจสอบก่อนเปลี่ยนสถานการณ์');
+  const destructiveBlocked = () => Boolean(api.pendingCommand()) || isPendingTransfer(transferResult);
+  const dismissReturn = () => { dismissedReturns.current.add(accountId); setReturnDismissed(true); setVisitState(current => current === 'EXPIRED' ? 'ACTIVE' : current); };
+  const requestReset = (intent) => {
+    setTutorialStep(null);
+    if (destructiveBlocked()) { setError('จัดการรายการที่รอหรือรับผลคำสั่งเดิมก่อนเริ่มข้อมูลใหม่'); return; }
+    setError(''); setResetIntent(intent);
+  };
+  const onScenario = (scenario) => requestReset(scenario);
+  const applyScenario = (scenario) => run(async () => {
+    if (destructiveBlocked()) throw new Error('กรุณาจัดการรายการเดิมก่อนเปลี่ยนสถานการณ์');
     await api.scenario(accountId, scenario);
+    setResetIntent(null); dismissReturn();
     setMatchedBillId(''); setTransferPurpose('general');
     await refresh(); setTransferResult(null); setClearanceToken(null); setReviewOpen(false);
+    if (scenario === 'high_value') { changeRecipient(recipients[0]); setAmount('50000'); }
     setNotice(`กำลังทดลอง: ${scenarioLabel(scenario)} · ยอดเงิน งบใช้จ่าย และคำแนะนำอัปเดตแล้ว`);
   });
-  const prepareHighValue = () => run(async () => { await api.scenario(accountId, 'high_value'); await refresh(); changeRecipient(recipients[0]); setAmount('50000'); setNotice('เตรียมยอดบัญชีสมมติ ฿60,000 สำหรับทดลองการตรวจรายการมูลค่าสูงแล้ว'); });
+  const prepareHighValue = () => requestReset('high_value');
   const onSavingsToggle = (enabled) => run(async () => { await api.savingsPreference(accountId, enabled); await refresh(); setNotice(enabled ? 'เปิดการแยกเงินออมแล้ว เลือกจำนวนแล้วกดออมเมื่อพร้อม' : 'ปิดการแยกเงินออมแล้ว ยังถอนเงินออมที่มีอยู่ได้ตามปกติ'); });
   const onReservePreview = (value) => api.reservePreview(accountId, value);
   const onReserveSave = (value) => run(async () => {
@@ -196,12 +222,15 @@ function App() {
     await refresh();
     setNotice(`ใช้เงินสำรอง ฿${money(value, 2)} ในแผนแล้ว งบใช้จ่ายและยอดพร้อมออมคำนวณใหม่ โดยยอดบัญชีไม่เปลี่ยน`);
   });
-  const doReset = () => run(async () => {
+  const doReset = () => requestReset('default');
+  const applyReset = () => run(async () => {
+    if (destructiveBlocked()) throw new Error('กรุณาจัดการรายการเดิมก่อนเริ่มใหม่');
     await api.reset(accountId); setMatchedBillId(''); setTransferPurpose('general');
     setTutorialStep(null);
     await refresh();
     setTransferResult(null); setClearanceToken(null); setReviewOpen(false);
-    setNotice('รีเซ็ตข้อมูลของบัญชีจำลองแล้ว');
+    setResetIntent(null); dismissReturn();
+    setNotice(`กลับค่าเริ่มต้นของ ${persona.name} แล้ว · เงินและรายการทั้งหมดเป็นข้อมูลจำลอง`);
   });
   const transferPayload = () => ({
     source_account_id: accountId,
@@ -313,10 +342,10 @@ function App() {
     visitTutorialStep(tutorialStep + 1);
   };
   useEffect(() => {
-    if (loading || !profile || !horizon || tutorialOffered.current) return;
+    if (loading || !profile || !horizon || tutorialOffered.current || (visitState === 'RESUMED' && !returnDismissed) || resetIntent) return;
     tutorialOffered.current = true;
     if (!tutorialWasSeen()) { setTab('home'); setTutorialStep(0); }
-  }, [loading, profile, horizon]);
+  }, [loading, profile, horizon, visitState, returnDismissed, resetIntent]);
   useEffect(() => {
     if (tutorialStep === 4 && reviewOpen && transferResult) setTutorialStep(5);
   }, [tutorialStep, reviewOpen, transferResult]);
@@ -356,7 +385,7 @@ function App() {
           </div>
         </header>
         <main className="main-content">
-          <div className="page-intro"><div><h1>{title}</h1><p>{description}</p></div><details className="demo-context"><summary>บัญชีทดลอง · {persona.name}<ChevronDown size={15} /></summary><div className="demo-context-panel"><label htmlFor="persona">ลองเปลี่ยนโปรไฟล์</label><select id="persona" value={accountId} disabled={busy} onChange={(event) => changePersona(event.target.value)}>{personas.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.role}</option>)}</select><p>แอปต้นแบบอิสระ ใช้ข้อมูลสมมติ ไม่ใช่แอปทางการของ KBank</p><button className="text-link" disabled={busy || !profile} onClick={doReset}><RotateCcw size={15} /> รีเซ็ตบัญชีทดลอง</button></div></details></div>
+          <div className="page-intro"><div><h1>{title}</h1><p>{description}</p></div><details className="demo-context"><summary>บัญชีทดลอง · {persona.name}<ChevronDown size={15} /></summary><div className="demo-context-panel"><label htmlFor="persona">ลองเปลี่ยนโปรไฟล์</label><select id="persona" value={accountId} disabled={busy} onChange={(event) => changePersona(event.target.value)}>{personas.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.role}</option>)}</select><p>แอปต้นแบบอิสระ ใช้ข้อมูลสมมติ ไม่ใช่แอปทางการของ KBank</p><button className="text-link" disabled={busy || !profile} onClick={doReset}><RotateCcw size={15} /> กลับค่าเริ่มต้นของโปรไฟล์</button></div></details></div>
 
           <div className="demo-disclaimer"><ProtectionIcon size={14} /><span>แอปต้นแบบ · ข้อมูลสมมติ · ไม่มีการโอนเงินจริง</span></div>
           {api.pendingCommand() && <div className="message error" role="alert"><span>ยังมีคำสั่งที่ไม่ทราบผล อาจบันทึกสำเร็จแล้ว ระบบเก็บคำสั่งเดิมไว้และหยุดคำสั่งใหม่ กรุณาตรวจยอด/ประวัติและรับผลเดิม</span><button disabled={busy} onClick={retryCommand}>รับผลคำสั่งเดิม</button></div>}
@@ -365,7 +394,11 @@ function App() {
 
           {hidden ? <section className="surface privacy-cover"><EyeOff size={32} /><h2>ซ่อนข้อมูลการเงินแล้ว</h2><p>ยอดเงิน กราฟ และรายการต่าง ๆ จะกลับมาเมื่อคุณเลือกแสดงข้อมูล</p><button className="primary-button" onClick={() => setHidden(false)}>แสดงข้อมูลการเงิน <Eye size={17} /></button></section> : loading ? <div className="loading-card"><div className="spinner" /> กำลังโหลดข้อมูลจำลอง...</div> : profile && horizon ? <>
             {tab !== 'transfer' && isPendingTransfer(transferResult) && <div className="pending-transfer-banner"><ShieldAlert size={19} /><span>มีรายการรอตรวจสอบก่อนโอน · ยังไม่ได้หักเงิน</span><button className="text-link" onClick={showTransferReview}>กลับไปดูรายการ <ArrowRight size={16} /></button></div>}
-            {['home', 'plan', 'accounts', 'transactions', 'savings'].includes(tab) && <ScenarioPicker {...{horizon, busy, onScenario}} page={tab} pending={isPendingTransfer(transferResult)} onResume={showTransferReview}/>}
+            {visitState === 'RESUMED' && !returnDismissed && <section className="demo-return" aria-label="กลับมาใช้ข้อมูลทดลองเดิม"><strong>คุณกำลังใช้ข้อมูลจากการทดลองครั้งก่อน · {persona.name}</strong><p>ยอด บิล เงินออม และรายการยังอยู่ใน session นี้</p><div className="demo-actions"><button className="primary-button" onClick={dismissReturn}>ทดลองต่อ</button><button className="secondary-button" disabled={busy || destructiveBlocked()} onClick={doReset}>เริ่มใหม่</button></div></section>}
+            {visitState === 'EXPIRED' && <div className="demo-return" role="status"><p>session เดิมสิ้นสุดแล้ว เริ่ม session ใหม่พร้อมเงินจำลองตามค่าเริ่มต้น ไม่ได้กู้ยอดหรือรายการเดิมกลับมา</p><button className="text-link" onClick={() => setVisitState('ACTIVE')}>รับทราบ</button></div>}
+            {visitState === 'NEW' && <p className="small-note">เริ่มด้วยเงินจำลองของ {persona.name} · ลองเปิดการแยกเงินออม หรือเลือกผู้รับเพื่อดูผลก่อนโอน</p>}
+            <ScenarioPicker {...{horizon, busy, onScenario, doReset}} persona={persona.name} page={tab} pending={destructiveBlocked()} onResume={api.pendingCommand() ? retryCommand : showTransferReview}/>
+            <DemoMoneyContext {...{horizon, profile}}/>
             {tab === 'home' && <Dashboard profile={profile} horizon={horizon} activities={(profile.events || []).slice(0, 5).map(describeEvent)} hidden={hidden} setHidden={setHidden} openTab={openTab} tryScenario={tryScenario} {...{onPayBill, onWithdraw, onTransferSettings, startTutorial, busy}} />}
             {tab === 'transactions' && <TransactionsHub {...{profile, horizon, openTab, onPayBill, onWithdraw, onTransferSettings}}/>}
             {tab === 'profile' && <ProfilePage {...{persona, profile, openTab, onTransferSettings, doReset, busy, setHidden}}/>}
@@ -381,13 +414,14 @@ function App() {
               {transferResult && !isPendingTransfer(transferResult) && <button className="transfer-last-result text-link" onClick={() => setReviewOpen(true)}>ดูผลรายการล่าสุด <ArrowRight size={16} /></button>}
               <div className="transfer-workspace"><TransferForm profile={profile} persona={persona} recipients={recipients} recipient={recipient} amount={amount} setAmount={setAmount} changeRecipient={changeRecipient} clearResult={clearTransferResult} busy={busy} evaluate={evaluate} prepareHighValue={prepareHighValue} bills={(horizon.recurring_commitments || []).filter((bill) => bill.due_days < horizon.days_to_payday && bill.amount > 0)} matchedBillId={matchedBillId} setMatchedBillId={setMatchedBillId} transferPurpose={transferPurpose} setTransferPurpose={setTransferPurpose} telemetry={telemetry} setTelemetry={(value) => { setTelemetry(value); clearTransferResult(); }} /><div className="transfer-flow-note"><ProtectionIcon size={19} /><p>ผลการตรวจสอบจะแสดงในหน้าต่าง Pop-up · เมื่อยกเลิก รายการและเวลาพักนั้นจะสิ้นสุด รายการใหม่ใช้ค่าตั้งค่าปัจจุบัน</p></div></div>
             </>}
-            {reviewOpen && transferResult && <TransferReviewDialog busy={busy} pending={isPendingTransfer(transferResult)} canContactBank={transferResult.status === 'BLOCKED_MULE_INTERDICTION' || (transferResult.status === 'MICRO_AUTH_REQUIRED' && transferResult.risk_tier !== 'HIGH_VALUE_DEMO_CHECK')} error={error} onClose={() => setReviewOpen(false)} onSettings={editTransferSettings} onCancelTransfer={() => decide('CANCEL')}><TransferResult result={transferResult} {...{ amount, recipient, busy, clearanceToken, verify, decide, scanning, checkCooldown, evaluate }} cancelInFooter clear={clearTransferResult} /></TransferReviewDialog>}
+            {reviewOpen && transferResult && <TransferReviewDialog busy={busy} pending={isPendingTransfer(transferResult)} canContactBank={transferResult.status === 'BLOCKED_MULE_INTERDICTION' || (transferResult.status === 'MICRO_AUTH_REQUIRED' && transferResult.risk_tier !== 'HIGH_VALUE_DEMO_CHECK')} error={error} onClose={() => setReviewOpen(false)} onSettings={editTransferSettings} onCancelTransfer={() => decide('CANCEL')}><p className="review-scenario">สถานการณ์ทดลอง: {scenarioLabel(horizon.scenario)} · {persona.name} · เงินจำลอง</p><TransferResult result={transferResult} {...{ amount, recipient, busy, clearanceToken, verify, decide, scanning, checkCooldown, evaluate }} cancelInFooter clear={clearTransferResult} /></TransferReviewDialog>}
 
-          </> : null}
+          </> : <section className="surface" role="status"><p>ยังโหลดข้อมูลการเงินไม่สำเร็จ ไม่สามารถแสดงยอดได้</p><button className="primary-button" disabled={busy} onClick={() => window.location.reload()}>ลองโหลดข้อมูลอีกครั้ง</button></section>}
           <footer className="page-footer"><span>K-NEXUS · FlowSense × TrustGraph</span><span>Inspired by everyday banking · ไม่ใช่ผลิตภัณฑ์ทางการของ KBank</span></footer>
         </main>
         <nav className="mobile-nav" aria-label="เมนูหลักบนมือถือ">{navItems.map(({ id, label, icon: Icon }) => <button key={id} data-tab={id} className={navSection === id ? 'active' : ''} aria-label={label} aria-current={navSection === id ? 'page' : undefined} onClick={() => openTab(id)}><span className="nav-icon"><Icon size={21} strokeWidth={1.7}/></span><span>{label}</span></button>)}</nav>
       </div>
+      {resetIntent && <DemoResetDialog intent={resetIntent} persona={persona.name} busy={busy} error={error} blocked={destructiveBlocked()} onCancel={() => setResetIntent(null)} onConfirm={() => resetIntent === 'default' ? applyReset() : applyScenario(resetIntent)}/> }
       {tutorialStep !== null && !hidden && !loading && <TutorialOverlay stepIndex={tutorialStep} busy={busy} error={tutorialStep === 4 ? error : ''} onNext={nextTutorial} onBack={() => visitTutorialStep(tutorialStep - 1)} onSkip={() => closeTutorial('skipped')} nextLabel={tutorialStep === 4 ? (Number(profile?.main_balance) > 0 || isPendingTransfer(transferResult) ? 'ดูผลตรวจตัวอย่าง' : 'ไปดูวิธีถอนเงินออม') : undefined}/> }
     </div>
   );

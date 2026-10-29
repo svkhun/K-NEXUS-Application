@@ -1,0 +1,5 @@
+{
+  "version": "demo-opening.2026-10-30.1",
+  "description": "Synthetic opening only for new accounts and explicit persona reset. Reuses the existing healthy demo preset; engine computes budgets and savings. No mutation on GET/refresh.",
+  "opening_preset": "healthy"
+}

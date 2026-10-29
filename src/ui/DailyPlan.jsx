@@ -18,7 +18,7 @@ export function DailySummary({ horizon, openTab }) {
     <div className="today-budget-amount"><div><h2>วันนี้ใช้เพิ่มได้อีก</h2><strong>฿{money(horizon.remaining_today, 2)}</strong></div><button className="round-link" onClick={() => openTab('plan')} aria-label="ไปตั้งงบรายวัน"><ArrowRight size={21} /></button></div>
     <div className="today-budget-stats"><span>ใช้แล้ว <b>฿{money(horizon.spent_today, 2)}</b></span><span>จากงบ <b>฿{money(horizon.daily_safe_limit, 2)}</b></span></div>
     <div className="daily-progress" role="progressbar" aria-label="สัดส่วนงบวันนี้ที่ใช้ไป" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(used)}><i style={{ width: `${used}%` }} /></div>
-    <div className="today-budget-footer"><p>{reserveShort ? `บิลและเงินสำรองยังขาด ฿${money(horizon.budget_reserve_shortfall, 2)}` : horizon.remaining_today <= 0 ? 'ใช้ถึงงบวันนี้แล้ว ลองปรับแผนก่อนใช้เพิ่ม' : `กันบิลและเงินสำรองในแผนแล้ว · อีก ${horizon.days_to_payday} วันถึงเงินเดือน`}</p><button className="text-link" onClick={() => openTab('plan')}>ดูแผนเงินของฉัน <ArrowRight size={15} /></button></div>
+    <div className="today-budget-footer"><p>{reserveShort ? `บิลและเงินสำรองยังขาด ฿${money(horizon.budget_reserve_shortfall, 2)}` : horizon.remaining_today == null ? 'ยังไม่พร้อมแสดงงบใช้เพิ่มวันนี้ กรุณาลองโหลดข้อมูลอีกครั้ง' : horizon.remaining_today === 0 ? 'ใช้ถึงงบวันนี้แล้ว ลองปรับแผนก่อนใช้เพิ่ม' : `กันบิลและเงินสำรองในแผนแล้ว · อีก ${horizon.days_to_payday} วันถึงเงินเดือน`}</p><button className="text-link" onClick={() => openTab('plan')}>ดูแผนเงินของฉัน <ArrowRight size={15} /></button></div>
   </section>;
 }
 
@@ -35,8 +35,8 @@ function SpendingOutlook({ horizon, forecast }) {
 }
 
 export default function DailyPlan({ profile, horizon, forecast, busy, openTab, onWithdraw, onReservePreview, onReserveSave }) {
-  const recommended = Math.floor(horizon.daily_safe_limit);
-  const [amount, setAmount] = useState(String(recommended));
+  const recommended = horizon.daily_safe_limit == null ? null : Math.floor(horizon.daily_safe_limit);
+  const [amount, setAmount] = useState(recommended == null ? '' : String(recommended));
   const plan = useMemo(() => simulateDailyBudget(horizon, amount), [horizon, amount]);
   const outlook = spendingOutlook(forecast?.timeline, horizon.payday_date);
   const ceiling = Math.min(100000, Math.max(1000, Math.ceil(Math.max(horizon.daily_safe_limit * 2, outlook.average || 0) / 100) * 100));

@@ -11,6 +11,20 @@
 .scenario-choices button[aria-pressed=true] { background: #a3dbcd; border-color: #a3dbcd; color: #214c48; opacity: 1; cursor: default; }
 .kplus-experience .scenario-choices button:focus-visible, .kplus-experience .scenario-explorer summary:focus-visible { outline: 3px solid #a3dbcd; outline-offset: 3px; }
 .scenario-label-short { display: none; }
+.scenario-context { margin-bottom: 18px; border: 1px solid #80bfa660; border-radius: 12px; background: #173c36; color: #e5f4ed; }
+.scenario-active { padding: 14px 16px 0; line-height: 1.6; }
+.scenario-active strong { font-size: 14px; }
+.scenario-active p { margin: 4px 0; font-size: 12px; color: #c0d9d0; }
+.scenario-active .text-link { min-height: 44px; color: #b2edcf; }
+.scenario-context .scenario-explorer { margin: 0; border: 0; background: transparent; }
+.demo-return, .demo-money-context { margin-bottom: 16px; padding: 16px; background: #153834; color: #d6ebe3; border: 1px solid #91c6ad70; border-radius: 12px; line-height: 1.7; font-size: 13px; }
+.demo-return p, .demo-money-context p { margin: 5px 0; }
+.demo-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.demo-actions button { min-height: 44px; white-space: normal; }
+.demo-reset-dialog { max-width: min(540px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); overflow-y: auto; margin: auto; padding: 24px; border: 1px solid #86c5a8; border-radius: 16px; color: #e3f4ec; background: #143b32; line-height: 1.8; }
+.demo-reset-dialog::backdrop { background: #001a18bb; }
+.demo-reset-dialog h2 { font-size: 20px; }
+.review-scenario { padding: 12px; border: 1px solid #80bfa660; border-radius: 8px; font-size: 13px; }
 .scenario-info { flex-basis: 100%; font-size: 12px; color: #abc5ca; }
 .scenario-info summary { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
 .scenario-info[open] summary svg { transform: rotate(180deg); }
