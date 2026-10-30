@@ -1,0 +1,66 @@
+{
+  "run_id": 40932704431,
+  "url": "https://github.com/svkhun/K-NEXUS-Application/actions/runs/40932704431",
+  "commit": "46ad6e28c996e74dfd6c41171f7d79f1e17e0f55",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "name": "verify",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build and audit frontend",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install and audit backend",
+          "conclusion": "success"
+        },
+        {
+          "name": "Exercise API security boundary",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Render container and verify startup",
+          "conclusion": "success"
+        },
+        {
+          "name": "Container diagnostics and cleanup",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ]
+}

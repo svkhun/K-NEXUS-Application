@@ -1,0 +1,62 @@
+{
+  "status": "PASS",
+  "personas": [
+    {
+      "account_id": "ACC_0100",
+      "method": "SCENARIO",
+      "daily_thb": 350,
+      "N": 0,
+      "source": "config/baseline-personas.v1.json",
+      "version": "synthetic-persona-assumptions.2026-10-29.1",
+      "as_of": "2026-10-30T01:44:26.177191+07:00",
+      "projection_start": "2026-10-31",
+      "status": "PASS",
+      "preference_no_debit": true,
+      "saving_replay_withdrawal": true,
+      "transfer_review_basis": true,
+      "stale_review_rejected": true,
+      "normal_transfer_replay_one_debit": true,
+      "cooldown_enforced_and_cancelled": true,
+      "blocked_policy": true,
+      "csrf_enforced": true
+    },
+    {
+      "account_id": "ACC_0101",
+      "method": "SCENARIO",
+      "daily_thb": 600,
+      "N": 0,
+      "source": "config/baseline-personas.v1.json",
+      "version": "synthetic-persona-assumptions.2026-10-29.1",
+      "as_of": "2026-10-30T01:44:28.272016+07:00",
+      "projection_start": "2026-10-31",
+      "status": "PASS",
+      "preference_no_debit": true,
+      "saving_replay_withdrawal": true,
+      "transfer_review_basis": true,
+      "stale_review_rejected": true,
+      "normal_transfer_replay_one_debit": true,
+      "cooldown_enforced_and_cancelled": true,
+      "blocked_policy": true,
+      "csrf_enforced": true
+    },
+    {
+      "account_id": "ACC_0150",
+      "method": "SCENARIO",
+      "daily_thb": 300,
+      "N": 0,
+      "source": "config/baseline-personas.v1.json",
+      "version": "synthetic-persona-assumptions.2026-10-29.1",
+      "as_of": "2026-10-30T01:44:30.324628+07:00",
+      "projection_start": "2026-10-31",
+      "status": "PASS",
+      "preference_no_debit": true,
+      "saving_replay_withdrawal": true,
+      "transfer_review_basis": true,
+      "stale_review_rejected": true,
+      "normal_transfer_replay_one_debit": true,
+      "cooldown_enforced_and_cancelled": true,
+      "blocked_policy": true,
+      "csrf_enforced": true
+    }
+  ]
+}

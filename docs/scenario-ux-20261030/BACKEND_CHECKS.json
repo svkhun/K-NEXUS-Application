@@ -1,0 +1,172 @@
+{
+  "test_baseline_integration.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 11,
+    "passed": 11,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [],
+    "seconds": 3.64
+  },
+  "test_daily_budget.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [],
+    "seconds": 0.69
+  },
+  "test_features.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 7,
+    "passed": 7,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [],
+    "seconds": 4.1
+  },
+  "test_flowsense_vnext.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 38,
+    "passed": 38,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [],
+    "seconds": 1.18
+  },
+  "test_flowsense_vnext_proposed3.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 12,
+    "passed": 12,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [],
+    "seconds": 2.04
+  },
+  "test_flowsense_vnext_proposed4.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 13,
+    "passed": 13,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [],
+    "seconds": 2.56
+  },
+  "test_handoff_integration.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 9,
+    "passed": 9,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [
+      {
+        "test": "test_handoff_integration.PackageIntegrityTests.test_approved_package_contract_and_reference_shapes",
+        "status": "NOT_RUN",
+        "reason": "Full research package/parity/legacy inference outside runtime distribution; runtime integrity checked separately"
+      },
+      {
+        "test": "test_handoff_integration.PackageIntegrityTests.test_corrupted_hash_mixed_embedding_and_changed_manifest_rejected",
+        "status": "NOT_RUN",
+        "reason": "Full research package/parity/legacy inference outside runtime distribution; runtime integrity checked separately"
+      },
+      {
+        "test": "test_handoff_integration.PackageIntegrityTests.test_legacy_rollback_loads_only_its_original_pair",
+        "status": "NOT_RUN",
+        "reason": "Full research package/parity/legacy inference outside runtime distribution; runtime integrity checked separately"
+      }
+    ],
+    "seconds": 3.29
+  },
+  "test_release_runtime.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 3,
+    "passed": 3,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [],
+    "seconds": 2.65
+  },
+  "test_reserve_preference.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 5,
+    "passed": 5,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [],
+    "seconds": 3.08
+  },
+  "test_savings_flow.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 8,
+    "passed": 8,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [],
+    "seconds": 3.4
+  },
+  "test_scenario_ux.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [],
+    "seconds": 3.66
+  },
+  "test_security.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 13,
+    "passed": 13,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [],
+    "seconds": 5.23
+  },
+  "test_transfer_cooldown.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 10,
+    "passed": 10,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [],
+    "seconds": 3.64
+  },
+  "test_transfer_planning.py": {
+    "status": "PASS",
+    "exit_code": 0,
+    "tests": 13,
+    "passed": 13,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not_run": [],
+    "seconds": 3.6
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "commit": {
+    "createdAt": "2026-10-29T18:38:26Z",
+    "id": "46ad6e28c996e74dfd6c41171f7d79f1e17e0f55",
+    "message": "Clarify active demo scenarios and safely resume or restart persona experiments"
+  },
+  "createdAt": "2026-10-29T18:39:49.232911Z",
+  "finishedAt": "2026-10-29T18:40:33.063679Z",
+  "id": "dep-dbhp5ta9lscs73a3uaqg",
+  "startedAt": "2026-10-29T18:39:49.201483Z",
+  "status": "live",
+  "trigger": "new_commit",
+  "updatedAt": "2026-10-29T18:41:02.671417Z"
+}

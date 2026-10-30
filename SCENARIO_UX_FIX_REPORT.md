@@ -1,6 +1,6 @@
 # Scenario UX/state fix — 30 October 2026 (Asia/Bangkok)
 
-Status: implementation and local verification complete; commit, CI, deploy and public QA pending below. All money is synthetic.
+Status: DEPLOYED — public HTTP and browser QA passed within the recorded scope. All money is synthetic.
 
 ## Confirmed root cause and release target
 
@@ -40,4 +40,15 @@ To roll back this UX release, revert only its reviewed source changes on the sam
 
 ## Publication evidence
 
-Pending: final commit/source hash, CI URL/conclusion, Render deploy terminal status, identity/assets and fresh independent-cookie public HTTP matrix, public desktop/narrow browser flow, preservation check. Evidence will be appended after observed completion.
+- Public URL: https://k-nexus-app.onrender.com/ ; identity: https://k-nexus-app.onrender.com/release.json .
+- Runtime commit: `46ad6e28c996e74dfd6c41171f7d79f1e17e0f55`; release ID `application-scenario-ux-20261030.1`; source SHA-256 `d6c7cb803e01798b5f6f5cf4c10644107490e2cb0392a72949d8a71bcf4b766e`. All 78 source input hashes match committed Git blobs; local line endings were normalized to committed bytes before the final identity check. Built assets match public bytes. BASELINE, FlowSense ML false, only TrustGraph loaded, original manifest pin unchanged.
+- CI run **40932704431 SUCCESS**: https://github.com/svkhun/K-NEXUS-Application/actions/runs/40932704431 . Fresh Linux build/audits, frontend/backend regressions, Docker build and startup all succeeded.
+- Render deploy **dep-dbhp5ta9lscs73a3uaqg**, terminal **live**, trigger `new_commit`, started 2026-10-29T18:39:49.201483Z, finished 2026-10-29T18:40:33.063679Z (01:40:33 on 30 October Bangkok). One automatic deployment; no manual/duplicate trigger. Service branch/checksPass/free one-instance configuration reconfirmed unchanged after deployment.
+- Fresh independent-cookie public HTTP: 3/3 personas PASS. Opening main/daily available/max save in THB: May 28,100 / 291.03 / 500; Non 45,160 / 455.17 / 500; Praew 28,820 / 271.72 / 500. Risk preset main balances 5,085 / 10,782 / 4,374 remain positive while daily available is true zero. Resume preserves balances/bills/events; reset is persona-scoped; savings retry debits once and total main+vault is conserved.
+- Additional public financial/security protocol: 3/3 persona sessions PASS for shared assumption provenance, savings/replay/withdrawal, stale-review rejection, normal transfer retry one debit, unchanged risky cooldown enforcement and cancel, blocked account policy and CSRF. The original baseline static verifier hardcodes its old release ID; only its unchanged persona functional helper was reused. New scenario verifier checks the new release identity.
+- Public browser PASS within scope: actual desktop 1280×720 and narrow 319×764; narrow document width/scroll width both 304, with no horizontal overflow. Verified active situation across home/financial/savings/transfer, risk zero explanation alongside positive main/vault, refresh/continue, native confirmation/reset, all three personas and selected persona persistence on refresh. Review shows active situation and distinct spending assumption; pending review disables reset and can be revisited/cancelled. Captured console warnings/errors: none in tested tabs. Browser server session after deployment was new and explicitly reported old session expiry rather than restored state.
+- Browser screenshots remain local under `artifacts/scenario-ux/public-desktop.jpg` and `public-narrow.jpg`. Machine-readable evidence committed under `docs/scenario-ux-20261030/`: CI, deploy, public HTTP, public security, browser scope, backend checks and preservation.
+- A first public harness attempt fetched `/index.html`, which is intentionally not an exposed server route; corrected the harness to request `/` like the existing verifier. All declared public assets then passed hashes. No server routing change or second runtime deployment was needed.
+- Final preservation PASS: original 1,626 files plus original main HEAD and index entries unchanged; approved runtime artifacts, engine/policy and contract semantics unchanged. Only this requested new report is copied back to the original checkout; existing reports/handoff/dirty work remain untouched.
+- NOT_RUN: physical devices and risky completion after 15-minute cooldown; forced public network-error/unknown injection and public history fixture mutation. Unknown/null/loading handling is covered by real component/journal tests, server ambiguity/expiry tests and browser-observed loading; no claim that unit tests establish browser network-error PASS. Three full research-package/legacy checks remain explicitly NOT_RUN, with runtime integrity checks passing.
+- Final evidence/harness correction is a documentation/test-only follow-up using `[skip render]`; the deployed runtime remains the commit and source hash above. No further deployment is needed for evidence files.

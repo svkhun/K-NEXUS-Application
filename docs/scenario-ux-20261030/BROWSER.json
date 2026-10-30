@@ -1,0 +1,38 @@
+{
+  "status": "PASS_WITHIN_RECORDED_SCOPE",
+  "url": "https://k-nexus-app.onrender.com/",
+  "runtime_commit": "46ad6e28c996e74dfd6c41171f7d79f1e17e0f55",
+  "desktop_viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "narrow_viewport": {
+    "width": 319,
+    "height": 764,
+    "document_client_width": 304,
+    "document_scroll_width": 304
+  },
+  "observed": [
+    "new server session after deployment explicitly described expired old cookie instead of restored data",
+    "active situation matches server values across home/plan/savings/transfer",
+    "risk main balance 5085, vault 10694.48, daily allowance 0 with bills/reserve explanation",
+    "refresh and Continue preserve values",
+    "native restart confirmation explains selected persona scope",
+    "reset restores default and allows small saving/transfer",
+    "pending transfer review disables reset; return to review and cancel works",
+    "review dialog shows active situation and distinct spending assumption",
+    "May/Non/Praew switching and selected Praew retained after refresh",
+    "returning to May retains her explicit reset default",
+    "no captured console warning/error in tested tabs"
+  ],
+  "screenshots": [
+    "artifacts/scenario-ux/public-desktop.jpg",
+    "artifacts/scenario-ux/public-narrow.jpg"
+  ],
+  "not_run": [
+    "physical devices",
+    "15-minute risky completion",
+    "public forced network-error/unknown injection; covered by frontend journal/component tests and HTTP regression instead",
+    "public HISTORY/ABSTAIN history injection; no public fixture endpoint"
+  ]
+}

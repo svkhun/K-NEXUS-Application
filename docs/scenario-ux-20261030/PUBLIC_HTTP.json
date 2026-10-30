@@ -1,0 +1,53 @@
+{
+  "status": "PASS",
+  "identity": {
+    "release_id": "application-scenario-ux-20261030.1",
+    "deployed_commit": "46ad6e28c996e74dfd6c41171f7d79f1e17e0f55",
+    "source_sha256": "d6c7cb803e01798b5f6f5cf4c10644107490e2cb0392a72949d8a71bcf4b766e",
+    "demo_initialization_version": "demo-opening.2026-10-30.1",
+    "baseline_mode": "BASELINE",
+    "flowsense_model_enabled": false,
+    "loaded_models": [
+      "trustgraph"
+    ],
+    "package_manifest_sha256": "d73fd16f7f4e304c6a00900b1771d09c09aa6136f49b98a951409200d1931b4a"
+  },
+  "personas": [
+    {
+      "account": "ACC_0100",
+      "status": "PASS",
+      "opening_balance": 28100.0,
+      "opening_budget": 291.03,
+      "opening_max_save": 500.0,
+      "risk_balance": 5085.0,
+      "risk_budget": 0.0,
+      "resume_preserved": true,
+      "reset_scoped": true,
+      "sweep_retry_single_debit": true
+    },
+    {
+      "account": "ACC_0101",
+      "status": "PASS",
+      "opening_balance": 45160.0,
+      "opening_budget": 455.17,
+      "opening_max_save": 500.0,
+      "risk_balance": 10782.0,
+      "risk_budget": 0.0,
+      "resume_preserved": true,
+      "reset_scoped": true,
+      "sweep_retry_single_debit": true
+    },
+    {
+      "account": "ACC_0150",
+      "status": "PASS",
+      "opening_balance": 28820.0,
+      "opening_budget": 271.72,
+      "opening_max_save": 500.0,
+      "risk_balance": 4374.0,
+      "risk_budget": 0.0,
+      "resume_preserved": true,
+      "reset_scoped": true,
+      "sweep_retry_single_debit": true
+    }
+  ]
+}

@@ -17,7 +17,7 @@ def run(base, commit, source):
         assert identity['loaded_models'] == ['trustgraph']
         assert identity['demo_initialization_version'] == 'demo-opening.2026-10-30.1'
         for name, digest in identity['assets'].items():
-            asset = public.get('/'+name)
+            asset = public.get('/' if name == 'index.html' else '/'+name)
             assert asset.status_code == 200
             assert hashlib.sha256(asset.content).hexdigest() == digest
     for account in ('ACC_0100', 'ACC_0101', 'ACC_0150'):
